@@ -84,7 +84,7 @@ bool checkRecurringDecimal(const mpreal& x, unsigned& period) {
 	// n-1: non-recurring digits
 	// repeated part: a(n) ... a(n+p-1)
 	// p: period
-	// N: precision digits minus # of digits of M
+	// N: digits of fraction part: precision digits minus # of digits of M
 	//
 	// 10^p x = M1 + 0.a(p+1) a(p+2) a(p+3)..a(n-1+p) a(n+p) a(n+p+1)..a(n+2p+1)a(n+2p)...aN     0    ....   0
 	//      x = M  + 0.a1     a2     a3..... a(n-1)   an     a(n+1)... a(n+p-1) a(n+p)....a(N-p) a(N-p+1)... aN
@@ -103,32 +103,27 @@ bool checkRecurringDecimal(const mpreal& x, unsigned& period) {
 	// n-1 + 2p <= N ie n <= N-2p+1 (3)
 	// When (1) and (3) are compared, because p >= 1, the condition (2) is strictor: n_max = N-2p
 	// When n = n_max = N-2p+1,
-	// (2) becomes
-	// {(10^p-1)x*10^(N-2p)} < 10^(-p)
 	mpreal zero = (mpreal)(0.);
-	const auto eff_digits = digits - (int)(mpfr::max(zero, mpfr::floor(mpfr::log10(x))));
-	const auto N = (mpreal)(eff_digits);
+	const auto eff_digits = x >= 1. ? (digits - 1 - (int)(mpfr::max(zero, mpfr::floor(mpfr::log10(x))))) : digits;
+	const auto N = (unsigned)(eff_digits);
 	mpreal one = (mpreal)(1.);
-	mpreal ten = (mpreal)(10.);
-	mpreal ten_N = mpfr::exp10(N);
-	mpreal ten_p = mpreal(10.); // just an initial value
-	mpreal ten_Nm2p = ten_N; // just an initial value
-	mpreal threshold = one; // just an initial value
-	mpreal zero_point_one = (mpreal)(0.1);
+	mpreal ten_N = mpfr::exp10(mpreal(N));
+	mpreal ten_p;
+	mpreal ten_nm1;
+	mpreal ten_nmNpm1;
 	for (unsigned p_i = 1; p_i <= digits/2; ++p_i) {
-		ten_p *= ten;
-		ten_Nm2p *= (zero_point_one * zero_point_one);
-		threshold *= zero_point_one;
-		//const auto ten_p_m_one = (ten_p - one);
-		//std::cout << ten_p_m_one << std::endl;
-		//const auto x_ten_p_m_one = (ten_p - one) * x;
-		//std::cout << x_ten_p_m_one << std::endl;
-		const auto z = (ten_p - one) * x * ten_Nm2p;
-		//std::cout << z << std::endl;
-		const auto z_fraction = z - mpfr::trunc(z); // remove integer part
-		if (-threshold < z_fraction && z_fraction < threshold) {
-			period = p_i;
-			return true;
+		ten_p = mpfr::exp10(mpreal(p_i));
+		unsigned n_max = N - 2*p_i + 1;
+		for(unsigned n = 0; n <= n_max; ++n) {
+			ten_nm1 = mpfr::exp10(n-1);
+			ten_nmNpm1 = mpfr::exp10(n-N+p_i-1);
+			const auto z = (ten_p - one) * x * ten_nm1;
+			//std::cout << z << std::endl;
+			const auto z_fraction = z - mpfr::trunc(z); // remove integer part
+			if (-ten_nmNpm1 < z_fraction && z_fraction < ten_nmNpm1) {
+				period = p_i;
+				return true;
+			}
 		}
 	}
 	period = 0;

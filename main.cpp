@@ -78,7 +78,7 @@ void test_multithreading_trigonometric_functions()
 	t2.join();
 }
 
-bool checkRecurringDecimal(const mpreal& x, unsigned& period) {
+bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	// suppose x = M + 0.a(1)a(2)a(3).....a(n-1) a(n) a(n+1)...a(n+p-1) a(n+p)....a(N)
 	// M: integer
 	// n-1: non-recurring digits
@@ -105,28 +105,30 @@ bool checkRecurringDecimal(const mpreal& x, unsigned& period) {
 	// When n = n_max = N-2p+1,
 	mpreal zero = (mpreal)(0.);
 	const auto eff_digits = x >= 1. ? (digits - 1 - (int)(mpfr::max(zero, mpfr::floor(mpfr::log10(x))))) : digits;
-	const auto N = (unsigned)(eff_digits);
+	const auto N = (int)(eff_digits);
 	mpreal one = (mpreal)(1.);
 	mpreal ten_N = mpfr::exp10(mpreal(N));
 	mpreal ten_p;
 	mpreal ten_nm1;
 	mpreal ten_nmNpm1;
-	for (unsigned p_i = 1; p_i <= digits/2; ++p_i) {
+	for (int p_i = 1; p_i <= digits/2; ++p_i) {
 		ten_p = mpfr::exp10(mpreal(p_i));
-		unsigned n_max = N - 2*p_i + 1;
-		for(unsigned n = 0; n <= n_max; ++n) {
-			ten_nm1 = mpfr::exp10(n-1);
-			ten_nmNpm1 = mpfr::exp10(n-N+p_i-1);
+		int n_max = N - 2*p_i + 1;
+		for(int n_j = 1; n_j <= n_max; ++n_j) {
+			ten_nm1 = mpfr::exp10(n_j-1);
+			ten_nmNpm1 = mpfr::exp10(n_j-N+p_i-1);
 			const auto z = (ten_p - one) * x * ten_nm1;
 			//std::cout << z << std::endl;
 			const auto z_fraction = z - mpfr::trunc(z); // remove integer part
 			if (-ten_nmNpm1 < z_fraction && z_fraction < ten_nmNpm1) {
 				period = p_i;
+				n = n_j;
 				return true;
 			}
 		}
 	}
 	period = 0;
+	n = 0;
 	return false;
 }
 int main()
@@ -134,11 +136,13 @@ int main()
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
 	std::cout.precision(digits);
 
-	//const mpreal x = (mpreal)(7777768117.11) + (mpreal)(2.) / (mpreal)(71.) / (mpreal)(100.);
-	const mpreal x = mpfr::const_pi();
-	unsigned p;
-	bool r = checkRecurringDecimal(x, p);
+	const mpreal x = (mpreal)(7777768117.11) + (mpreal)(2.) / (mpreal)(71.) / (mpreal)(100.);
+	// const mpreal x = mpfr::const_pi();
+	int p, n;
+	bool r = checkRecurringDecimal(x, p, n);
 	std::cout << "x: " << x << std::endl;
+	std::cout << "p: " << p << std::endl;
+	std::cout << "n: " << n << std::endl;
 	std::cout << "recurring decimal?: " << (r ? "true" : "false") << ", period: " << p << std::endl;
 	//test_mpreal();
 

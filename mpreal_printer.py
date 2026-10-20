@@ -30,7 +30,7 @@ def _mpfr_to_string(m):
     mant = 0
     for i in range(n):
         mant |= int(d[i].cast(ul)) << (64 * i)
-    digits = int(prec * 0.30103) + 3
+    digits = int(prec * 0.30103)
     with localcontext() as c:
         c.prec = digits + 20
         c.Emax = 999999999999999999; c.Emin = -999999999999999999

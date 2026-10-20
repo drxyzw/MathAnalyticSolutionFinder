@@ -84,7 +84,12 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	// n-1: non-recurring digits
 	// repeated part: a(n) ... a(n+p-1)
 	// p: period
-	// N: digits of fraction part: precision digits minus # of digits of M
+	// N: digits of fraction part: precision digits minus # of digits of M minus ERROR_BUFFER
+	//
+	// Transformation:
+	// x --> x / 10^[# of digits of M]
+	// N --> [precision digits]
+	// n-1 --> non-recurring digits of updated x
 	//
 	// 10^p x = M1 + 0.a(p+1) a(p+2) a(p+3)..a(n-1+p) a(n+p) a(n+p+1)..a(n+2p+1)a(n+2p)...aN     0    ....   0
 	//      x = M  + 0.a1     a2     a3..... a(n-1)   an     a(n+1)... a(n+p-1) a(n+p)....a(N-p) a(N-p+1)... aN
@@ -99,29 +104,45 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	// |{(10^p-1)x*10^(n-1)}| < 10^(n-N+p-1) (2)
 	// where {X} = X - [X]* and [X]* is the closest integer 
 	// This is a condition for a recurring decimal
-	// at least, we require 2 periods to be detected as recurring decimal:
+	//
+	// At least, we require 2 periods to be detected as recurring decimal:
 	// (non-recurring digits) + (2 periods)
 	// n-1 + 2p <= N ie n <= N-2p+1 (3)
 	// When (1) and (3) are compared, because p >= 1, the condition (2) is strictor: n_max = N-2p
-	// When n = n_max = N-2p+1,
-	mpreal zero = (mpreal)(0.);
-	const auto eff_digits = x >= 1. ? (digits - 1 - (int)(mpfr::max(zero, mpfr::floor(mpfr::log10(x))))) : digits;
-	const auto N = (int)(eff_digits);
-	mpreal one = (mpreal)(1.);
-	mpreal half = mpreal(0.5);
-	mpreal ten_p;
+	// Hence n_max = N-2p+1
+	// Another condition is MIN_RECURRING_DIGITS
+	// n + MIN_RECURRING_DIGITS <= N
+	// n_max = N - MIN_RECURRING_DIGITS
+	// n_max = min(N-2p+1, N - MIN_RECURRING_DIGITS)
+	//
+	// p <= MAX_PERIOD
+	//
+	// Because the final digit has truncation error and + multiplication / division
+	// --> erro second last digit --> keep 3 digits for a buffer
+	int ERROR_BUFFER = 3;
+	const mpreal zero = (mpreal)(0.);
+	const mpreal one = (mpreal)(1.);
+	const mpreal ten = (mpreal)(10.);
+	const mpreal zero_one = (mpreal)(0.1);
+	const mpreal digits_x_int = mpfr::max(zero, one + mpfr::floor(mpfr::log10(mpfr::abs(x))));
+	const mpreal x_tf = x * mpfr::exp10(-digits_x_int);
+	const int N = digits - ERROR_BUFFER;
+	mpreal ten_p = one; // initial value
 	mpreal ten_nm1;
 	mpreal ten_nmNpm1;
-	for (int p_i = 1; p_i <= digits/2; ++p_i) {
-		ten_p = mpfr::exp10(mpreal(p_i));
-		int n_max = N - 2*p_i + 1;
+	const int MIN_RECURRING_DIGITS = (int)(N/2);
+	const int MAX_PERIOD = (int)(N/2);
+	for (int p_i = 1; p_i <= MAX_PERIOD; ++p_i) {
+		ten_p *= ten;
+		const int n_max = std::min(N - MIN_RECURRING_DIGITS, N - 2*p_i + 1);
+		ten_nm1 = zero_one;
+		ten_nmNpm1 = mpfr::exp10(-N+p_i-1);
 		for(int n_j = 1; n_j <= n_max; ++n_j) {
-			ten_nm1 = mpfr::exp10(n_j-1);
-			ten_nmNpm1 = mpfr::exp10(n_j-N+p_i-1);
-			mpreal one_ten_nmNpm1 = one + ten_nmNpm1;
-			const auto z = ((ten_p * x)- (one * x))  * ten_nm1;
+			ten_nm1 *= ten;
+			ten_nmNpm1 *= ten;
+			const mpreal z = (ten_p - one) * x_tf * ten_nm1;
 			//std::cout << z << std::endl;
-			const auto z_fraction = z - mpfr::trunc(z + half); // remove integer part
+			const mpreal z_fraction = z - mpfr::round(z); // remove integer part
 			if (-ten_nmNpm1 < z_fraction && z_fraction < ten_nmNpm1) {
 				period = p_i;
 				n = n_j;
@@ -138,9 +159,10 @@ int main()
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
 	std::cout.precision(digits);
 
-	const mpreal x = (mpreal)(2.) / (mpreal)(3.);
+	// const mpreal x = (mpreal)(2.) / (mpreal)(3.);
 	// const mpreal x = (mpreal)(7777768117.11) + (mpreal)(2.) / (mpreal)(71.) / (mpreal)(100.);
 	// const mpreal x = mpfr::const_pi();
+	const mpreal x = mpfr::sqrt(6);
 	int p, n;
 	bool r = checkRecurringDecimal(x, p, n);
 	std::cout << "x: " << x << std::endl;

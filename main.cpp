@@ -14,7 +14,7 @@
 
 using mutex_t = std::mutex;
 mutex_t mutex;
-const int digits = 500;
+const int digits = 50;
 using mpfr::mpreal;
 
 void test_mpreal()
@@ -97,6 +97,7 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	// {(10^p-1)x*10(n-1)} = - a(N-p+1)*10^(n-N+p-2) - a(N-p+2)*10^(n-N+p-3) ... - aN*10^(n-N-1)
 	// (as long as n-N+p-2 <= -1 ie n <= N-p+1 (1))
 	// |{(10^p-1)x*10^(n-1)}| < 10^(n-N+p-1) (2)
+	// where {X} = X - [X]* and [X]* is the closest integer 
 	// This is a condition for a recurring decimal
 	// at least, we require 2 periods to be detected as recurring decimal:
 	// (non-recurring digits) + (2 periods)
@@ -107,7 +108,7 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	const auto eff_digits = x >= 1. ? (digits - 1 - (int)(mpfr::max(zero, mpfr::floor(mpfr::log10(x))))) : digits;
 	const auto N = (int)(eff_digits);
 	mpreal one = (mpreal)(1.);
-	mpreal ten_N = mpfr::exp10(mpreal(N));
+	mpreal half = mpreal(0.5);
 	mpreal ten_p;
 	mpreal ten_nm1;
 	mpreal ten_nmNpm1;
@@ -117,9 +118,10 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 		for(int n_j = 1; n_j <= n_max; ++n_j) {
 			ten_nm1 = mpfr::exp10(n_j-1);
 			ten_nmNpm1 = mpfr::exp10(n_j-N+p_i-1);
-			const auto z = (ten_p - one) * x * ten_nm1;
+			mpreal one_ten_nmNpm1 = one + ten_nmNpm1;
+			const auto z = ((ten_p * x)- (one * x))  * ten_nm1;
 			//std::cout << z << std::endl;
-			const auto z_fraction = z - mpfr::trunc(z); // remove integer part
+			const auto z_fraction = z - mpfr::trunc(z + half); // remove integer part
 			if (-ten_nmNpm1 < z_fraction && z_fraction < ten_nmNpm1) {
 				period = p_i;
 				n = n_j;
@@ -136,7 +138,8 @@ int main()
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
 	std::cout.precision(digits);
 
-	const mpreal x = (mpreal)(7777768117.11) + (mpreal)(2.) / (mpreal)(71.) / (mpreal)(100.);
+	const mpreal x = (mpreal)(2.) / (mpreal)(3.);
+	// const mpreal x = (mpreal)(7777768117.11) + (mpreal)(2.) / (mpreal)(71.) / (mpreal)(100.);
 	// const mpreal x = mpfr::const_pi();
 	int p, n;
 	bool r = checkRecurringDecimal(x, p, n);

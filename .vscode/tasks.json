@@ -8,14 +8,16 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-std=c++17",
-                "${file}",
+                "${workspaceFolder}/main.cpp",
+                "${workspaceFolder}/test.cpp",
+                "${workspaceFolder}/check_recurring_decimal.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
+                "${workspaceFolder}/main",
                 "-lmpfr",
                 "-lgmp"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"

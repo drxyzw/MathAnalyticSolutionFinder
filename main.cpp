@@ -6,6 +6,10 @@
 #include <fstream>
 #include <thread>
 #include <mutex>
+#include <chrono>
+#include <string>
+#include <algorithm>
+#include <gmpxx.h>
 #if __has_include(<gmp_util.h>)
 #include <gmp_util.h>
 #else
@@ -154,6 +158,58 @@ bool checkRecurringDecimal(const mpreal& x, int& period, int& n) {
 	n = 0;
 	return false;
 }
+
+// Same test as checkRecurringDecimal, done in exact integer arithmetic.
+// In checkRecurringDecimal, x_tf = x / 10^D can be negative and z = (10^p-1) * x_tf * 10^(n-1).
+// Here y = |x| / 10^D >= 0, so z' = (10^p-1) * y * 10^(n-1) = |z|.
+// |{z}| = |{z'}| because the distance to the nearest integer is the same for z and -z,
+// so the test can use z' >= 0.
+// A has target digits as integer
+// A = round(y * 10^digits) >= 0, B = (10^p-1) * A >= 0.
+// z' * 10^(digits-n+1) = (10^p-1) * y * 10^digits = B (up to the rounding of A), so
+// |{z'}| < 10^(n-N+p-1)  <=>  B is within 10^j of a multiple of 10^k
+// where j = p + ERROR_BUFFER and k = digits - n + 1,
+// i.e. the decimal digits of B at positions j..k-1 (from the right) are all 0 or all 9.
+// The smallest n comes from the longest such run, so no loop over n is needed.
+bool checkRecurringDecimalFast(const mpreal& x, int& period, int& n) {
+	const int ERROR_BUFFER = 3;
+	const mpreal zero = (mpreal)(0.);
+	const mpreal one = (mpreal)(1.);
+	const mpreal digits_x_int = mpfr::max(zero, one + mpfr::floor(mpfr::log10(mpfr::abs(x))));
+	const mpreal y = mpfr::abs(x) * mpfr::exp10(-digits_x_int);
+	const mpreal scaled = y * mpfr::exp10(mpreal(digits));
+	mpz_class A;
+	mpfr_get_z(A.get_mpz_t(), scaled.mpfr_srcptr(), MPFR_RNDN);
+	const int N = digits - ERROR_BUFFER;
+	const int MIN_RECURRING_DIGITS = (int)(N/2);
+	const int MAX_PERIOD = (int)(N/2);
+	mpz_class ten_p = 1;
+	for (int p_i = 1; p_i <= MAX_PERIOD; ++p_i) {
+		ten_p *= 10;
+		const int n_max = std::min(N - MIN_RECURRING_DIGITS, N - 2*p_i + 1);
+		const mpz_class B = A * ten_p - A;
+		const std::string s = B.get_str();
+		// j-th digit from the right; positions above the top digit are 0
+		auto digit_at = [&s](int j) { return j < (int)s.size() ? s[s.size() - 1 - j] : '0'; };
+		const int j = p_i + ERROR_BUFFER;
+		const char c = digit_at(j);
+		if (c != '0' && c != '9')
+			continue;
+		int k = j;
+		while (k < digits && digit_at(k) == c)
+			++k;
+		const int n_j = digits + 1 - k;
+		if (n_j <= n_max) {
+			period = p_i;
+			n = n_j;
+			return true;
+		}
+	}
+	period = 0;
+	n = 0;
+	return false;
+}
+
 int main()
 {
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
@@ -164,11 +220,20 @@ int main()
 	// const mpreal x = mpfr::const_pi();
 	const mpreal x = mpfr::sqrt(6);
 	int p, n;
+	auto t0 = std::chrono::steady_clock::now();
 	bool r = checkRecurringDecimal(x, p, n);
+	auto t1 = std::chrono::steady_clock::now();
+	int p_fast, n_fast;
+	bool r_fast = checkRecurringDecimalFast(x, p_fast, n_fast);
+	auto t2 = std::chrono::steady_clock::now();
 	std::cout << "x: " << x << std::endl;
 	std::cout << "p: " << p << std::endl;
 	std::cout << "n: " << n << std::endl;
 	std::cout << "recurring decimal?: " << (r ? "true" : "false") << ", period: " << p << std::endl;
+	std::cout << "fast: recurring decimal?: " << (r_fast ? "true" : "false") << ", period: " << p_fast << ", n: " << n_fast
+		<< ((r == r_fast && p == p_fast && n == n_fast) ? " (same)" : " (DIFFERENT)") << std::endl;
+	std::cout << "elapsed: original " << std::chrono::duration<double, std::milli>(t1 - t0).count() << " ms, fast "
+		<< std::chrono::duration<double, std::milli>(t2 - t1).count() << " ms" << std::endl;
 	//test_mpreal();
 
 	//test_multithreading_trigonometric_functions();

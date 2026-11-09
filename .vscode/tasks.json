@@ -11,6 +11,7 @@
                 "${workspaceFolder}/main.cpp",
                 "${workspaceFolder}/test.cpp",
                 "${workspaceFolder}/check_recurring_decimal.cpp",
+                "${workspaceFolder}/pslq.cpp",
                 "-o",
                 "${workspaceFolder}/main",
                 "-lmpfr",

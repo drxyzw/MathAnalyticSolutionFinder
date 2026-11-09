@@ -5,7 +5,9 @@
 
 int main()
 {
-	test_check_recurring_decimal_performance();
+	//test_check_recurring_decimal_performance();
+
+	test_pslq_apery_over_pi_cubed();
 
 	//test_mpreal();
 

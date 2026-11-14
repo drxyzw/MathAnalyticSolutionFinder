@@ -1,0 +1,961 @@
+NOTE: targets y = f(zeta3 * pi^k), k in {-3,-2,-1,0}. (A) multiplicative basis n=13, (B) additive basis n=14. [CHECK] jobs use x0 = f^-1(v) with v = 2^(1/3) pi^(1/2) e^(1/5) [/4 for bounded-range f] (A), v = 2pi-3-log2/5-sqrt3/7 [/4] (B).
+skip arccosh(zeta3 * pi^-3): outside the domain
+skip arccosh(zeta3 * pi^-2): outside the domain
+skip arccosh(zeta3 * pi^-1): outside the domain
+skip arcsin(1/t)(zeta3 * pi^-3): outside the domain
+skip arcsin(1/t)(zeta3 * pi^-2): outside the domain
+skip arcsin(1/t)(zeta3 * pi^-1): outside the domain
+skip arccos(1/t)(zeta3 * pi^-3): outside the domain
+skip arccos(1/t)(zeta3 * pi^-2): outside the domain
+skip arccos(1/t)(zeta3 * pi^-1): outside the domain
+skip log(t-1)(zeta3 * pi^-3): outside the domain
+skip log(t-1)(zeta3 * pi^-2): outside the domain
+skip log(t-1)(zeta3 * pi^-1): outside the domain
+=== (A) [CHECK] exp(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.491558337000000011851597037094 s
+
+=== (B) [CHECK] exp(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 14.0072883780000001507914930698 s
+
+=== (A) exp(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36005, normBound = 1.206e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 19.047564885999999972909790813 s
+
+=== (A) exp(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36420, normBound = 1.271e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 20.6052309720000010884177754633 s
+
+=== (A) exp(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36505, normBound = 1.237e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 21.4521917860000002065135049634 s
+
+=== (B) exp(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39559, normBound = 2.100e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 26.4133987280000006592217687285 s
+
+=== (A) exp(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36481, normBound = 1.253e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.7563053870000011613683454925 s
+
+=== (A) log(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36229, normBound = 1.267e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.5274337980000005643432814395 s
+
+=== (B) exp(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39321, normBound = 1.932e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 27.7473526290000016558678908041 s
+
+=== (A) [CHECK] log(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.228406420999999998366902786984 s
+
+=== (B) exp(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39953, normBound = 2.320e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 28.9660687539999983641791914124 s
+
+=== (B) exp(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39601, normBound = 1.975e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 36.5593155330000030289738788269 s
+
+=== (A) log(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36449, normBound = 1.652e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 21.1695516840000017566580936546 s
+
+=== (B) [CHECK] log(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 15.0880101240000001894259185065 s
+
+=== (B) log(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39723, normBound = 1.954e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.5589538860000011766260286095 s
+
+=== (A) log(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36242, normBound = 1.294e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.4138642889999992746652424103 s
+
+=== (B) log(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39788, normBound = 2.062e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 38.8634110109999966198301990516 s
+
+=== (A) sin(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 35991, normBound = 1.225e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.6434771169999997653121681651 s
+
+=== (B) log(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39504, normBound = 2.100e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.8548164309999997101385815768 s
+
+=== (A) [CHECK] sin(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.398261931999999985176685868282 s
+
+=== (A) log(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36227, normBound = 1.194e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 37.4353720789999968587835610379 s
+
+=== (B) log(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39730, normBound = 2.020e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 35.0899641820000027792048058473 s
+
+=== (A) sin(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36456, normBound = 1.219e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 27.2556097480000012467371561797 s
+
+=== (B) sin(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39559, normBound = 2.036e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 39.1479694439999974520105752163 s
+
+=== (B) [CHECK] sin(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 18.4032054920000014419656508835 s
+
+=== (A) sin(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36240, normBound = 1.381e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 27.8702119659999993928067851812 s
+
+=== (A) sin(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36156, normBound = 1.384e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 32.3219629419999989750067470595 s
+
+=== (A) cos(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36338, normBound = 1.199e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.3003127110000001209755282616 s
+
+=== (B) sin(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39658, normBound = 2.008e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.8737779080000009912509995047 s
+
+=== (A) [CHECK] cos(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.301055177000000007137003876778 s
+
+=== (B) sin(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39902, normBound = 2.030e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 42.8139721650000026897942007054 s
+
+=== (B) cos(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39783, normBound = 2.029e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.0668350859999975455139065161 s
+
+=== (B) sin(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39789, normBound = 2.206e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 44.3243574999999978558662405703 s
+
+=== (A) cos(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36498, normBound = 1.269e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.3532682310000012648742995225 s
+
+=== (B) [CHECK] cos(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 17.9520369399999992765515344217 s
+
+=== (A) cos(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36606, normBound = 1.230e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 40.0269457300000013333374226931 s
+
+=== (B) cos(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39610, normBound = 1.940e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.8659376379999983441848598886 s
+
+=== (A) cos(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36108, normBound = 1.257e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 30.1926874550000015062778402353 s
+
+=== (A) tan(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36631, normBound = 1.273e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 28.1479603390000008289462130051 s
+
+=== (A) [CHECK] tan(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.342422047999999978884488882613 s
+
+=== (B) cos(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39738, normBound = 2.020e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 39.4692357859999987113042152487 s
+
+=== (B) cos(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39952, normBound = 1.935e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 35.2839426190000011729352991097 s
+
+=== (B) tan(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39730, normBound = 2.021e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.910031316000001311294909101 s
+
+=== (A) tan(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36222, normBound = 1.196e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.6838803929999990316446201177 s
+
+=== (A) tan(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36123, normBound = 1.259e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 30.6278572330000002921224222519 s
+
+=== (B) [CHECK] tan(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 1.835e-3998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 16.9725995370000006801092240494 s
+
+=== (B) tan(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39683, normBound = 2.109e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.4989121110000027670139388647 s
+
+=== (A) sinh(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36370, normBound = 1.266e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.22681199699999865515565034 s
+
+=== (B) tan(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39626, normBound = 1.932e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.8814977769999998713501554448 s
+
+=== (A) [CHECK] sinh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.273706039999999983791667546029 s
+
+=== (B) tan(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39570, normBound = 2.239e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 31.444526804999998859102561255 s
+
+=== (A) tan(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36629, normBound = 1.205e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 36.690775975000001096759660868 s
+
+=== (B) sinh(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39803, normBound = 2.089e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.7059597200000027328314899933 s
+
+=== (A) sinh(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36384, normBound = 1.240e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 28.1590325710000008996303222375 s
+
+=== (B) [CHECK] sinh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 1.835e-3998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 17.3536939150000009135510481428 s
+
+=== (B) sinh(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39754, normBound = 1.942e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.2757824510000013162880350137 s
+
+=== (A) sinh(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36136, normBound = 1.239e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.4234912840000006895024853293 s
+
+=== (A) sinh(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36290, normBound = 1.245e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 34.39214491900000325586006511 s
+
+=== (A) cosh(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36343, normBound = 1.229e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.6245767449999988230047165416 s
+
+=== (A) [CHECK] cosh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.312770608000000005510798928299 s
+
+=== (B) sinh(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39654, normBound = 2.230e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.33729620999999809782821103 s
+
+=== (A) cosh(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36256, normBound = 1.194e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 22.9456875509999989048992574681 s
+
+=== (B) sinh(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 40019, normBound = 1.940e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 43.79109357000000102289050119 s
+
+=== (B) cosh(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39777, normBound = 2.128e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.1732309779999994248100847472 s
+
+=== (A) cosh(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36431, normBound = 1.259e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 23.0077014039999987460305419518 s
+
+=== (B) cosh(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39642, normBound = 2.017e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.3363681670000033818723750301 s
+
+=== (B) cosh(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39425, normBound = 1.966e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.997372108000000423544406658 s
+
+=== (B) [CHECK] cosh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 21.2861279619999983481193339685 s
+
+=== (A) cosh(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36012, normBound = 1.311e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 34.2250164470000015626283129677 s
+
+=== (A) [CHECK] tanh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.451513702000000016756331433498 s
+
+=== (A) tanh(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36449, normBound = 1.230e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 28.5027102309999982310273480834 s
+
+=== (B) cosh(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39769, normBound = 1.958e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 39.7538942549999987363662512507 s
+
+=== (B) tanh(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39759, normBound = 2.289e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.049740286000002242872142233 s
+
+=== (A) tanh(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36422, normBound = 1.211e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 33.1030867699999973297053657006 s
+
+=== (A) tanh(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36465, normBound = 1.336e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.9035813730000015198129403871 s
+
+=== (B) [CHECK] tanh(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 22.0938574830000007409580575768 s
+
+=== (B) tanh(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39663, normBound = 2.028e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 38.8524120060000015541845641565 s
+
+=== (A) tanh(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36583, normBound = 1.315e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 30.2941224069999996970636857441 s
+
+=== (B) tanh(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39346, normBound = 1.972e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.2932750699999999710598785896 s
+
+=== (A) [CHECK] arctan(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.300493889999999985729317586447 s
+
+=== (A) arctan(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36022, normBound = 1.210e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 27.8963493239999991146760294214 s
+
+=== (A) arctan(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36346, normBound = 1.230e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.8847167210000002057768142549 s
+
+=== (B) arctan(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39540, normBound = 2.174e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.5537979270000015219466149574 s
+
+=== (A) arctan(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36116, normBound = 1.219e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 23.7943854160000007880171324359 s
+
+=== (B) arctan(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39847, normBound = 2.027e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.0054988790000010112635209225 s
+
+=== (B) tanh(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 40213, normBound = 1.960e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 51.8863112370000010287185432389 s
+
+=== (A) arctan(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36235, normBound = 1.353e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.6393465640000002281340130139 s
+
+=== (B) arctan(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39732, normBound = 1.972e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 34.9067857610000018553364498075 s
+
+=== (B) arctan(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39683, normBound = 2.152e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.5169984409999983654415700585 s
+
+=== (A) [CHECK] arcsinh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.257684310999999999225451574603 s
+
+=== (B) [CHECK] arctan(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.8799289339999987191731634084 s
+
+=== (A) arcsinh(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36243, normBound = 1.248e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.0738614149999996527640178101 s
+
+=== (A) arcsinh(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36220, normBound = 1.203e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 31.3023361049999984118130669231 s
+
+=== (A) [CHECK] arccosh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.599325152999999999359204139182 s
+
+=== (B) arcsinh(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39355, normBound = 1.935e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.2613918959999992353004927281 s
+
+=== (B) arcsinh(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39804, normBound = 1.979e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.1916046600000029798138712067 s
+
+=== (A) arcsinh(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36396, normBound = 1.328e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.5119217650000003061450115638 s
+
+=== (A) [CHECK] arcsin(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.300682832000000010985729659296 s
+
+=== (A) arcsinh(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36305, normBound = 1.238e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 23.4251871579999999539722921327 s
+
+=== (B) [CHECK] arcsinh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 17.1877262130000012518848961918 s
+
+=== (B) [CHECK] arccosh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 17.3193609180000009928335202858 s
+
+=== (A) [CHECK] arccos(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4 (n = 13, digits = 2000)
+status = Found, iterations = 465, normBound = 2.237e+01
+relation: -30*log|y| +6*1 +15*log(pi) -50*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.290877692999999992728987763257 s
+
+=== (B) arcsinh(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39549, normBound = 1.999e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 35.6962638440000006312402547337 s
+
+=== (B) arcsinh(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39672, normBound = 2.114e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 36.6460274969999986183211149182 s
+
+=== (A) arccosh(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36223, normBound = 1.266e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 29.899845439999999996416590875 s
+
+=== (A) [CHECK] log(t-1)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.248508808999999997180196942281 s
+
+=== (A) arcsin(1/t)(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36543, normBound = 1.305e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.4519218169999987821938702837 s
+
+=== (B) [CHECK] arcsin(1/t)(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 21.6257366869999998471030266955 s
+
+=== (A) arccos(1/t)(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36368, normBound = 1.209e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.3326540880000017352813301841 s
+
+=== (B) [CHECK] arccos(1/t)(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4 (n = 14, digits = 2000)
+status = Found, iterations = 784, normBound = 8.471e+01
+relation: +140*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.359e-3998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 18.9462639469999984953574312385 s
+
+=== (B) arccosh(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39861, normBound = 2.218e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 40.4832641839999993749188433867 s
+
+=== (B) arcsin(1/t)(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39493, normBound = 2.150e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.2009377110000016841695469338 s
+
+=== (B) arccos(1/t)(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39436, normBound = 2.127e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 31.6889787409999996725673554465 s
+
+=== (B) [CHECK] log(t-1)(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 18.2558378609999998332114046207 s
+
+=== (A) log(t-1)(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36256, normBound = 1.257e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 33.5542376229999987913288350683 s
+
+=== (A) t^t(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36232, normBound = 1.236e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.9680788510000013502576621249 s
+
+=== (A) [CHECK] t^t(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 7.865e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.300707897999999973492890603666 s
+
+=== (B) log(t-1)(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39468, normBound = 2.065e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.5219109159999995029011188308 s
+
+=== (A) t^t(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36213, normBound = 1.267e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 24.0039629249999997284703567857 s
+
+=== (B) t^t(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39462, normBound = 2.069e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 36.0728649599999968700103636365 s
+
+=== (A) t^t(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36339, normBound = 1.194e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.1221781300000017722595657688 s
+
+=== (B) t^t(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39753, normBound = 2.056e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 29.9107644870000015657751646359 s
+
+=== (B) [CHECK] t^t(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 1.835e-3998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 16.1808724690000005352885636967 s
+
+=== (A) t^t(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36176, normBound = 1.235e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 33.5015266859999982784756866749 s
+
+=== (B) t^t(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39947, normBound = 2.008e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.7692070470000018644896044862 s
+
+=== (A) Gamma(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36635, normBound = 1.217e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 27.9224034970000012378932296997 s
+
+=== (A) Gamma(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36308, normBound = 1.311e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.6327190029999982812114467379 s
+
+=== (A) [CHECK] Gamma(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 7.4191610460000001481262188463 s
+
+=== (A) Gamma(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36183, normBound = 1.227e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.2978747900000016102239897009 s
+
+=== (B) Gamma(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39686, normBound = 2.104e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 33.8499485460000002490232873242 s
+
+=== (B) t^t(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39562, normBound = 1.970e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 51.8056930469999983301931933966 s
+
+=== (A) Gamma(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36176, normBound = 1.196e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 26.8704624360000003946424840251 s
+
+=== (B) Gamma(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39788, normBound = 1.984e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 31.0142949759999986270031513413 s
+
+=== (B) Gamma(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39714, normBound = 1.983e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 29.8742023120000013136632333044 s
+
+=== (B) Gamma(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39716, normBound = 1.987e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 39.1987973379999985468202794436 s
+
+=== (A) [CHECK] exp(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5) (n = 13, digits = 2000)
+status = Found, iterations = 402, normBound = 1.486e+01
+relation: +30*log|y| -6*1 -15*log(pi) -10*log2
+residual at 4000 digits = 5.243e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 0.528450199000000009341704299004 s
+
+=== (A) exp(1/t)(zeta3*pi^-3) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36488, normBound = 1.455e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 25.310970916999998792107362533 s
+
+=== (B) [CHECK] Gamma(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 1.835e-3998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 29.1743437730000003682562237373 s
+
+=== (A) exp(1/t)(zeta3*pi^-2) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36176, normBound = 1.239e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 22.8143089140000014936049410608 s
+
+=== (B) exp(1/t)(zeta3*pi^-3) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39177, normBound = 2.047e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 32.6459889850000024580367607996 s
+
+=== (B) exp(1/t)(zeta3*pi^-2) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39241, normBound = 1.986e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 30.0136730239999991454169503413 s
+
+=== (A) exp(1/t)(zeta3*pi^0) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36134, normBound = 1.303e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 23.5396836289999988878207659582 s
+
+=== (B) [CHECK] exp(1/t)(x0), f(x0) = 2pi-3-log2/5-sqrt3/7 (n = 14, digits = 2000)
+status = Found, iterations = 643, normBound = 5.611e+01
+relation: +35*y +105*1 -70*pi +7*log2 +5*sqrt3
+residual at 4000 digits = 2.622e-3999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 16.6736342700000008676397555973 s
+
+=== (A) exp(1/t)(zeta3*pi^-1) (n = 13, digits = 2000)
+status = PrecisionExhausted, iterations = 36518, normBound = 1.244e+123
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 32.7536615369999992708471836522 s
+
+=== (B) exp(1/t)(zeta3*pi^-1) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39406, normBound = 1.973e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 28.9612181170000013707976904698 s
+
+=== (B) exp(1/t)(zeta3*pi^0) (n = 14, digits = 2000)
+status = PrecisionExhausted, iterations = 39636, normBound = 2.135e+114
+power estimate 10^(0.8*D/n) = 1e114
+elapsed 27.3036471019999993359306245111 s
+
+
+===== SUMMARY (2000 digits) =====
+validation: all PASS
+(A) exp(zeta3*pi^-3) | none, normBound 1.27e+123
+(B) exp(zeta3*pi^-3) | none, normBound 1.93e+114
+(A) exp(zeta3*pi^-2) | none, normBound 1.25e+123
+(B) exp(zeta3*pi^-2) | none, normBound 2.32e+114
+(A) exp(zeta3*pi^-1) | none, normBound 1.21e+123
+(B) exp(zeta3*pi^-1) | none, normBound 2.10e+114
+(A) exp(zeta3*pi^0) | none, normBound 1.24e+123
+(B) exp(zeta3*pi^0) | none, normBound 1.97e+114
+PASS (A) [CHECK] exp(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] exp(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) log(zeta3*pi^-3) | none, normBound 1.27e+123
+(B) log(zeta3*pi^-3) | none, normBound 2.06e+114
+(A) log(zeta3*pi^-2) | none, normBound 1.65e+123
+(B) log(zeta3*pi^-2) | none, normBound 1.95e+114
+(A) log(zeta3*pi^-1) | none, normBound 1.19e+123
+(B) log(zeta3*pi^-1) | none, normBound 2.02e+114
+(A) log(zeta3*pi^0) | none, normBound 1.29e+123
+(B) log(zeta3*pi^0) | none, normBound 2.10e+114
+PASS (A) [CHECK] log(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] log(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) sin(zeta3*pi^-3) | none, normBound 1.23e+123
+(B) sin(zeta3*pi^-3) | none, normBound 2.04e+114
+(A) sin(zeta3*pi^-2) | none, normBound 1.22e+123
+(B) sin(zeta3*pi^-2) | none, normBound 2.03e+114
+(A) sin(zeta3*pi^-1) | none, normBound 1.38e+123
+(B) sin(zeta3*pi^-1) | none, normBound 2.01e+114
+(A) sin(zeta3*pi^0) | none, normBound 1.38e+123
+(B) sin(zeta3*pi^0) | none, normBound 2.21e+114
+PASS (A) [CHECK] sin(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] sin(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) cos(zeta3*pi^-3) | none, normBound 1.20e+123
+(B) cos(zeta3*pi^-3) | none, normBound 2.03e+114
+(A) cos(zeta3*pi^-2) | none, normBound 1.23e+123
+(B) cos(zeta3*pi^-2) | none, normBound 2.02e+114
+(A) cos(zeta3*pi^-1) | none, normBound 1.27e+123
+(B) cos(zeta3*pi^-1) | none, normBound 1.94e+114
+(A) cos(zeta3*pi^0) | none, normBound 1.26e+123
+(B) cos(zeta3*pi^0) | none, normBound 1.93e+114
+PASS (A) [CHECK] cos(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] cos(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) tan(zeta3*pi^-3) | none, normBound 1.27e+123
+(B) tan(zeta3*pi^-3) | none, normBound 2.02e+114
+(A) tan(zeta3*pi^-2) | none, normBound 1.26e+123
+(B) tan(zeta3*pi^-2) | none, normBound 2.11e+114
+(A) tan(zeta3*pi^-1) | none, normBound 1.20e+123
+(B) tan(zeta3*pi^-1) | none, normBound 1.93e+114
+(A) tan(zeta3*pi^0) | none, normBound 1.20e+123
+(B) tan(zeta3*pi^0) | none, normBound 2.24e+114
+PASS (A) [CHECK] tan(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] tan(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) sinh(zeta3*pi^-3) | none, normBound 1.27e+123
+(B) sinh(zeta3*pi^-3) | none, normBound 2.09e+114
+(A) sinh(zeta3*pi^-2) | none, normBound 1.24e+123
+(B) sinh(zeta3*pi^-2) | none, normBound 1.94e+114
+(A) sinh(zeta3*pi^-1) | none, normBound 1.24e+123
+(B) sinh(zeta3*pi^-1) | none, normBound 1.94e+114
+(A) sinh(zeta3*pi^0) | none, normBound 1.24e+123
+(B) sinh(zeta3*pi^0) | none, normBound 2.23e+114
+PASS (A) [CHECK] sinh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] sinh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) cosh(zeta3*pi^-3) | none, normBound 1.23e+123
+(B) cosh(zeta3*pi^-3) | none, normBound 2.13e+114
+(A) cosh(zeta3*pi^-2) | none, normBound 1.19e+123
+(B) cosh(zeta3*pi^-2) | none, normBound 2.02e+114
+(A) cosh(zeta3*pi^-1) | none, normBound 1.31e+123
+(B) cosh(zeta3*pi^-1) | none, normBound 1.97e+114
+(A) cosh(zeta3*pi^0) | none, normBound 1.26e+123
+(B) cosh(zeta3*pi^0) | none, normBound 1.96e+114
+PASS (A) [CHECK] cosh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] cosh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) tanh(zeta3*pi^-3) | none, normBound 1.23e+123
+(B) tanh(zeta3*pi^-3) | none, normBound 2.29e+114
+(A) tanh(zeta3*pi^-2) | none, normBound 1.21e+123
+(B) tanh(zeta3*pi^-2) | none, normBound 2.03e+114
+(A) tanh(zeta3*pi^-1) | none, normBound 1.34e+123
+(B) tanh(zeta3*pi^-1) | none, normBound 1.97e+114
+(A) tanh(zeta3*pi^0) | none, normBound 1.32e+123
+(B) tanh(zeta3*pi^0) | none, normBound 1.96e+114
+PASS (A) [CHECK] tanh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] tanh(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) arctan(zeta3*pi^-3) | none, normBound 1.21e+123
+(B) arctan(zeta3*pi^-3) | none, normBound 2.17e+114
+(A) arctan(zeta3*pi^-2) | none, normBound 1.23e+123
+(B) arctan(zeta3*pi^-2) | none, normBound 2.03e+114
+(A) arctan(zeta3*pi^-1) | none, normBound 1.22e+123
+(B) arctan(zeta3*pi^-1) | none, normBound 1.97e+114
+(A) arctan(zeta3*pi^0) | none, normBound 1.35e+123
+(B) arctan(zeta3*pi^0) | none, normBound 2.15e+114
+PASS (A) [CHECK] arctan(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] arctan(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) arcsinh(zeta3*pi^-3) | none, normBound 1.20e+123
+(B) arcsinh(zeta3*pi^-3) | none, normBound 1.93e+114
+(A) arcsinh(zeta3*pi^-2) | none, normBound 1.25e+123
+(B) arcsinh(zeta3*pi^-2) | none, normBound 1.98e+114
+(A) arcsinh(zeta3*pi^-1) | none, normBound 1.33e+123
+(B) arcsinh(zeta3*pi^-1) | none, normBound 2.00e+114
+(A) arcsinh(zeta3*pi^0) | none, normBound 1.24e+123
+(B) arcsinh(zeta3*pi^0) | none, normBound 2.11e+114
+PASS (A) [CHECK] arcsinh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] arcsinh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) arccosh(zeta3*pi^0) | none, normBound 1.27e+123
+(B) arccosh(zeta3*pi^0) | none, normBound 2.22e+114
+PASS (A) [CHECK] arccosh(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] arccosh(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) arcsin(1/t)(zeta3*pi^0) | none, normBound 1.31e+123
+(B) arcsin(1/t)(zeta3*pi^0) | none, normBound 2.15e+114
+PASS (A) [CHECK] arcsin(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] arcsin(1/t)(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) arccos(1/t)(zeta3*pi^0) | none, normBound 1.21e+123
+(B) arccos(1/t)(zeta3*pi^0) | none, normBound 2.13e+114
+PASS (A) [CHECK] arccos(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)/4
+PASS (B) [CHECK] arccos(1/t)(x0), f(x0) = (2pi-3-log2/5-sqrt3/7)/4
+(A) log(t-1)(zeta3*pi^0) | none, normBound 1.26e+123
+(B) log(t-1)(zeta3*pi^0) | none, normBound 2.07e+114
+PASS (A) [CHECK] log(t-1)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] log(t-1)(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) t^t(zeta3*pi^-3) | none, normBound 1.24e+123
+(B) t^t(zeta3*pi^-3) | none, normBound 2.07e+114
+(A) t^t(zeta3*pi^-2) | none, normBound 1.27e+123
+(B) t^t(zeta3*pi^-2) | none, normBound 2.06e+114
+(A) t^t(zeta3*pi^-1) | none, normBound 1.19e+123
+(B) t^t(zeta3*pi^-1) | none, normBound 1.97e+114
+(A) t^t(zeta3*pi^0) | none, normBound 1.23e+123
+(B) t^t(zeta3*pi^0) | none, normBound 2.01e+114
+PASS (A) [CHECK] t^t(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] t^t(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) Gamma(zeta3*pi^-3) | none, normBound 1.22e+123
+(B) Gamma(zeta3*pi^-3) | none, normBound 2.10e+114
+(A) Gamma(zeta3*pi^-2) | none, normBound 1.31e+123
+(B) Gamma(zeta3*pi^-2) | none, normBound 1.99e+114
+(A) Gamma(zeta3*pi^-1) | none, normBound 1.23e+123
+(B) Gamma(zeta3*pi^-1) | none, normBound 1.98e+114
+(A) Gamma(zeta3*pi^0) | none, normBound 1.20e+123
+(B) Gamma(zeta3*pi^0) | none, normBound 1.98e+114
+PASS (A) [CHECK] Gamma(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] Gamma(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+(A) exp(1/t)(zeta3*pi^-3) | none, normBound 1.45e+123
+(B) exp(1/t)(zeta3*pi^-3) | none, normBound 2.05e+114
+(A) exp(1/t)(zeta3*pi^-2) | none, normBound 1.24e+123
+(B) exp(1/t)(zeta3*pi^-2) | none, normBound 1.99e+114
+(A) exp(1/t)(zeta3*pi^-1) | none, normBound 1.24e+123
+(B) exp(1/t)(zeta3*pi^-1) | none, normBound 1.97e+114
+(A) exp(1/t)(zeta3*pi^0) | none, normBound 1.30e+123
+(B) exp(1/t)(zeta3*pi^0) | none, normBound 2.14e+114
+PASS (A) [CHECK] exp(1/t)(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)
+PASS (B) [CHECK] exp(1/t)(x0), f(x0) = 2pi-3-log2/5-sqrt3/7
+total elapsed 390.882697979999989001953508705 s

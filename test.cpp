@@ -759,7 +759,7 @@ mpreal polylog3(const mpreal& z)
 }
 
 // PSLQ on the vector computeVector(digits); prints the relation with labels and verifies it at 2*digits.
-struct LinearSearchOutcome { bool found = false; bool verified = false; };
+struct LinearSearchOutcome { bool found = false; bool verified = false; std::string normBound; };
 LinearSearchOutcome reportLinearRelationSearch(std::ostream& out, const std::string& name, const std::function<std::vector<mpreal>(int digits)>& computeVector,
 	const std::vector<std::string>& labels, int digits)
 {
@@ -770,6 +770,7 @@ LinearSearchOutcome reportLinearRelationSearch(std::ostream& out, const std::str
 	const int n = (int)c.size();
 	out << "=== " << name << " (n = " << n << ", digits = " << digits << ")" << std::endl;
 	PslqResult r = pslq(c);
+	outcome.normBound = r.normBound.toString("%.2Re");
 	out << "status = " << toString(r.status) << ", iterations = " << r.iterations
 		<< ", normBound = " << r.normBound.toString("%.3Re") << std::endl;
 	if (r.status == PslqResult::Status::Found)
@@ -1157,4 +1158,165 @@ void test_pslq_zeta3_elementary_functions(int digits, int maxDegree)
 			std::cout << " | " << nb(maxDegree) << " / " << nb(4) << " / " << nb(8);
 		std::cout << std::endl;
 	}
+}
+
+void test_pslq_zeta3_elementary_functions_relations(int digits)
+{
+	std::cout.precision(30);
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		std::function<mpreal(const mpreal&)> inv; // x0 with f(x0) = v
+		bool small; // true: value range is bounded/small, use v/4
+	};
+	auto newton = [](const std::function<mpreal(const mpreal&)>& g, const std::function<mpreal(const mpreal&)>& dg, mpreal x)
+	{
+		const mpreal eps = mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() + 20);
+		for (int i = 0; i < 200; ++i)
+		{
+			const mpreal dx = g(x) / dg(x);
+			x -= dx;
+			if (mpfr::abs(dx) < eps) break;
+		}
+		return x;
+	};
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, [](const mpreal& v) { return mpfr::log(v); }, false },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, [](const mpreal& v) { return mpfr::exp(v); }, false },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, [](const mpreal& v) { return mpfr::asin(v); }, true },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, [](const mpreal& v) { return mpfr::acos(v); }, true },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, [](const mpreal& v) { return mpfr::atan(v); }, true },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, [](const mpreal& v) { return mpfr::asinh(v); }, false },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, [](const mpreal& v) { return mpfr::acosh(v); }, false },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, [](const mpreal& v) { return mpfr::atanh(v); }, true },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, [](const mpreal& v) { return mpfr::tan(v); }, true },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, [](const mpreal& v) { return mpfr::sinh(v); }, false },
+		{ "arccosh", [](const mpreal& t) { return mpfr::acosh(t); }, [](const mpreal& v) { return mpfr::cosh(v); }, false },
+		{ "arcsin(1/t)", [](const mpreal& t) { return mpfr::asin(1 / t); }, [](const mpreal& v) { return 1 / mpfr::sin(v); }, true },
+		{ "arccos(1/t)", [](const mpreal& t) { return mpfr::acos(1 / t); }, [](const mpreal& v) { return 1 / mpfr::cos(v); }, true },
+		{ "log(t-1)", [](const mpreal& t) { return mpfr::log(t - 1); }, [](const mpreal& v) { return 1 + mpfr::exp(v); }, false },
+		{ "t^t", [](const mpreal& t) { return mpfr::pow(t, t); }, [newton](const mpreal& v) {
+				const mpreal lv = mpfr::log(v);
+				return newton([&](const mpreal& c) { return c * mpfr::log(c) - lv; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, mpreal(2)); }, false },
+		{ "Gamma", [](const mpreal& t) { return mpfr::gamma(t); }, [newton](const mpreal& v) {
+				const mpreal lv = mpfr::log(v);
+				return newton([&](const mpreal& c) { return mpfr::lngamma(c) - lv; }, [](const mpreal& c) { return mpfr::digamma(c); }, mpreal(3)); }, false },
+		{ "exp(1/t)", [](const mpreal& t) { return mpfr::exp(1 / t); }, [](const mpreal& v) { return 1 / mpfr::log(v); }, false },
+	};
+	const std::vector<std::string> labelsA = { "log|y|", "1", "log(pi)", "log2", "log3", "log5", "log7", "log11", "log13", "log(gamma)",
+		"log(1+sqrt2)", "log(phi)", "log(2+sqrt3)" };
+	const std::vector<std::string> labelsB = { "y", "1", "pi", "pi^2", "pi^3", "log2", "log3", "e", "gamma", "G", "sqrt2", "sqrt3", "sqrt5", "zeta3" };
+	auto vecA = [](const mpreal& y)
+	{
+		return std::vector<mpreal>{ mpfr::log(mpfr::abs(y)), mpreal(1), mpfr::log(mpfr::const_pi()), mpfr::log(mpreal(2)), mpfr::log(mpreal(3)),
+			mpfr::log(mpreal(5)), mpfr::log(mpreal(7)), mpfr::log(mpreal(11)), mpfr::log(mpreal(13)), mpfr::log(mpfr::const_euler()),
+			mpfr::log(1 + mpfr::sqrt(mpreal(2))), mpfr::log((1 + mpfr::sqrt(mpreal(5))) / 2), mpfr::log(2 + mpfr::sqrt(mpreal(3))) };
+	};
+	auto vecB = [](const mpreal& y)
+	{
+		const mpreal pi = mpfr::const_pi();
+		return std::vector<mpreal>{ y, mpreal(1), pi, pi * pi, pi * pi * pi, mpfr::log(mpreal(2)), mpfr::log(mpreal(3)), mpfr::exp(mpreal(1)),
+			mpfr::const_euler(), mpfr::const_catalan(), mpfr::sqrt(mpreal(2)), mpfr::sqrt(mpreal(3)), mpfr::sqrt(mpreal(5)), mpfr::zeta(mpreal(3)) };
+	};
+	auto valA = [](bool small) { return mpfr::cbrt(mpreal(2)) * mpfr::sqrt(mpfr::const_pi()) * mpfr::exp(mpreal(1) / 5) / (small ? 4 : 1); };
+	auto valB = [](bool small)
+	{
+		return (2 * mpfr::const_pi() - 3 - mpfr::log(mpreal(2)) / 5 - mpfr::sqrt(mpreal(3)) / 7) / (small ? 4 : 1);
+	};
+
+	struct Job
+	{
+		std::string name;
+		bool isCheck, isA;
+		std::function<std::vector<mpreal>(int)> compute;
+		const std::vector<std::string>* labels;
+		std::string text;
+		LinearSearchOutcome oc;
+		bool skipped = false;
+	};
+	std::vector<Job> jobs;
+	const std::vector<int> ks = { -3, -2, -1, 0 };
+	std::cout << "NOTE: targets y = f(zeta3 * pi^k), k in {-3,-2,-1,0}. (A) multiplicative basis n=13, (B) additive basis n=14. "
+		"[CHECK] jobs use x0 = f^-1(v) with v = 2^(1/3) pi^(1/2) e^(1/5) [/4 for bounded-range f] (A), v = 2pi-3-log2/5-sqrt3/7 [/4] (B)." << std::endl;
+	for (const auto& fn : fns)
+	{
+		for (int k : ks)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(50));
+			const mpreal y50 = fn.f(mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)));
+			if (mpfr::isnan(y50) || mpfr::isinf(y50))
+			{
+				std::cout << "skip " << fn.name << "(zeta3 * pi^" << k << "): outside the domain" << std::endl;
+				continue;
+			}
+			auto yOf = [fn, k](int d)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				return fn.f(mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)));
+			};
+			const std::string nm = fn.name + "(zeta3*pi^" + std::to_string(k) + ")";
+			jobs.push_back({ "(A) " + nm, false, true, [yOf, vecA](int d) { return vecA(yOf(d)); }, &labelsA });
+			jobs.push_back({ "(B) " + nm, false, false, [yOf, vecB](int d) { return vecB(yOf(d)); }, &labelsB });
+		}
+		const bool sm = fn.small;
+		auto chk = [fn, sm](int d, bool isA, const std::function<mpreal(bool)>& val)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(d));
+			(void)isA;
+			return fn.f(fn.inv(val(sm)));
+		};
+		jobs.push_back({ "(A) [CHECK] " + fn.name + "(x0), f(x0) = " + std::string(sm ? "2^(1/3)pi^(1/2)e^(1/5)/4" : "2^(1/3)pi^(1/2)e^(1/5)"), true, true,
+			[chk, vecA, valA](int d) { return vecA(chk(d, true, valA)); }, &labelsA });
+		jobs.push_back({ "(B) [CHECK] " + fn.name + "(x0), f(x0) = " + std::string(sm ? "(2pi-3-log2/5-sqrt3/7)/4" : "2pi-3-log2/5-sqrt3/7"), true, false,
+			[chk, vecB, valB](int d) { return vecB(chk(d, false, valB)); }, &labelsB });
+	}
+
+	std::mutex mtx;
+	std::atomic<size_t> next(0);
+	const auto t0 = std::chrono::steady_clock::now();
+	auto worker = [&]()
+	{
+		for (;;)
+		{
+			const size_t i = next++;
+			if (i >= jobs.size()) return;
+			std::ostringstream os;
+			os.precision(30);
+			Job& j = jobs[i];
+			j.oc = reportLinearRelationSearch(os, j.name, j.compute, *j.labels, digits);
+			j.text = os.str();
+			std::lock_guard<std::mutex> lk(mtx);
+			std::cout << j.text << std::endl;
+		}
+	};
+	std::vector<std::thread> th;
+	for (int t = 0; t < 10; ++t) th.emplace_back(worker);
+	for (auto& t : th) t.join();
+
+	std::cout << "\n===== SUMMARY (" << digits << " digits) =====" << std::endl;
+	// validity per (function, type)
+	int nFail = 0;
+	for (const auto& j : jobs)
+		if (j.isCheck && !(j.oc.found && j.oc.verified)) { ++nFail; std::cout << "CHECK FAIL: " << j.name << std::endl; }
+	std::cout << "validation: " << (jobs.size() ? "" : "") << (nFail == 0 ? "all PASS" : "some FAIL") << std::endl;
+	for (const auto& j : jobs)
+	{
+		if (j.isCheck)
+		{
+			std::cout << (j.oc.found && j.oc.verified ? "PASS " : "FAIL ") << j.name << std::endl;
+			continue;
+		}
+		// find corresponding check
+		bool valid = true;
+		const std::string fname = j.name.substr(4, j.name.find('(', 4) - 4);
+		for (const auto& c : jobs)
+			if (c.isCheck && c.isA == j.isA && c.name.compare(4 + 8, fname.size() + 1, fname + "(") == 0 && !(c.oc.found && c.oc.verified)) valid = false;
+		std::cout << j.name << " | ";
+		if (!valid) std::cout << "INVALID (check failed)";
+		else if (j.oc.found) std::cout << (j.oc.verified ? "FOUND (verified)" : "found but NOT verified");
+		else std::cout << "none, normBound " << j.oc.normBound;
+		std::cout << std::endl;
+	}
+	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
 }

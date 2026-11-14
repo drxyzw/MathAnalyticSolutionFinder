@@ -43,7 +43,9 @@ int main()
 
 	//test_pslq_zeta_central_binomial(3000, 5);
 
-	test_pslq_zeta3_elementary_functions(1000, 12);
+	//test_pslq_zeta3_elementary_functions(1000, 12);
+
+	test_pslq_zeta3_elementary_functions_relations(2000);
 
 	//test_mpreal();
 

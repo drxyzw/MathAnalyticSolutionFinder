@@ -41,6 +41,7 @@ g++ -O2 -std=c++17 main.cpp test.cpp check_recurring_decimal.cpp pslq.cpp -o mai
   - `test_pslq_zeta_multiplicative(digits, maxPrime, zetaArgs, includePi, includeEuler)`：ζ値・π・γ・e・素数・単数の間の積の関係を探す。
 - [check_recurring_decimal.h](check_recurring_decimal.h)：循環小数かどうかを判定する。
 - [grid_search.cpp](grid_search.cpp)：グリッド探索（独立したプログラム）。
+- [cf_search.cpp](cf_search.cpp)：多項式連分数（Ramanujan Machine 型）の探索。独立プログラム。`./cf_search <F1|F2|F3> <C> <M> <threads> [stride]`。ビルド：`g++ -O2 -std=c++17 cf_search.cpp -o cf_search -lmpfr -lgmp -pthread`
 
 ## 決まりごと
 - 新しい実験は関数として追加する。

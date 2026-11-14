@@ -402,3 +402,4 @@ FodyWeavers.xsd
 
 # Result files too large even after zip (>10MB)
 results/results.tsv
+cf_search

@@ -1,0 +1,211 @@
+=== CHECK w=21 adds y; expect (3,-7,..,2,-1) (n = 42, digits = 2000)
+status = Found, iterations = 2799, normBound = 2.583e+00
+relation: -3*z21 +7*pi^2*z19 -2*z3^7 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e38
+elapsed 192.336593205000013995231711306 s
+=== CHECK w=23 adds y; expect (3,-7,..,2,-1) (n = 57, digits = 2000)
+status = Found, iterations = 7582, normBound = 2.583e+00
+relation: +3*z23 -7*pi^2*z21 +2*pi^2*z3^7 -1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e28
+elapsed 264.694005487000026732857804745 s
+=== CHECK w=20 adds zeta(w); expect rational*pi^w (n = 36, digits = 2000)
+status = Found, iterations = 37414, normBound = 5.558e+14
+relation: -174611*pi^20 +1531329465290625*zeta(20)
+residual at 4000 digits = 3.690e-3985  VERIFIED
+power estimate 10^(0.8*D/n) = 1e44
+elapsed 374.886974884999972346122376621 s
+=== MAIN w=19  (n = 29, digits = 2000)
+status = PrecisionExhausted, iterations = 88009, normBound = 1.527e+55
+power estimate 10^(0.8*D/n) = 1e55
+elapsed 241.005822754999996959668351337 s
+=== MAIN w=20  (n = 35, digits = 2000)
+status = PrecisionExhausted, iterations = 108289, normBound = 5.422e+45
+power estimate 10^(0.8*D/n) = 1e45
+elapsed 448.410951388999990285810781643 s
+=== CHECK w=19 adds y; expect (3,-7,..,2,-1) (n = 30, digits = 2000)
+status = Found, iterations = 967, normBound = 2.583e+00
+relation: +3*z19 -7*pi^2*z17 +2*pi^4*z3^5 -1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e53
+elapsed 200.249091346999989582400303334 s
+=== MAIN w=17  (n = 21, digits = 2000)
+status = PrecisionExhausted, iterations = 62517, normBound = 1.842e+76
+power estimate 10^(0.8*D/n) = 1e76
+elapsed 110.975599685999995358542946633 s
+=== MAIN w=18  (n = 25, digits = 2000)
+status = PrecisionExhausted, iterations = 75186, normBound = 1.022e+64
+power estimate 10^(0.8*D/n) = 1e64
+elapsed 188.711240368999995098420185968 s
+=== MAIN w=16  (n = 17, digits = 2000)
+status = PrecisionExhausted, iterations = 49224, normBound = 1.427e+94
+power estimate 10^(0.8*D/n) = 1e94
+elapsed 74.593983375999997065264324192 s
+=== CHECK w=17 adds y; expect (3,-7,..,2,-1) (n = 22, digits = 2000)
+status = Found, iterations = 522, normBound = 3.864e+00
+relation: -3*z17 +7*pi^2*z15 -2*pi^2*z3^5 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e72
+elapsed 213.233877279000012094911653548 s
+=== MAIN w=21  (n = 41, digits = 2000)
+status = PrecisionExhausted, iterations = 126610, normBound = 4.662e+38
+power estimate 10^(0.8*D/n) = 1e39
+elapsed 688.322152671000026202818844467 s
+=== MAIN w=15  (n = 15, digits = 2000)
+status = PrecisionExhausted, iterations = 42665, normBound = 4.655e+106
+power estimate 10^(0.8*D/n) = 1e106
+elapsed 58.6110728029999989985299180262 s
+=== CHECK w=18 adds zeta(w); expect rational*pi^w (n = 26, digits = 2000)
+status = Found, iterations = 16834, normBound = 9.417e+12
+relation: -43867*pi^18 +38979295480125*zeta(18)
+residual at 4000 digits = 1.729e-3986  VERIFIED
+power estimate 10^(0.8*D/n) = 1e61
+elapsed 285.726288747000012335774954408 s
+=== MAIN w=14  (n = 12, digits = 2000)
+status = PrecisionExhausted, iterations = 32658, normBound = 2.345e+133
+power estimate 10^(0.8*D/n) = 1e133
+elapsed 41.2266673869999991097756719682 s
+=== CHECK w=22 adds zeta(w); expect rational*pi^w (n = 49, digits = 2000)
+status = Found, iterations = 75390, normBound = 2.354e+15
+relation: +155366*pi^22 -13447856940643125*zeta(22)
+residual at 4000 digits = 7.379e-3984  VERIFIED
+power estimate 10^(0.8*D/n) = 1e32
+elapsed 743.864944339999965450260788202 s
+=== MAIN w=13  (n = 10, digits = 2000)
+status = PrecisionExhausted, iterations = 25427, normBound = 1.018e+160
+power estimate 10^(0.8*D/n) = 1e160
+elapsed 43.5190024739999969938253343571 s
+=== MAIN w=12  (n = 8, digits = 2000)
+status = PrecisionExhausted, iterations = 18502, normBound = 1.015e+200
+power estimate 10^(0.8*D/n) = 1e200
+elapsed 28.5374194289999998375151335495 s
+=== CHECK w=16 adds zeta(w); expect rational*pi^w (n = 18, digits = 2000)
+status = Found, iterations = 6400, normBound = 1.182e+11
+relation: +3617*pi^16 -325641566250*zeta(16)
+residual at 4000 digits = 1.351e-3988  VERIFIED
+power estimate 10^(0.8*D/n) = 1e88
+elapsed 213.680598470999996152386302128 s
+=== MAIN w=11  (n = 7, digits = 2000)
+status = PrecisionExhausted, iterations = 15063, normBound = 4.109e+228
+power estimate 10^(0.8*D/n) = 1e228
+elapsed 24.4271665929999990396481734933 s
+=== MAIN w=10  (n = 5, digits = 2000)
+status = PrecisionExhausted, iterations = 8046, normBound = 1.231e+320
+power estimate 10^(0.8*D/n) = 1e320
+elapsed 21.258317270999999237801603158 s
+=== CHECK w=15 adds y; expect (3,-7,..,2,-1) (n = 16, digits = 2000)
+status = Found, iterations = 147, normBound = 2.567e+00
+relation: +3*z15 -7*pi^2*z13 +2*z3^5 -1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e100
+elapsed 199.252490891000007877664756961 s
+=== CHECK w=13 adds y; expect (3,-7,..,2,-1) (n = 11, digits = 2000)
+status = Found, iterations = 63, normBound = 3.057e+00
+relation: -3*z13 +7*pi^2*z11 -2*pi^4*z3^3 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e145
+elapsed 183.139140074000010827148798853 s
+=== MAIN w=9  (n = 5, digits = 2000)
+status = PrecisionExhausted, iterations = 8183, normBound = 2.367e+320
+power estimate 10^(0.8*D/n) = 1e320
+elapsed 37.6026283699999979148742568213 s
+=== CHECK w=14 adds zeta(w); expect rational*pi^w (n = 13, digits = 2000)
+status = Found, iterations = 1870, normBound = 1.146e+07
+relation: -2*pi^14 +18243225*zeta(14)
+residual at 4000 digits = 8.247e-3993  VERIFIED
+power estimate 10^(0.8*D/n) = 1e123
+elapsed 230.005988903999991634918842465 s
+=== MAIN w=8  (n = 3, digits = 2000)
+status = PrecisionExhausted, iterations = 2781, normBound = 3.839e+533
+power estimate 10^(0.8*D/n) = 1e533
+elapsed 20.3350099240000012912332749693 s
+=== MAIN w=7  (n = 3, digits = 2000)
+status = PrecisionExhausted, iterations = 2834, normBound = 2.713e+533
+power estimate 10^(0.8*D/n) = 1e533
+elapsed 26.7714132169999992072462191572 s
+=== CHECK w=12 adds zeta(w); expect rational*pi^w (n = 9, digits = 2000)
+status = Found, iterations = 932, normBound = 2.804e+08
+relation: +691*pi^12 -638512875*zeta(12)
+residual at 4000 digits = 1.759e-3991  VERIFIED
+power estimate 10^(0.8*D/n) = 1e177
+elapsed 204.57859007600001177706872113 s
+=== MAIN w=6  (n = 2, digits = 2000)
+status = PrecisionExhausted, iterations = 1056, normBound = 2.520e+800
+power estimate 10^(0.8*D/n) = 1e800
+elapsed 20.4792286889999992638422554592 s
+=== CHECK w=11 adds y; expect (3,-7,..,2,-1) (n = 8, digits = 2000)
+status = Found, iterations = 37, normBound = 3.611e+00
+relation: -3*z11 +7*pi^2*z9 -2*pi^2*z3^3 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e200
+elapsed 215.046516407000012804928701371 s
+=== CHECK w=10 adds zeta(w); expect rational*pi^w (n = 6, digits = 2000)
+status = Found, iterations = 155, normBound = 5.987e+04
+relation: +1*pi^10 -93555*zeta(10)
+residual at 4000 digits = 2.148e-3995  VERIFIED
+power estimate 10^(0.8*D/n) = 1e266
+elapsed 229.558566509000002042739652097 s
+=== CHECK w=9 adds y; expect (3,-7,..,2,-1) (n = 6, digits = 2000)
+status = Found, iterations = 22, normBound = 6.175e+00
+relation: -3*z9 +7*pi^2*z7 -2*z3^3 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e266
+elapsed 173.534662300000007917333277874 s
+=== MAIN w=22  (n = 48, digits = 2000)
+status = PrecisionExhausted, iterations = 148011, normBound = 2.785e+32
+power estimate 10^(0.8*D/n) = 1e33
+elapsed 1093.6070105999999668711097911 s
+=== CHECK w=8 adds zeta(w); expect rational*pi^w (n = 4, digits = 2000)
+status = Found, iterations = 28, normBound = 6.734e+03
+relation: -1*pi^8 +9450*zeta(8)
+residual at 4000 digits = 1.342e-3996  VERIFIED
+power estimate 10^(0.8*D/n) = 1e400
+elapsed 189.885556091000012202130164951 s
+=== CHECK w=7 adds y; expect (3,-7,..,2,-1) (n = 4, digits = 2000)
+status = Found, iterations = 9, normBound = 4.812e+00
+relation: -3*z7 +7*pi^2*z5 -2*pi^4*z3 +1*y=3m1-7m2+2m_last
+residual at 4000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e400
+elapsed 178.396888073000013719138223678 s
+=== CHECK w=6 adds zeta(w); expect rational*pi^w (n = 3, digits = 2000)
+status = Found, iterations = 6, normBound = 8.039e+02
+relation: +1*pi^6 -945*zeta(6)
+residual at 4000 digits = 1.678e-3997  VERIFIED
+power estimate 10^(0.8*D/n) = 1e533
+elapsed 185.900846416999996790764271282 s
+=== MAIN w=23  (n = 56, digits = 2000)
+status = PrecisionExhausted, iterations = 172013, normBound = 1.854e+27
+power estimate 10^(0.8*D/n) = 1e28
+elapsed 1492.12236953799992988933809102 s
+=== MAIN w=24  (n = 66, digits = 2000)
+status = PrecisionExhausted, iterations = 201413, normBound = 3.344e+22
+power estimate 10^(0.8*D/n) = 1e24
+elapsed 2342.88632047999999485909938812 s
+=== CHECK w=24 adds zeta(w); expect rational*pi^w (n = 67, digits = 2000)
+status = Found, iterations = 182082, normBound = 3.840e+19
+relation: +236364091*pi^24 -201919571963756521875*zeta(24)
+residual at 4000 digits = 9.672e-3980  VERIFIED
+power estimate 10^(0.8*D/n) = 1e23
+elapsed 2410.70075810600019394769333303 s
+=== SUMMARY (digits = 2000, maxZetaArg = 23)
+w=6 n=2 power~1e800 check=PASS main=no relation
+w=7 n=3 power~1e533 check=PASS main=no relation
+w=8 n=3 power~1e533 check=PASS main=no relation
+w=9 n=5 power~1e320 check=PASS main=no relation
+w=10 n=5 power~1e320 check=PASS main=no relation
+w=11 n=7 power~1e228 check=PASS main=no relation
+w=12 n=8 power~1e200 check=PASS main=no relation
+w=13 n=10 power~1e160 check=PASS main=no relation
+w=14 n=12 power~1e133 check=PASS main=no relation
+w=15 n=15 power~1e106 check=PASS main=no relation
+w=16 n=17 power~1e94 check=PASS main=no relation
+w=17 n=21 power~1e76 check=PASS main=no relation
+w=18 n=25 power~1e64 check=PASS main=no relation
+w=19 n=29 power~1e55 check=PASS main=no relation
+w=20 n=35 power~1e45 check=PASS main=no relation
+w=21 n=41 power~1e39 check=PASS main=no relation
+w=22 n=48 power~1e33 check=PASS main=no relation
+w=23 n=56 power~1e28 check=PASS main=no relation
+w=24 n=66 power~1e24 check=PASS main=no relation
+elapsed 2410.70592959399982646573334932 s

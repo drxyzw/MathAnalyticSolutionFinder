@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <functional>
 #include "check_recurring_decimal.h"
 #include "pslq.h"
 #include "test.h"
@@ -291,24 +292,24 @@ namespace
 	// (1, y, ..., y^degree) for y = x * e^(-r) * pi^(-s) over the whole (r, s) grid.
 	// xAtPrec(digits) must return x computed at the given number of digits (used to verify hits).
 	template <class XAtPrec>
-	void reportAlgebraicExpPiSearch(const char* name, XAtPrec xAtPrec, int pslqDigits, int degree, int maxDen, int maxAbs)
+	void reportAlgebraicExpPiSearch(const char* name, XAtPrec xAtPrec, int pslqDigits, int degree, int maxDen, int maxAbs, bool piGrid = true)
 	{
 		std::cout << "=== " << name << " ===" << std::endl;
 		mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
 		const mpreal x = xAtPrec(pslqDigits);
 		const mpreal pi = mpfr::const_pi();
 		const std::vector<Rational> rats = enumerateRationals(maxDen, maxAbs);
-		const size_t nr = rats.size();
-		std::vector<mpreal> expMinus(nr), piMinus(nr);
+		// without the pi grid, s is fixed to 0
+		const std::vector<Rational> ratsS = piGrid ? rats : std::vector<Rational>{ { 0, 1 } };
+		const size_t nr = rats.size(), ns = ratsS.size();
+		std::vector<mpreal> expMinus(nr), piMinus(ns);
 		for (size_t i = 0; i < nr; ++i)
-		{
-			const mpreal q = mpreal(rats[i].num) / rats[i].den;
-			expMinus[i] = mpfr::exp(-q);
-			piMinus[i] = mpfr::pow(pi, -q);
-		}
-		const size_t total = nr * nr;
+			expMinus[i] = mpfr::exp(-mpreal(rats[i].num) / rats[i].den);
+		for (size_t i = 0; i < ns; ++i)
+			piMinus[i] = mpfr::pow(pi, -mpreal(ratsS[i].num) / ratsS[i].den);
+		const size_t total = nr * ns;
 		std::cout << "degree <= " << degree << ", " << pslqDigits << " digits, denominators <= " << maxDen
-			<< ", |r|,|s| <= " << maxAbs << ": " << total << " (r, s) pairs" << std::endl;
+			<< (piGrid ? ", |r|,|s| <= " : ", |r| <= ") << maxAbs << ": " << total << (piGrid ? " (r, s) pairs" : " values of r (s = 0)") << std::endl;
 
 		std::vector<PslqResult> results(total);
 		std::atomic<size_t> next{ 0 }, done{ 0 };
@@ -322,7 +323,7 @@ namespace
 					mpreal::set_default_prec(mpfr::digits2bits(pslqDigits)); // default precision is thread-local
 					for (size_t k; (k = next++) < total;)
 					{
-						const mpreal y = x * expMinus[k / nr] * piMinus[k % nr];
+						const mpreal y = x * expMinus[k / ns] * piMinus[k % ns];
 						results[k] = findIntegerPolynomial(y, degree);
 						const size_t d = ++done;
 						if (d % 1000 == 0)
@@ -345,8 +346,8 @@ namespace
 		for (size_t k = 0; k < total; ++k)
 		{
 			PslqResult& r = results[k];
-			const Rational& er = rats[k / nr];
-			const Rational& ps = rats[k % nr];
+			const Rational& er = rats[k / ns];
+			const Rational& ps = ratsS[k % ns];
 			if (r.status != PslqResult::Status::Found)
 			{
 				if (minBound < 0 || r.normBound < minBound)
@@ -358,7 +359,7 @@ namespace
 			}
 			// PSLQ may return a multiple of the minimal polynomial; retry with increasing degree.
 			{
-				const mpreal y = x * expMinus[k / nr] * piMinus[k % nr];
+				const mpreal y = x * expMinus[k / ns] * piMinus[k % ns];
 				for (int d = 1; d < degree; ++d)
 				{
 					PslqResult rd = findIntegerPolynomial(y, d);
@@ -385,8 +386,8 @@ namespace
 		std::cout << hits << " verified hit(s)." << std::endl;
 		if (minBound >= 0)
 			std::cout << "For every other (r, s): no integer polynomial of degree <= " << degree
-				<< " with |coeffs|_2 < " << minBound.toString("%.3Re") << " (weakest at r = " << rats[minBoundIdx / nr].str()
-				<< ", s = " << rats[minBoundIdx % nr].str() << ")" << std::endl;
+				<< " with |coeffs|_2 < " << minBound.toString("%.3Re") << " (weakest at r = " << rats[minBoundIdx / ns].str()
+				<< ", s = " << ratsS[minBoundIdx % ns].str() << ")" << std::endl;
 	}
 }
 
@@ -407,4 +408,326 @@ void test_pslq_apery_algebraic_exp_pi_grid()
 			const mpreal pi = mpfr::const_pi();
 			return mpfr::zeta(mpreal(3)) / (pi * pi * pi);
 		}, 500, 8, 6, 6);
+}
+
+namespace
+{
+	// Runs findIntegerPolynomial for every degree 1..maxDegree on each target, in parallel over (target, degree).
+	// xAtPrec(digits) must return x at the given number of digits (Found results are re-checked at 2x digits).
+	struct PolySearchTarget
+	{
+		std::string name;
+		std::function<mpreal(int)> xAtPrec;
+	};
+
+	void reportPolynomialSearchParallel(const std::vector<PolySearchTarget>& targets, int pslqDigits, int maxDegree)
+	{
+		mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+		const size_t nt = targets.size();
+		std::vector<mpreal> xs(nt);
+		for (size_t t = 0; t < nt; ++t)
+			xs[t] = targets[t].xAtPrec(pslqDigits);
+
+		// jobs: (target, degree), biggest degree first for load balancing
+		std::vector<std::pair<size_t, int>> jobs;
+		for (int d = maxDegree; d >= 1; --d)
+			for (size_t t = 0; t < nt; ++t)
+				jobs.push_back({ t, d });
+		std::vector<std::vector<PslqResult>> results(nt, std::vector<PslqResult>(maxDegree + 1));
+		std::vector<std::vector<double>> seconds(nt, std::vector<double>(maxDegree + 1));
+
+		std::atomic<size_t> next{ 0 }, done{ 0 };
+		const unsigned nThreads = std::max(1u, std::thread::hardware_concurrency());
+		const auto t0 = std::chrono::steady_clock::now();
+		std::vector<std::thread> threads;
+		for (unsigned th = 0; th < nThreads; ++th)
+		{
+			threads.emplace_back([&]()
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(pslqDigits)); // default precision is thread-local
+					for (size_t k; (k = next++) < jobs.size();)
+					{
+						const auto [t, d] = jobs[k];
+						const auto s0 = std::chrono::steady_clock::now();
+						results[t][d] = findIntegerPolynomial(xs[t], d);
+						seconds[t][d] = std::chrono::duration<double>(std::chrono::steady_clock::now() - s0).count();
+						const size_t c = ++done;
+						std::unique_lock lock(mutex);
+						std::cout << "  [" << c << " / " << jobs.size() << "] " << targets[t].name << ", degree " << d << ": "
+							<< toString(results[t][d].status) << " (" << static_cast<long>(seconds[t][d] * 1000) << " ms)" << std::endl;
+					}
+				});
+		}
+		for (auto& th : threads)
+			th.join();
+		std::cout << "elapsed " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - t0).count()
+			<< " s" << std::endl;
+
+		for (size_t t = 0; t < nt; ++t)
+		{
+			std::cout << "=== " << targets[t].name << " (" << pslqDigits << " digits) ===" << std::endl;
+			int verified = 0;
+			for (int d = 1; d <= maxDegree; ++d)
+			{
+				const PslqResult& r = results[t][d];
+				std::cout << "degree " << d << ": " << toString(r.status) << ", iter " << r.iterations << ", "
+					<< std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(seconds[t][d])).count() << " ms";
+				if (r.status != PslqResult::Status::Found)
+				{
+					std::cout << ", no polynomial with |coeffs|_2 < " << r.normBound.toString("%.3Re") << std::endl;
+					continue;
+				}
+				mpreal::set_default_prec(mpfr::digits2bits(2 * pslqDigits));
+				const mpreal x2 = targets[t].xAtPrec(2 * pslqDigits);
+				mpreal v = 0;
+				for (size_t i = r.relation.size(); i-- > 0;)
+					v = v * x2 + r.relation[i];
+				const bool genuine = mpfr::abs(v) < mpfr::pow(mpreal(10), -1.5 * pslqDigits);
+				mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+				verified += genuine;
+				std::cout << (genuine ? "  VERIFIED" : "  SPURIOUS") << "\n    " << polynomialToString(r.relation)
+					<< "   (residual at " << 2 * pslqDigits << " digits: " << mpfr::abs(v).toString("%.3Re") << ")" << std::endl;
+			}
+			std::cout << verified << " verified relation(s) for " << targets[t].name << std::endl;
+		}
+	}
+}
+
+void test_pslq_zeta3_zeta5_ratio_parallel(int maxDegree)
+{
+	const int pslqDigits = 500;
+	std::cout.precision(60);
+	auto zetaRatio = [](int p, int q)
+		{
+			return [p, q](int digits)
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(digits));
+					return mpfr::pow(mpfr::zeta(mpreal(3)), mpreal(1) / p) / mpfr::pow(mpfr::zeta(mpreal(5)), mpreal(1) / q);
+				};
+		};
+	reportPolynomialSearchParallel({
+		{ "zeta(3)^(1/3) / zeta(5)^(1/5)", zetaRatio(3, 5) },
+		{ "zeta(3)^(1/2) / zeta(5)^(1/4)", zetaRatio(2, 4) },
+		}, pslqDigits, maxDegree);
+}
+
+void test_pslq_zeta3_zeta7_over_zeta5_squared(int pslqDigits, int maxDegree)
+{
+	std::cout.precision(60);
+	reportPolynomialSearchParallel({
+		{ "zeta(3) * zeta(7) / zeta(5)^2", [](int digits)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(digits));
+				const mpreal z5 = mpfr::zeta(mpreal(5));
+				return mpfr::zeta(mpreal(3)) * mpfr::zeta(mpreal(7)) / (z5 * z5);
+			} },
+		}, pslqDigits, maxDegree);
+}
+
+void test_pslq_zeta3_zeta7_over_zeta5_squared_exp_grid(int pslqDigits, int degree, int maxDen, int maxAbs)
+{
+	std::cout.precision(50);
+
+	// sanity check: (2^(1/3) + 1) * e^(5/7)
+	reportAlgebraicExpPiSearch("(2^(1/3) + 1) * e^(5/7)  [sanity]", [](int d)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(d));
+			return (mpfr::cbrt(mpreal(2)) + 1) * mpfr::exp(mpreal(5) / 7);
+		}, pslqDigits, degree, maxDen, maxAbs, false);
+
+	reportAlgebraicExpPiSearch("zeta(3) * zeta(7) / zeta(5)^2", [](int d)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(d));
+			const mpreal z5 = mpfr::zeta(mpreal(5));
+			return mpfr::zeta(mpreal(3)) * mpfr::zeta(mpreal(7)) / (z5 * z5);
+		}, pslqDigits, degree, maxDen, maxAbs, false);
+}
+
+// Tests whether zeta(3)*zeta(7)/zeta(5)^2 = alpha * e^r with r rational (any denominator) and alpha in the
+// multiplicative group generated by rational powers of primes and of a few quadratic units,
+// via PSLQ on (log x, 1, log 2, log 3, ..., log units).
+void test_pslq_zeta3_zeta7_over_zeta5_squared_multiplicative(int pslqDigits, int maxPrime)
+{
+	mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+	std::cout.precision(50);
+
+	const mpreal sqrt2 = mpfr::sqrt(mpreal(2)), sqrt3 = mpfr::sqrt(mpreal(3)), sqrt5 = mpfr::sqrt(mpreal(5));
+	std::vector<LogBasis> basis;
+	basis.push_back({ "e", mpreal(1) });
+	for (int p = 2; p <= maxPrime; ++p)
+	{
+		bool isPrime = true;
+		for (int d = 2; d * d <= p && isPrime; ++d)
+			isPrime = p % d != 0;
+		if (isPrime)
+			basis.push_back({ std::to_string(p), mpfr::log(mpreal(p)) });
+	}
+	basis.push_back({ "((1+sqrt5)/2)", mpfr::log((1 + sqrt5) / 2) });
+	basis.push_back({ "(1+sqrt2)", mpfr::log(1 + sqrt2) });
+	basis.push_back({ "(2+sqrt3)", mpfr::log(2 + sqrt3) });
+	std::cout << "primes <= " << maxPrime << ", " << pslqDigits << " digits, PSLQ vector length " << basis.size() + 1 << std::endl;
+
+	// sanity check with a large-denominator r: 2^(1/3) * e^(357/1000) * (1+sqrt2)^(-1/2) * 11^(3/7)
+	const mpreal known = mpfr::cbrt(mpreal(2)) * mpfr::exp(mpreal(357) / 1000) / mpfr::sqrt(1 + sqrt2)
+		* mpfr::pow(mpreal(11), mpreal(3) / 7);
+	reportMultiplicativeSearch("2^(1/3) * e^(357/1000) * (1+sqrt2)^(-1/2) * 11^(3/7)  [sanity]", known, basis);
+
+	const mpreal z5 = mpfr::zeta(mpreal(5));
+	const mpreal x = mpfr::zeta(mpreal(3)) * mpfr::zeta(mpreal(7)) / (z5 * z5);
+	reportMultiplicativeSearch("zeta(3) * zeta(7) / zeta(5)^2", x, basis);
+}
+
+namespace
+{
+	// PSLQ on (log b_1, ..., log b_n): searches prod b_i^(c_i) = 1 with integers c_i.
+	void reportLogRelationSearch(const char* name, const std::vector<LogBasis>& basis)
+	{
+		std::cout << "=== " << name << " ===" << std::endl;
+		std::vector<mpreal> v;
+		for (const auto& b : basis)
+			v.push_back(b.log);
+		const auto t0 = std::chrono::steady_clock::now();
+		const PslqResult r = pslq(v);
+		const auto t1 = std::chrono::steady_clock::now();
+		std::cout << toString(r.status) << ", iter " << r.iterations << ", "
+			<< std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count() << " ms" << std::endl;
+		if (r.status != PslqResult::Status::Found)
+		{
+			std::cout << "    no relation prod base_i^(c_i) = 1 with integer c, |c|_2 < " << r.normBound.toString("%.3Re") << std::endl;
+			return;
+		}
+		std::cout << "    ";
+		bool first = true;
+		for (size_t i = 0; i < basis.size(); ++i)
+		{
+			const std::string c = r.relation[i].toString("%.0Rf");
+			if (c == "0" || c == "-0")
+				continue;
+			std::cout << (first ? "" : " * ") << basis[i].name << "^(" << c << ")";
+			first = false;
+		}
+		std::cout << " = 1   (residual " << r.residual.toString("%.3Re") << ")" << std::endl;
+	}
+}
+
+// PSLQ on (log zeta(3), log zeta(5), log zeta(7), 1, log 2, log 3, ..., log p, log units):
+// searches zeta(3)^a * zeta(5)^b * zeta(7)^c = e^r * prod p^(a_p) * units with rational exponents.
+void test_pslq_zeta357_multiplicative(int pslqDigits, int maxPrime)
+{
+	mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+	std::cout.precision(50);
+
+	const mpreal sqrt2 = mpfr::sqrt(mpreal(2)), sqrt3 = mpfr::sqrt(mpreal(3)), sqrt5 = mpfr::sqrt(mpreal(5));
+	const mpreal z3 = mpfr::zeta(mpreal(3)), z5 = mpfr::zeta(mpreal(5)), z7 = mpfr::zeta(mpreal(7));
+	std::vector<LogBasis> rest;
+	rest.push_back({ "e", mpreal(1) });
+	for (int p = 2; p <= maxPrime; ++p)
+	{
+		bool isPrime = true;
+		for (int d = 2; d * d <= p && isPrime; ++d)
+			isPrime = p % d != 0;
+		if (isPrime)
+			rest.push_back({ std::to_string(p), mpfr::log(mpreal(p)) });
+	}
+	rest.push_back({ "((1+sqrt5)/2)", mpfr::log((1 + sqrt5) / 2) });
+	rest.push_back({ "(1+sqrt2)", mpfr::log(1 + sqrt2) });
+	rest.push_back({ "(2+sqrt3)", mpfr::log(2 + sqrt3) });
+	std::cout << "primes <= " << maxPrime << ", " << pslqDigits << " digits, PSLQ vector length " << rest.size() + 3 << std::endl;
+
+	// sanity check: replace zeta(7) by y = zeta(3)^2 * zeta(5)^(-1/3) * 2^(1/3) * e^(357/1000)
+	{
+		const mpreal y = z3 * z3 / mpfr::cbrt(z5) * mpfr::cbrt(mpreal(2)) * mpfr::exp(mpreal(357) / 1000);
+		std::vector<LogBasis> basis{ { "zeta(3)", mpfr::log(z3) }, { "zeta(5)", mpfr::log(z5) }, { "y", mpfr::log(y) } };
+		basis.insert(basis.end(), rest.begin(), rest.end());
+		reportLogRelationSearch("y = zeta(3)^2 * zeta(5)^(-1/3) * 2^(1/3) * e^(357/1000)  [sanity]", basis);
+	}
+
+	std::vector<LogBasis> basis{ { "zeta(3)", mpfr::log(z3) }, { "zeta(5)", mpfr::log(z5) }, { "zeta(7)", mpfr::log(z7) } };
+	basis.insert(basis.end(), rest.begin(), rest.end());
+	reportLogRelationSearch("zeta(3), zeta(5), zeta(7)", basis);
+}
+
+// PSLQ on (log zeta(s_1), ..., log zeta(s_k), [log pi], 1, log 2, ..., log p, log units):
+// searches prod zeta(s_i)^(a_i) * pi^b = e^r * prod p^(a_p) * units with rational exponents.
+void test_pslq_zeta_multiplicative(int pslqDigits, int maxPrime, const std::vector<int>& zetaArgs, bool includePi, bool includeEuler)
+{
+	mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+	std::cout.precision(50);
+
+	const mpreal sqrt2 = mpfr::sqrt(mpreal(2)), sqrt3 = mpfr::sqrt(mpreal(3)), sqrt5 = mpfr::sqrt(mpreal(5));
+	std::vector<LogBasis> zetas;
+	for (int s : zetaArgs)
+		zetas.push_back({ "zeta(" + std::to_string(s) + ")", mpfr::log(mpfr::zeta(mpreal(s))) });
+	std::vector<LogBasis> rest;
+	if (includePi)
+		rest.push_back({ "pi", mpfr::log(mpfr::const_pi()) });
+	if (includeEuler)
+		rest.push_back({ "gamma", mpfr::log(mpfr::const_euler()) });
+	rest.push_back({ "e", mpreal(1) });
+	for (int p = 2; p <= maxPrime; ++p)
+	{
+		bool isPrime = true;
+		for (int d = 2; d * d <= p && isPrime; ++d)
+			isPrime = p % d != 0;
+		if (isPrime)
+			rest.push_back({ std::to_string(p), mpfr::log(mpreal(p)) });
+	}
+	rest.push_back({ "((1+sqrt5)/2)", mpfr::log((1 + sqrt5) / 2) });
+	rest.push_back({ "(1+sqrt2)", mpfr::log(1 + sqrt2) });
+	rest.push_back({ "(2+sqrt3)", mpfr::log(2 + sqrt3) });
+	std::cout << "primes <= " << maxPrime << ", " << pslqDigits << " digits, PSLQ vector length "
+		<< zetas.size() + rest.size() << std::endl;
+
+	// sanity check: replace the last zeta by y = zeta(s_1)^2 * zeta(s_2)^(-1/3) * pi^(5/4) * 2^(1/3) * e^(357/1000)
+	if (zetas.size() >= 3)
+	{
+		const mpreal z1 = mpfr::zeta(mpreal(zetaArgs[0])), z2 = mpfr::zeta(mpreal(zetaArgs[1]));
+		mpreal y = z1 * z1 / mpfr::cbrt(z2) * mpfr::cbrt(mpreal(2)) * mpfr::exp(mpreal(357) / 1000);
+		if (includePi)
+			y *= mpfr::pow(mpfr::const_pi(), mpreal(5) / 4);
+		if (includeEuler)
+			y *= mpfr::pow(mpfr::const_euler(), mpreal(-2) / 7);
+		std::vector<LogBasis> basis(zetas.begin(), zetas.end() - 1);
+		basis.push_back({ "y", mpfr::log(y) });
+		basis.insert(basis.end(), rest.begin(), rest.end());
+		const std::string name = "y = " + zetas[0].name + "^2 * " + zetas[1].name + "^(-1/3)"
+			+ (includePi ? " * pi^(5/4)" : "") + (includeEuler ? " * gamma^(-2/7)" : "") + " * 2^(1/3) * e^(357/1000)  [sanity]";
+		reportLogRelationSearch(name.c_str(), basis);
+	}
+
+	std::vector<LogBasis> basis = zetas;
+	basis.insert(basis.end(), rest.begin(), rest.end());
+	std::string name;
+	for (const auto& z : zetas)
+		name += (name.empty() ? "" : ", ") + z.name;
+	if (includePi)
+		name += ", pi";
+	if (includeEuler)
+		name += ", gamma";
+	reportLogRelationSearch(name.c_str(), basis);
+}
+
+void test_pslq_zeta3_zeta5_ratio(int p, int q)
+{
+	// x = zeta(3)^(1/p) / zeta(5)^(1/q): search for an integer polynomial P with P(x) = 0
+	// via PSLQ on (1, x, ..., x^d) at 500 digits.
+	const int pslqDigits = 500;
+	const int maxDegree = 24;
+	mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+	std::cout.precision(60);
+
+	const std::string expo = "^(1/" + std::to_string(p) + ") / ";
+	const std::string expq = "^(1/" + std::to_string(q) + ")";
+
+	// sanity check with a known algebraic number of the same shape
+	const std::string sanityName = "2" + expo + "3" + expq;
+	reportPolynomialSearch(sanityName.c_str(),
+		mpfr::pow(mpreal(2), mpreal(1) / p) / mpfr::pow(mpreal(3), mpreal(1) / q), maxDegree);
+
+	const mpreal zeta3 = mpfr::zeta(mpreal(3));
+	const mpreal zeta5 = mpfr::zeta(mpreal(5));
+	const mpreal x = mpfr::pow(zeta3, mpreal(1) / p) / mpfr::pow(zeta5, mpreal(1) / q);
+	const std::string name = "zeta(3)" + expo + "zeta(5)" + expq;
+	std::cout << name << " = " << x << std::endl;
+	reportPolynomialSearch(name.c_str(), x, maxDegree);
 }

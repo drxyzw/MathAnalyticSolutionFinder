@@ -1,0 +1,107 @@
+  [1 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 35: PrecisionExhausted (57345 ms)
+  [2 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 36: PrecisionExhausted (62000 ms)
+  [3 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 38: PrecisionExhausted (64869 ms)
+  [4 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 37: PrecisionExhausted (74757 ms)
+  [5 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 39: PrecisionExhausted (92747 ms)
+  [6 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 41: PrecisionExhausted (98972 ms)
+  [7 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 40: PrecisionExhausted (100760 ms)
+  [8 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 32: PrecisionExhausted (44994 ms)
+  [9 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 31: PrecisionExhausted (37330 ms)
+  [10 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 42: PrecisionExhausted (116043 ms)
+  [11 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 44: PrecisionExhausted (117997 ms)
+  [12 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 33: PrecisionExhausted (56712 ms)
+  [13 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 43: PrecisionExhausted (119653 ms)
+  [14 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 28: PrecisionExhausted (29337 ms)
+  [15 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 34: PrecisionExhausted (74231 ms)
+  [16 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 23: PrecisionExhausted (14134 ms)
+  [17 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 26: PrecisionExhausted (22041 ms)
+  [18 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 30: PrecisionExhausted (43188 ms)
+  [19 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 22: PrecisionExhausted (17143 ms)
+  [20 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 25: PrecisionExhausted (21071 ms)
+  [21 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 27: PrecisionExhausted (27691 ms)
+  [22 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 24: PrecisionExhausted (20522 ms)
+  [23 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 13: PrecisionExhausted (2419 ms)
+  [24 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 29: PrecisionExhausted (42646 ms)
+  [25 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 14: PrecisionExhausted (4380 ms)
+  [26 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 16: PrecisionExhausted (5491 ms)
+  [27 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 21: PrecisionExhausted (12831 ms)
+  [28 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 15: PrecisionExhausted (6036 ms)
+  [29 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 11: PrecisionExhausted (1584 ms)
+  [30 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 12: PrecisionExhausted (2339 ms)
+  [31 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 9: PrecisionExhausted (1150 ms)
+  [32 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 5: PrecisionExhausted (175 ms)
+  [33 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 3: PrecisionExhausted (46 ms)
+  [34 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 6: PrecisionExhausted (300 ms)
+  [35 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 1: PrecisionExhausted (2 ms)
+  [36 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 2: PrecisionExhausted (16 ms)
+  [37 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 4: PrecisionExhausted (137 ms)
+  [38 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 10: PrecisionExhausted (1748 ms)
+  [39 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 8: PrecisionExhausted (814 ms)
+  [40 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 20: PrecisionExhausted (12171 ms)
+  [41 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 46: PrecisionExhausted (144093 ms)
+  [42 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 7: PrecisionExhausted (1065 ms)
+  [43 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 18: PrecisionExhausted (10254 ms)
+  [44 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 19: PrecisionExhausted (11688 ms)
+  [45 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 17: PrecisionExhausted (9203 ms)
+  [46 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 45: PrecisionExhausted (149870 ms)
+  [47 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 47: PrecisionExhausted (150930 ms)
+  [48 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 49: PrecisionExhausted (154020 ms)
+  [49 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 48: PrecisionExhausted (158025 ms)
+  [50 / 50] zeta(3) * zeta(7) / zeta(5)^2, degree 50: PrecisionExhausted (161881 ms)
+elapsed 161 s
+=== zeta(3) * zeta(7) / zeta(5)^2 (700 digits) ===
+degree 1: PrecisionExhausted, iter 365, 2 ms, no polynomial with |coeffs|_2 < 2.055e+280
+degree 2: PrecisionExhausted, iter 965, 16 ms, no polynomial with |coeffs|_2 < 4.719e+186
+degree 3: PrecisionExhausted, iter 1798, 46 ms, no polynomial with |coeffs|_2 < 1.119e+140
+degree 4: PrecisionExhausted, iter 2929, 137 ms, no polynomial with |coeffs|_2 < 1.361e+112
+degree 5: PrecisionExhausted, iter 4013, 175 ms, no polynomial with |coeffs|_2 < 2.169e+93
+degree 6: PrecisionExhausted, iter 5290, 300 ms, no polynomial with |coeffs|_2 < 1.028e+80
+degree 7: PrecisionExhausted, iter 6436, 1065 ms, no polynomial with |coeffs|_2 < 1.105e+70
+degree 8: PrecisionExhausted, iter 7753, 814 ms, no polynomial with |coeffs|_2 < 1.767e+62
+degree 9: PrecisionExhausted, iter 9140, 1150 ms, no polynomial with |coeffs|_2 < 1.002e+56
+degree 10: PrecisionExhausted, iter 10147, 1748 ms, no polynomial with |coeffs|_2 < 8.705e+50
+degree 11: PrecisionExhausted, iter 11448, 1584 ms, no polynomial with |coeffs|_2 < 4.773e+46
+degree 12: PrecisionExhausted, iter 12746, 2339 ms, no polynomial with |coeffs|_2 < 1.198e+43
+degree 13: PrecisionExhausted, iter 13982, 2419 ms, no polynomial with |coeffs|_2 < 1.031e+40
+degree 14: PrecisionExhausted, iter 15079, 4380 ms, no polynomial with |coeffs|_2 < 2.158e+37
+degree 15: PrecisionExhausted, iter 16251, 6036 ms, no polynomial with |coeffs|_2 < 1.006e+35
+degree 16: PrecisionExhausted, iter 17535, 5491 ms, no polynomial with |coeffs|_2 < 8.792e+32
+degree 17: PrecisionExhausted, iter 18671, 9203 ms, no polynomial with |coeffs|_2 < 1.360e+31
+degree 18: PrecisionExhausted, iter 19803, 10254 ms, no polynomial with |coeffs|_2 < 2.998e+29
+degree 19: PrecisionExhausted, iter 21075, 11688 ms, no polynomial with |coeffs|_2 < 1.017e+28
+degree 20: PrecisionExhausted, iter 22272, 12171 ms, no polynomial with |coeffs|_2 < 4.656e+26
+degree 21: PrecisionExhausted, iter 23490, 12831 ms, no polynomial with |coeffs|_2 < 2.926e+25
+degree 22: PrecisionExhausted, iter 24628, 17143 ms, no polynomial with |coeffs|_2 < 2.294e+24
+degree 23: PrecisionExhausted, iter 25789, 14134 ms, no polynomial with |coeffs|_2 < 2.536e+23
+degree 24: PrecisionExhausted, iter 26872, 20522 ms, no polynomial with |coeffs|_2 < 2.525e+22
+degree 25: PrecisionExhausted, iter 28122, 21071 ms, no polynomial with |coeffs|_2 < 2.514e+21
+degree 26: PrecisionExhausted, iter 29325, 22041 ms, no polynomial with |coeffs|_2 < 3.624e+20
+degree 27: PrecisionExhausted, iter 30194, 27691 ms, no polynomial with |coeffs|_2 < 5.522e+19
+degree 28: PrecisionExhausted, iter 31138, 29337 ms, no polynomial with |coeffs|_2 < 1.004e+19
+degree 29: PrecisionExhausted, iter 31889, 42646 ms, no polynomial with |coeffs|_2 < 2.008e+18
+degree 30: PrecisionExhausted, iter 33535, 43188 ms, no polynomial with |coeffs|_2 < 4.459e+17
+degree 31: PrecisionExhausted, iter 34653, 37330 ms, no polynomial with |coeffs|_2 < 1.092e+17
+degree 32: PrecisionExhausted, iter 35617, 44994 ms, no polynomial with |coeffs|_2 < 1.957e+16
+degree 33: PrecisionExhausted, iter 36669, 56712 ms, no polynomial with |coeffs|_2 < 7.454e+15
+degree 34: PrecisionExhausted, iter 37226, 74231 ms, no polynomial with |coeffs|_2 < 1.973e+15
+degree 35: PrecisionExhausted, iter 38853, 57345 ms, no polynomial with |coeffs|_2 < 5.773e+14
+degree 36: PrecisionExhausted, iter 39433, 62000 ms, no polynomial with |coeffs|_2 < 2.004e+14
+degree 37: PrecisionExhausted, iter 41060, 74757 ms, no polynomial with |coeffs|_2 < 6.825e+13
+degree 38: PrecisionExhausted, iter 41798, 64869 ms, no polynomial with |coeffs|_2 < 3.139e+13
+degree 39: PrecisionExhausted, iter 42961, 92747 ms, no polynomial with |coeffs|_2 < 1.030e+13
+degree 40: PrecisionExhausted, iter 44040, 100760 ms, no polynomial with |coeffs|_2 < 4.106e+12
+degree 41: PrecisionExhausted, iter 44930, 98972 ms, no polynomial with |coeffs|_2 < 1.800e+12
+degree 42: PrecisionExhausted, iter 45630, 116043 ms, no polynomial with |coeffs|_2 < 7.641e+11
+degree 43: PrecisionExhausted, iter 47080, 119653 ms, no polynomial with |coeffs|_2 < 3.582e+11
+degree 44: PrecisionExhausted, iter 48060, 117997 ms, no polynomial with |coeffs|_2 < 1.680e+11
+degree 45: PrecisionExhausted, iter 48641, 149870 ms, no polynomial with |coeffs|_2 < 9.222e+10
+degree 46: PrecisionExhausted, iter 49736, 144093 ms, no polynomial with |coeffs|_2 < 3.838e+10
+degree 47: PrecisionExhausted, iter 50988, 150930 ms, no polynomial with |coeffs|_2 < 2.104e+10
+degree 48: PrecisionExhausted, iter 51487, 158025 ms, no polynomial with |coeffs|_2 < 1.260e+10
+degree 49: PrecisionExhausted, iter 52373, 154020 ms, no polynomial with |coeffs|_2 < 5.716e+09
+degree 50: PrecisionExhausted, iter 53776, 161881 ms, no polynomial with |coeffs|_2 < 2.928e+09
+0 verified relation(s) for zeta(3) * zeta(7) / zeta(5)^2
+
+real	2m42.123s
+user	23m21.723s
+sys	0m1.102s

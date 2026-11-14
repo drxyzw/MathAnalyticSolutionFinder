@@ -1,0 +1,11 @@
+primes <= 100, 2000 digits, PSLQ vector length 32
+=== y = zeta(3)^2 * zeta(5)^(-1/3) * 2^(1/3) * e^(357/1000)  [sanity] ===
+Found, iter 7931, 16390 ms
+    zeta(3)^(-6000) * zeta(5)^(1000) * y^(3000) * e^(-1071) * 2^(-1000) = 1   (residual 6.488e-1997)
+=== zeta(3), zeta(5), zeta(7) ===
+PrecisionExhausted, iter 99639, 210542 ms
+    no relation prod base_i^(c_i) = 1 with integer c, |c|_2 < 1.100e+50
+
+real	3m51.456s
+user	3m49.722s
+sys	0m0.045s

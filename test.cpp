@@ -422,7 +422,13 @@ namespace
 		std::function<mpreal(int)> xAtPrec;
 	};
 
-	void reportPolynomialSearchParallel(const std::vector<PolySearchTarget>& targets, int pslqDigits, int maxDegree)
+	struct PolySearchSummary
+		{
+			std::vector<std::vector<PslqResult>> results; // [target][degree]
+			std::vector<int> verified;
+		};
+
+		PolySearchSummary reportPolynomialSearchParallel(const std::vector<PolySearchTarget>& targets, int pslqDigits, int maxDegree)
 	{
 		mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
 		const size_t nt = targets.size();
@@ -465,6 +471,7 @@ namespace
 		std::cout << "elapsed " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - t0).count()
 			<< " s" << std::endl;
 
+		std::vector<int> verifiedCounts(nt, 0);
 		for (size_t t = 0; t < nt; ++t)
 		{
 			std::cout << "=== " << targets[t].name << " (" << pslqDigits << " digits) ===" << std::endl;
@@ -491,7 +498,9 @@ namespace
 					<< "   (residual at " << 2 * pslqDigits << " digits: " << mpfr::abs(v).toString("%.3Re") << ")" << std::endl;
 			}
 			std::cout << verified << " verified relation(s) for " << targets[t].name << std::endl;
+			verifiedCounts[t] = verified;
 		}
+		return { results, verifiedCounts };
 	}
 }
 
@@ -1055,4 +1064,97 @@ void test_pslq_zeta_central_binomial(int digits, int targetZeta)
 	if (w == 5) withK.push_back({ -1, 3, 1, true });
 	run("V3 [sanity] main basis WITH Koecher series: relation must appear", withK, true, true);
 	run("M main basis WITHOUT Koecher series", base, true, true);
+}
+
+void test_pslq_zeta3_elementary_functions(int digits, int maxDegree)
+{
+	std::cout.precision(60);
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		std::function<mpreal(int)> checkC; // known x0 with f(x0) algebraic
+		int checkK;
+		std::string checkNote;
+	};
+	auto pi = []() { return mpfr::const_pi(); };
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "exp(x0)=1+2^(1/3): deg 3" },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, [](int) { return mpfr::exp(mpfr::sqrt(mpreal(2))); }, 0, "x0=exp(sqrt2): log=sqrt2" },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, [](int) { return mpfr::const_pi() / 5; }, 0, "c=pi/5: deg 4" },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, [](int) { return mpfr::const_pi() / 7; }, 0, "c=pi/7: deg 3" },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, [](int) { return mpfr::const_pi() / 5; }, 0, "c=pi/5: deg 4" },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, [](int) { return mpfr::tan(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=tan(sqrt2/3): sqrt2/3" },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, [](int) { return mpfr::sinh(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=sinh(sqrt2/3): sqrt2/3" },
+		{ "arccosh", [](const mpreal& t) { return mpfr::acosh(t); }, [](int) { return mpfr::cosh(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=cosh(sqrt2/3): sqrt2/3" },
+		{ "arcsin(1/t)", [](const mpreal& t) { return mpfr::asin(1 / t); }, [](int) { return 1 / mpfr::sin(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=1/sin(sqrt2/3): sqrt2/3" },
+		{ "arccos(1/t)", [](const mpreal& t) { return mpfr::acos(1 / t); }, [](int) { return 1 / mpfr::cos(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=1/cos(sqrt2/3): sqrt2/3" },
+		{ "log(t-1)", [](const mpreal& t) { return mpfr::log(t - 1); }, [](int) { return 1 + mpfr::exp(mpfr::sqrt(mpreal(2))); }, 0, "x0=1+exp(sqrt2): sqrt2" },
+		{ "t^t", [](const mpreal& t) { return mpfr::pow(t, t); }, [](int) {
+				// solve c^c = 2 by Newton on g(c) = c log c - log 2
+				const mpreal l2 = mpfr::log(mpreal(2));
+				mpreal c = 1.5;
+				for (int i = 0; i < 200; ++i)
+					c -= (c * mpfr::log(c) - l2) / (mpfr::log(c) + 1);
+				return c; }, 0, "c^c=2: rational 2" },
+		{ "Gamma", [](const mpreal& t) { return mpfr::gamma(t); }, [](int) { return mpreal(4); }, 0, "c=4: Gamma=6 (weak check)" },
+		{ "exp(1/t)", [](const mpreal& t) { return mpfr::exp(1 / t); }, [](int) { return 1 / mpfr::log(mpreal(2)); }, 0, "c=1/log2: 2" },
+	};
+	(void)pi;
+	const std::vector<int> ks = { -2, -1, 0, 1, 2, 3 }; // targets f(zeta(3) / pi^k)
+	std::vector<PolySearchTarget> targets;
+	for (const auto& fn : fns)
+		for (int k : ks)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(50));
+			if (mpfr::isnan(fn.f(mpfr::zeta(mpreal(3)) / mpfr::pow(mpfr::const_pi(), mpreal(k)))))
+			{
+				std::cout << "skip " << fn.name << "(zeta3 / pi^" << k << "): outside the domain of the function" << std::endl;
+				continue;
+			}
+			targets.push_back({ fn.name + "(zeta3 / pi^" + std::to_string(k) + ")", [fn, k](int d)
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(d));
+					return fn.f(mpfr::zeta(mpreal(3)) / mpfr::pow(mpfr::const_pi(), mpreal(k)));
+				} });
+		}
+	const size_t nMain = targets.size();
+	for (const auto& fn : fns)
+		targets.push_back({ "[CHECK] " + fn.name + "(c / pi^2), c = x0 pi^2  (" + fn.checkNote + ")", [fn](int d)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				const mpreal pi2 = mpfr::const_pi() * mpfr::const_pi();
+				const mpreal c = fn.checkC(d) * pi2; // known x0 times pi^2, so that c / pi^2 = x0
+				return fn.f(c / pi2);
+			} });
+	std::cout << "NOTE: targets are f(zeta(3)/pi^k). [CHECK] targets replace zeta(3)/pi^k by a known x0 (built as c/pi^2 with c = x0 pi^2) with f(x0) algebraic. "
+		"t^t uses x0^x0=2, Gamma uses x0=4 (weak), exp(1/t) uses x0=1/log2." << std::endl;
+
+	const auto sm = reportPolynomialSearchParallel(targets, digits, maxDegree);
+
+	std::cout << "\n===== SUMMARY (" << digits << " digits, degree <= " << maxDegree << ") =====" << std::endl;
+	std::cout << "target | verified relations (first degree) | norm bound at max degree / degree 4 / degree 8" << std::endl;
+	for (size_t t = 0; t < targets.size(); ++t)
+	{
+		if (t == nMain)
+			std::cout << "--- validation cases ---" << std::endl;
+		int firstDeg = 0;
+		for (int d = 1; d <= maxDegree && !firstDeg; ++d)
+			if (sm.results[t][d].status == PslqResult::Status::Found)
+				firstDeg = d;
+		std::cout << targets[t].name << " | ";
+		if (sm.verified[t] > 0)
+			std::cout << "FOUND (verified), first at degree " << firstDeg;
+		else if (firstDeg)
+			std::cout << "SPURIOUS only";
+		else
+			std::cout << "none";
+		auto nb = [&](int d) { return d <= maxDegree ? sm.results[t][d].normBound.toString("%.2Re") : std::string("n/a"); };
+		if (firstDeg == 0)
+			std::cout << " | " << nb(maxDegree) << " / " << nb(4) << " / " << nb(8);
+		std::cout << std::endl;
+	}
 }

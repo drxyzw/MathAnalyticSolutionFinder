@@ -35,13 +35,13 @@ g++ -O2 -std=c++17 main.cpp test.cpp check_recurring_decimal.cpp pslq.cpp -o mai
 - [test.cpp](test.cpp) のヘルパー関数：
   - `reportPolynomialSearch(name, x, maxDegree)`：次数 1..maxDegree を順に調べる。
   - `reportPolynomialSearchParallel(targets, digits, maxDegree)`：(ターゲット, 次数) の組を並列に調べる。見つかった関係は2倍の精度で検算する。
-  - `reportAlgebraicExpPiSearch(name, xAtPrec, digits, degree, maxDen, maxAbs, piGrid)`：x = α·e^r·π^s の形をグリッドで探索する。piGrid=false にすると s=0 に固定する。
+  - `reportAlgebraicExpPiSearch(name, xAtPrec, digits, degree, maxDen, maxAbs, piGrid)`：$x=\alpha e^r \pi^s$の形をグリッドで探索する。piGrid=false にすると s=0 に固定する。
   - `reportMultiplicativeSearch(name, x, basis)`：(log x, log 基底…) に対して PSLQ を行う。
   - `reportLogRelationSearch(name, basis)`：∏ b_i^(c_i) = 1 の形の関係を探す。
   - `test_pslq_zeta_multiplicative(digits, maxPrime, zetaArgs, includePi, includeEuler)`：ζ値・π・γ・e・素数・単数の間の積の関係を探す。
 - [check_recurring_decimal.h](check_recurring_decimal.h)：循環小数かどうかを判定する。
 - [grid_search.cpp](grid_search.cpp)：グリッド探索（独立したプログラム）。
-- [cf_search.cpp](cf_search.cpp)：多項式連分数（Ramanujan Machine 型）の探索。独立プログラム。`./cf_search <F1|F2|F3> <C> <M> <threads> [stride]`、`./cf_search F4 <C> <M> <threads> <Aalpha> <Ab> [stride]`（a_n=-(αn²+βn+γ)³）。ビルド：`g++ -O2 -std=c++17 cf_search.cpp -o cf_search -lmpfr -lgmp -pthread`
+- [cf_search.cpp](cf_search.cpp)：多項式連分数（Ramanujan Machine 型）の探索。独立プログラム。メビウス変換 (A+Bt)/(C+Dt) と照合し、ヒットは mpreal で検証する。`./cf_search <F1|F2|F3>[multi] <C> <M> <threads> [stride]`（F1: a_n=-n^6, F2: ζ(2), F3: ζ(5)）、`./cf_search F4[multi] <C> <M> <threads> <Aα> <Ab> [stride]`（a_n=-(αn²+βn+γ)³）、`./cf_search G1 <Ca> <Cb> <M> <threads> [stride]`（a_n, b_n とも2次。多項式収束は Richardson 外挿で扱う）。`multi` と G1 は、ζ(3)·π^k の初等関数17種×k∈{-3..0}（定義域外は除外）と対照 ζ(3), e, π の複数ターゲットで照合する。ビルド：`g++ -O2 -std=c++17 cf_search.cpp -o cf_search -lmpfr -lgmp -pthread`
 
 ## 決まりごと
 - 新しい実験は関数として追加する。

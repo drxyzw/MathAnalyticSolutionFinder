@@ -1,0 +1,1231 @@
+cf_search family=G1 (multi-target) C=20 Ca=20 M=10 threads=10 stride=1
+skip target arccosh(zeta3*pi^-3) (outside the domain)
+skip target arccosh(zeta3*pi^-2) (outside the domain)
+skip target arccosh(zeta3*pi^-1) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-3) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-2) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-1) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-3) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-2) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-1) (outside the domain)
+skip target log(t-1)(zeta3*pi^-3) (outside the domain)
+skip target log(t-1)(zeta3*pi^-2) (outside the domain)
+skip target log(t-1)(zeta3*pi^-1) (outside the domain)
+targets = 59
+mobius table size = 5055522 entries (77 MB); dropped near-rational images: 83614
+SELFTEST G1 (required: a_n=n^2, b_n=2n+1 -> 4/pi (target pi, polynomial convergence);
+  a_n=n, b_n=n+1 -> 1/(e-2) (target e); a_n=(2n+1)^2, b_n=2 -> pi/(4-pi) via Richardson)
+  selftest case 4/pi (geometric, 0.77 digits/term) b=[1,2,0] (c0..cK): [pi] (A,B,C,D)=(4,0,0,1) diff=1e-209.14 digits/term=0.765518 VERIFIED; 
+  selftest case 1/(e-2) b=[1,1,0] (c0..cK): [e] (A,B,C,D)=(1,0,-2,1) diff=1e-208.59 digits/term=1.72276 VERIFIED; 
+  selftest case Brouncker tail pi/(4-pi), a_n=(2n+1)^2, b_n=2 (polynomial conv.) b=[2,0,0] (c0..cK): [pi] (A,B,C,D)=(0,1,4,-1) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL; 
+SELFTEST PASS
+
+=== search G1: a_n=a2 n^2+a1 n+a0, |a_i|<=20, deg b=2, |c_i|<=20, tasks=2825761 ===
+candidates tested = 4600752434  search time = 3665.81 s (7.96785 us/candidate/thread)
+stage-2 hits = 660
+G1 (a:-20,11,-4) [tan(zeta3*pi^-1)] b=[-1,9,-19] (c0..cK) (A,B,C,D)=(0,4,4,3) diff=1e-13.41 digits/term=nan VERIFIED-ACCEL
+G1 (a:-20,11,-4) [tan(zeta3*pi^-1)] b=[1,-9,19] (c0..cK) (A,B,C,D)=(0,4,-4,-3) diff=1e-13.41 digits/term=nan VERIFIED-ACCEL
+G1 (a:-20,17,-15) [cos(zeta3*pi^-2)] b=[-18,-13,17] (c0..cK) (A,B,C,D)=(8,10,-9,8) diff=1e-12.61 digits/term=nan VERIFIED-ACCEL
+G1 (a:-20,17,-15) [cos(zeta3*pi^-2)] b=[18,13,-17] (c0..cK) (A,B,C,D)=(8,10,9,-8) diff=1e-12.61 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,-20,2) [exp(zeta3*pi^-2)] b=[-6,5,-9] (c0..cK) (A,B,C,D)=(6,-6,-1,-4) diff=1e-13.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,-20,2) [exp(zeta3*pi^-2)] b=[6,-5,9] (c0..cK) (A,B,C,D)=(6,-6,1,4) diff=1e-13.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,-13,16) [cosh(zeta3*pi^-3)] b=[-2,-3,-4] (c0..cK) (A,B,C,D)=(8,10,3,9) diff=1e-13.02 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,-13,16) [cosh(zeta3*pi^-3)] b=[2,3,4] (c0..cK) (A,B,C,D)=(8,10,-3,-9) diff=1e-13.02 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,2,0) [exp(zeta3*pi^-2)] b=[-4,8,20] (c0..cK) (A,B,C,D)=(2,7,-10,7) diff=1e-12.97 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,2,0) [exp(zeta3*pi^-2)] b=[4,-8,-20] (c0..cK) (A,B,C,D)=(2,7,10,-7) diff=1e-12.97 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,17,-20) [cosh(zeta3*pi^0)] b=[-11,3,-14] (c0..cK) (A,B,C,D)=(1,8,-7,3) diff=1e-12.11 digits/term=nan VERIFIED-ACCEL
+G1 (a:-19,17,-20) [cosh(zeta3*pi^0)] b=[11,-3,14] (c0..cK) (A,B,C,D)=(1,8,7,-3) diff=1e-12.11 digits/term=nan VERIFIED-ACCEL
+G1 (a:-18,-9,0) [pi] b=[-12,-9,0] (c0..cK) (A,B,C,D)=(6,0,-10,3) diff=1e-208.31 digits/term=0.322341 VERIFIED
+G1 (a:-18,-9,0) [pi] b=[-9,-9,0] (c0..cK) (A,B,C,D)=(6,0,-4,1) diff=1e-208.37 digits/term=0.310433 VERIFIED
+G1 (a:-18,-9,0) [pi] b=[9,9,0] (c0..cK) (A,B,C,D)=(6,0,4,-1) diff=1e-208.37 digits/term=0.310433 VERIFIED
+G1 (a:-18,-9,0) [pi] b=[12,9,0] (c0..cK) (A,B,C,D)=(6,0,10,-3) diff=1e-208.31 digits/term=0.322341 VERIFIED
+G1 (a:-18,-9,9) [pi] b=[-12,-9,0] (c0..cK) (A,B,C,D)=(0,3,-4,1) diff=1e-207.94 digits/term=0.322577 VERIFIED
+G1 (a:-18,-9,9) [pi] b=[-9,-9,0] (c0..cK) (A,B,C,D)=(6,3,-2,0) diff=1e-207.72 digits/term=0.310691 VERIFIED
+G1 (a:-18,-9,9) [pi] b=[9,9,0] (c0..cK) (A,B,C,D)=(6,3,2,0) diff=1e-207.72 digits/term=0.310691 VERIFIED
+G1 (a:-18,-9,9) [pi] b=[12,9,0] (c0..cK) (A,B,C,D)=(0,3,4,-1) diff=1e-207.94 digits/term=0.322577 VERIFIED
+G1 (a:-18,2,7) [arctan(zeta3*pi^-3)] b=[-1,-15,6] (c0..cK) (A,B,C,D)=(1,8,-8,-10) diff=1e-14.08 digits/term=nan VERIFIED-ACCEL
+G1 (a:-18,2,7) [arctan(zeta3*pi^-3)] b=[1,15,-6] (c0..cK) (A,B,C,D)=(1,8,8,10) diff=1e-14.08 digits/term=nan VERIFIED-ACCEL
+G1 (a:-18,9,0) [pi] b=[-6,-9,0] (c0..cK) (A,B,C,D)=(6,0,2,-1) diff=1e-209.34 digits/term=0.316685 VERIFIED
+G1 (a:-18,9,0) [pi] b=[-3,-9,0] (c0..cK) (A,B,C,D)=(6,0,0,-1) diff=1e-208.74 digits/term=0.304201 VERIFIED
+G1 (a:-18,9,0) [pi] b=[3,9,0] (c0..cK) (A,B,C,D)=(6,0,0,1) diff=1e-208.74 digits/term=0.304201 VERIFIED
+G1 (a:-18,9,0) [pi] b=[6,9,0] (c0..cK) (A,B,C,D)=(6,0,-2,1) diff=1e-209.34 digits/term=0.316685 VERIFIED
+G1 (a:-18,11,10) [exp(zeta3*pi^-2)] b=[-3,9,-2] (c0..cK) (A,B,C,D)=(8,8,-9,0) diff=1e-14.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:-18,11,10) [exp(zeta3*pi^-2)] b=[3,-9,2] (c0..cK) (A,B,C,D)=(8,8,9,0) diff=1e-14.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-20,-9) [tanh(zeta3*pi^-2)] b=[-1,18,0] (c0..cK) (A,B,C,D)=(4,3,0,-8) diff=1e-13.63 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-20,-9) [tanh(zeta3*pi^-2)] b=[1,-18,0] (c0..cK) (A,B,C,D)=(4,3,0,8) diff=1e-13.63 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-17,-16) [arccosh(zeta3*pi^0)] b=[-10,-11,15] (c0..cK) (A,B,C,D)=(5,10,1,-5) diff=1e-12.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-17,-16) [arccosh(zeta3*pi^0)] b=[10,11,-15] (c0..cK) (A,B,C,D)=(5,10,-1,5) diff=1e-12.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-17,10) [exp(1/t)(zeta3*pi^0)] b=[-10,1,18] (c0..cK) (A,B,C,D)=(10,2,-8,3) diff=1e-12.12 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,-17,10) [exp(1/t)(zeta3*pi^0)] b=[10,-1,-18] (c0..cK) (A,B,C,D)=(10,2,8,-3) diff=1e-12.12 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,4,10) [sin(zeta3*pi^-1)] b=[-1,-13,3] (c0..cK) (A,B,C,D)=(1,-9,1,8) diff=1e-13.36 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,4,10) [sin(zeta3*pi^-1)] b=[1,13,-3] (c0..cK) (A,B,C,D)=(1,-9,-1,-8) diff=1e-13.36 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,10,16) [tan(zeta3*pi^-2)] b=[-4,-18,6] (c0..cK) (A,B,C,D)=(10,9,-2,-3) diff=1e-12.78 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,10,16) [tan(zeta3*pi^-2)] b=[4,18,-6] (c0..cK) (A,B,C,D)=(10,9,2,3) diff=1e-12.78 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,11,9) [sinh(zeta3*pi^-1)] b=[-10,9,2] (c0..cK) (A,B,C,D)=(7,0,-1,1) diff=1e-12.31 digits/term=nan VERIFIED-ACCEL
+G1 (a:-17,11,9) [sinh(zeta3*pi^-1)] b=[10,-9,-2] (c0..cK) (A,B,C,D)=(7,0,1,-1) diff=1e-12.31 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-9,14) [exp(1/t)(zeta3*pi^-2)] b=[-4,-10,-9] (c0..cK) (A,B,C,D)=(1,7,-8,-2) diff=1e-12.54 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-9,14) [exp(1/t)(zeta3*pi^-2)] b=[4,10,9] (c0..cK) (A,B,C,D)=(1,7,8,2) diff=1e-12.54 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-8,8) [e] b=[-10,-20,-8] (c0..cK) (A,B,C,D)=(4,-4,-2,1) diff=1e-209.22 digits/term=3.57078 VERIFIED
+G1 (a:-16,-8,8) [e] b=[10,20,8] (c0..cK) (A,B,C,D)=(4,-4,2,-1) diff=1e-209.22 digits/term=3.57078 VERIFIED
+G1 (a:-16,-1,-10) [sin(zeta3*pi^-3)] b=[-18,-1,19] (c0..cK) (A,B,C,D)=(10,9,7,-5) diff=1e-13.26 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-1,-10) [sin(zeta3*pi^-3)] b=[18,1,-19] (c0..cK) (A,B,C,D)=(10,9,-7,5) diff=1e-13.26 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-1,14) [arctan(zeta3*pi^-2)] b=[0,-5,12] (c0..cK) (A,B,C,D)=(3,-7,-4,0) diff=1e-13.44 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,-1,14) [arctan(zeta3*pi^-2)] b=[0,5,-12] (c0..cK) (A,B,C,D)=(3,-7,4,0) diff=1e-13.44 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,16,11) [log(t-1)(zeta3*pi^0)] b=[-2,17,19] (c0..cK) (A,B,C,D)=(7,-4,-8,0) diff=1e-13.94 digits/term=nan VERIFIED-ACCEL
+G1 (a:-16,16,11) [log(t-1)(zeta3*pi^0)] b=[2,-17,-19] (c0..cK) (A,B,C,D)=(7,-4,8,0) diff=1e-13.94 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,-17,-1) [sin(zeta3*pi^-2)] b=[-1,1,-9] (c0..cK) (A,B,C,D)=(8,7,2,0) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,-17,-1) [sin(zeta3*pi^-2)] b=[1,-1,9] (c0..cK) (A,B,C,D)=(8,7,-2,0) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,1,-10) [exp(zeta3*pi^0)] b=[-8,-16,16] (c0..cK) (A,B,C,D)=(2,-7,-3,2) diff=1e-12.66 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,1,-10) [exp(zeta3*pi^0)] b=[8,16,-16] (c0..cK) (A,B,C,D)=(2,-7,3,-2) diff=1e-12.66 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,10,-2) [cosh(zeta3*pi^-1)] b=[-4,6,-9] (c0..cK) (A,B,C,D)=(8,3,-2,-2) diff=1e-12.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,10,-2) [cosh(zeta3*pi^-1)] b=[4,-6,9] (c0..cK) (A,B,C,D)=(8,3,2,2) diff=1e-12.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,17,3) [cosh(zeta3*pi^-3)] b=[0,-9,-13] (c0..cK) (A,B,C,D)=(2,1,-7,-6) diff=1e-13.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:-15,17,3) [cosh(zeta3*pi^-3)] b=[0,9,13] (c0..cK) (A,B,C,D)=(2,1,7,6) diff=1e-13.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-19,-15) [t^t(zeta3*pi^-1)] b=[-3,-13,-19] (c0..cK) (A,B,C,D)=(7,-5,-5,4) diff=1e-12.97 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-19,-15) [t^t(zeta3*pi^-1)] b=[3,13,19] (c0..cK) (A,B,C,D)=(7,-5,5,-4) diff=1e-12.97 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-12,13) [arcsin(1/t)(zeta3*pi^0)] b=[-6,-11,-15] (c0..cK) (A,B,C,D)=(9,3,-10,8) diff=1e-13.13 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-12,13) [arcsin(1/t)(zeta3*pi^0)] b=[6,11,15] (c0..cK) (A,B,C,D)=(9,3,10,-8) diff=1e-13.13 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-7,-10) [log(t-1)(zeta3*pi^0)] b=[-6,8,-14] (c0..cK) (A,B,C,D)=(8,-5,-7,-1) diff=1e-12.63 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-7,-10) [log(t-1)(zeta3*pi^0)] b=[6,-8,14] (c0..cK) (A,B,C,D)=(8,-5,7,1) diff=1e-12.63 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-6,-20) [tan(zeta3*pi^-2)] b=[-15,16,6] (c0..cK) (A,B,C,D)=(5,6,0,-2) diff=1e-11.69 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,-6,-20) [tan(zeta3*pi^-2)] b=[15,-16,-6] (c0..cK) (A,B,C,D)=(5,6,0,2) diff=1e-11.69 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,9,-20) [log(zeta3*pi^-2)] b=[-5,-9,-3] (c0..cK) (A,B,C,D)=(4,4,-5,-3) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-14,9,-20) [log(zeta3*pi^-2)] b=[5,9,3] (c0..cK) (A,B,C,D)=(4,4,5,3) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-13,12,14) [arctan(zeta3*pi^-3)] b=[-14,8,-5] (c0..cK) (A,B,C,D)=(3,-1,0,-5) diff=1e-11.98 digits/term=nan VERIFIED-ACCEL
+G1 (a:-13,12,14) [arctan(zeta3*pi^-3)] b=[14,-8,5] (c0..cK) (A,B,C,D)=(3,-1,0,5) diff=1e-11.98 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,7,-4) [sinh(zeta3*pi^-1)] b=[-10,13,20] (c0..cK) (A,B,C,D)=(6,9,3,-10) diff=1e-12.09 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,7,-4) [sinh(zeta3*pi^-1)] b=[10,-13,-20] (c0..cK) (A,B,C,D)=(6,9,-3,10) diff=1e-12.09 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,8,-11) [arcsin(1/t)(zeta3*pi^0)] b=[-9,-18,-2] (c0..cK) (A,B,C,D)=(9,8,-1,-1) diff=1e-12.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,8,-11) [arcsin(1/t)(zeta3*pi^0)] b=[9,18,2] (c0..cK) (A,B,C,D)=(9,8,1,1) diff=1e-12.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,12,3) [sin(zeta3*pi^-2)] b=[-1,7,-5] (c0..cK) (A,B,C,D)=(1,-10,2,-7) diff=1e-13.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:-11,12,3) [sin(zeta3*pi^-2)] b=[1,-7,5] (c0..cK) (A,B,C,D)=(1,-10,-2,7) diff=1e-13.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-19,10) [sinh(zeta3*pi^-2)] b=[-7,17,-10] (c0..cK) (A,B,C,D)=(10,-2,-1,0) diff=1e-13.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-19,10) [sinh(zeta3*pi^-2)] b=[7,-17,10] (c0..cK) (A,B,C,D)=(10,-2,1,0) diff=1e-13.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-16,-1) [arccos(1/t)(zeta3*pi^0)] b=[0,-16,10] (c0..cK) (A,B,C,D)=(2,4,3,1) diff=1e-12.93 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-16,-1) [arccos(1/t)(zeta3*pi^0)] b=[0,16,-10] (c0..cK) (A,B,C,D)=(2,4,-3,-1) diff=1e-12.93 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-15,-19) [exp(zeta3*pi^0)] b=[-2,11,-19] (c0..cK) (A,B,C,D)=(5,5,0,2) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,-15,-19) [exp(zeta3*pi^0)] b=[2,-11,19] (c0..cK) (A,B,C,D)=(5,5,0,-2) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,13,6) [arctan(zeta3*pi^-3)] b=[-7,-6,-11] (c0..cK) (A,B,C,D)=(9,-5,-1,-5) diff=1e-12.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-10,13,6) [arctan(zeta3*pi^-3)] b=[7,6,11] (c0..cK) (A,B,C,D)=(9,-5,1,5) diff=1e-12.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-20,-11) [tanh(zeta3*pi^-1)] b=[-3,-11,10] (c0..cK) (A,B,C,D)=(7,-5,8,3) diff=1e-13.13 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-20,-11) [tanh(zeta3*pi^-1)] b=[3,11,-10] (c0..cK) (A,B,C,D)=(7,-5,-8,-3) diff=1e-13.13 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-8,19) [t^t(zeta3*pi^-3)] b=[-1,-13,-13] (c0..cK) (A,B,C,D)=(9,6,-8,-6) diff=1e-13.16 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-8,19) [t^t(zeta3*pi^-3)] b=[1,13,13] (c0..cK) (A,B,C,D)=(9,6,8,6) diff=1e-13.16 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-3,-2) [arctan(zeta3*pi^-2)] b=[-3,-11,-16] (c0..cK) (A,B,C,D)=(10,4,-5,7) diff=1e-12.61 digits/term=nan VERIFIED-ACCEL
+G1 (a:-9,-3,-2) [arctan(zeta3*pi^-2)] b=[3,11,16] (c0..cK) (A,B,C,D)=(10,4,5,-7) diff=1e-12.61 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,-20,-8) [pi] b=[-12,-6,0] (c0..cK) (A,B,C,D)=(8,0,-4,1) diff=1e-207.70 digits/term=0.310433 VERIFIED
+G1 (a:-8,-20,-8) [pi] b=[-10,-6,0] (c0..cK) (A,B,C,D)=(8,4,0,-1) diff=1e-208.09 digits/term=0.297987 VERIFIED
+G1 (a:-8,-20,-8) [pi] b=[10,6,0] (c0..cK) (A,B,C,D)=(8,4,0,1) diff=1e-208.09 digits/term=0.297987 VERIFIED
+G1 (a:-8,-20,-8) [pi] b=[12,6,0] (c0..cK) (A,B,C,D)=(8,0,4,-1) diff=1e-207.70 digits/term=0.310433 VERIFIED
+G1 (a:-8,-15,6) [t^t(zeta3*pi^-3)] b=[-15,10,5] (c0..cK) (A,B,C,D)=(10,10,-5,3) diff=1e-12.49 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,-15,6) [t^t(zeta3*pi^-3)] b=[15,-10,-5] (c0..cK) (A,B,C,D)=(10,10,5,-3) diff=1e-12.49 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,-12,-4) [pi] b=[-10,-6,0] (c0..cK) (A,B,C,D)=(2,-1,-3,1) diff=1e-207.94 digits/term=0.316288 VERIFIED
+G1 (a:-8,-12,-4) [pi] b=[-8,-6,0] (c0..cK) (A,B,C,D)=(0,2,2,-1) diff=1e-208.54 digits/term=0.304119 VERIFIED
+G1 (a:-8,-12,-4) [pi] b=[8,6,0] (c0..cK) (A,B,C,D)=(0,2,-2,1) diff=1e-208.54 digits/term=0.304119 VERIFIED
+G1 (a:-8,-12,-4) [pi] b=[10,6,0] (c0..cK) (A,B,C,D)=(2,-1,3,-1) diff=1e-207.94 digits/term=0.316288 VERIFIED
+G1 (a:-8,-9,18) [cos(zeta3*pi^-2)] b=[-4,-2,-6] (c0..cK) (A,B,C,D)=(4,4,5,-7) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,-9,18) [cos(zeta3*pi^-2)] b=[4,2,6] (c0..cK) (A,B,C,D)=(4,4,-5,7) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,-4,0) [pi] b=[-8,-6,0] (c0..cK) (A,B,C,D)=(4,0,-10,3) diff=1e-207.85 digits/term=0.322341 VERIFIED
+G1 (a:-8,-4,0) [pi] b=[-6,-6,0] (c0..cK) (A,B,C,D)=(4,0,-4,1) diff=1e-207.94 digits/term=0.310433 VERIFIED
+G1 (a:-8,-4,0) [pi] b=[6,6,0] (c0..cK) (A,B,C,D)=(4,0,4,-1) diff=1e-207.94 digits/term=0.310433 VERIFIED
+G1 (a:-8,-4,0) [pi] b=[8,6,0] (c0..cK) (A,B,C,D)=(4,0,10,-3) diff=1e-207.85 digits/term=0.322341 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[-10,-6,0] (c0..cK) (A,B,C,D)=(4,-3,10,-3) diff=1e-207.88 digits/term=0.333792 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[-8,-6,0] (c0..cK) (A,B,C,D)=(0,2,-4,1) diff=1e-208.74 digits/term=0.322577 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[-6,-6,0] (c0..cK) (A,B,C,D)=(2,1,-1,0) diff=1e-208.17 digits/term=0.310691 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[-4,-6,0] (c0..cK) (A,B,C,D)=(8,2,-2,-1) diff=1e-208.38 digits/term=0.297909 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[4,6,0] (c0..cK) (A,B,C,D)=(8,2,2,1) diff=1e-208.38 digits/term=0.297909 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[6,6,0] (c0..cK) (A,B,C,D)=(2,1,1,0) diff=1e-208.17 digits/term=0.310691 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[8,6,0] (c0..cK) (A,B,C,D)=(0,2,4,-1) diff=1e-208.74 digits/term=0.322577 VERIFIED
+G1 (a:-8,-4,4) [pi] b=[10,6,0] (c0..cK) (A,B,C,D)=(4,-3,-10,3) diff=1e-207.88 digits/term=0.333792 VERIFIED
+G1 (a:-8,4,0) [pi] b=[-6,-6,0] (c0..cK) (A,B,C,D)=(8,0,8,-3) diff=1e-207.85 digits/term=0.328366 VERIFIED
+G1 (a:-8,4,0) [pi] b=[-4,-6,0] (c0..cK) (A,B,C,D)=(4,0,2,-1) diff=1e-208.66 digits/term=0.316685 VERIFIED
+G1 (a:-8,4,0) [pi] b=[-2,-6,0] (c0..cK) (A,B,C,D)=(4,0,0,-1) diff=1e-208.40 digits/term=0.304201 VERIFIED
+G1 (a:-8,4,0) [pi] b=[2,6,0] (c0..cK) (A,B,C,D)=(4,0,0,1) diff=1e-208.40 digits/term=0.304201 VERIFIED
+G1 (a:-8,4,0) [pi] b=[4,6,0] (c0..cK) (A,B,C,D)=(4,0,-2,1) diff=1e-208.66 digits/term=0.316685 VERIFIED
+G1 (a:-8,4,0) [pi] b=[6,6,0] (c0..cK) (A,B,C,D)=(8,0,-8,3) diff=1e-207.85 digits/term=0.328366 VERIFIED
+G1 (a:-8,4,12) [pi] b=[-6,-6,0] (c0..cK) (A,B,C,D)=(4,3,-2,0) diff=1e-208.59 digits/term=0.329077 VERIFIED
+G1 (a:-8,4,12) [pi] b=[-2,-6,0] (c0..cK) (A,B,C,D)=(10,3,-3,-1) diff=1e-208.11 digits/term=0.305058 VERIFIED
+G1 (a:-8,4,12) [pi] b=[2,6,0] (c0..cK) (A,B,C,D)=(10,3,3,1) diff=1e-208.11 digits/term=0.305058 VERIFIED
+G1 (a:-8,4,12) [pi] b=[6,6,0] (c0..cK) (A,B,C,D)=(4,3,2,0) diff=1e-208.59 digits/term=0.329077 VERIFIED
+G1 (a:-8,11,-4) [t^t(zeta3*pi^-3)] b=[-2,16,-19] (c0..cK) (A,B,C,D)=(2,10,1,-8) diff=1e-13.30 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,11,-4) [t^t(zeta3*pi^-3)] b=[2,-16,19] (c0..cK) (A,B,C,D)=(2,10,-1,8) diff=1e-13.30 digits/term=nan VERIFIED-ACCEL
+G1 (a:-8,12,0) [pi] b=[-2,-6,0] (c0..cK) (A,B,C,D)=(8,0,0,-1) diff=1e-208.59 digits/term=0.323151 VERIFIED
+G1 (a:-8,12,0) [pi] b=[-2,6,0] (c0..cK) (A,B,C,D)=(4,0,-4,-1) diff=1e-208.87 digits/term=0.297826 VERIFIED
+G1 (a:-8,12,0) [pi] b=[0,-6,0] (c0..cK) (A,B,C,D)=(4,0,-2,-1) diff=1e-209.00 digits/term=0.310974 VERIFIED
+G1 (a:-8,12,0) [pi] b=[0,6,0] (c0..cK) (A,B,C,D)=(4,0,2,1) diff=1e-209.00 digits/term=0.310974 VERIFIED
+G1 (a:-8,12,0) [pi] b=[2,-6,0] (c0..cK) (A,B,C,D)=(4,0,4,1) diff=1e-208.87 digits/term=0.297826 VERIFIED
+G1 (a:-8,12,0) [pi] b=[2,6,0] (c0..cK) (A,B,C,D)=(8,0,0,1) diff=1e-208.59 digits/term=0.323151 VERIFIED
+G1 (a:-8,20,0) [pi] b=[-4,6,0] (c0..cK) (A,B,C,D)=(4,0,-10,-3) diff=1e-209.14 digits/term=0.305237 VERIFIED
+G1 (a:-8,20,0) [pi] b=[-2,6,0] (c0..cK) (A,B,C,D)=(8,0,8,3) diff=1e-208.93 digits/term=0.317957 VERIFIED
+G1 (a:-8,20,0) [pi] b=[2,-6,0] (c0..cK) (A,B,C,D)=(8,0,-8,-3) diff=1e-208.93 digits/term=0.317957 VERIFIED
+G1 (a:-8,20,0) [pi] b=[4,-6,0] (c0..cK) (A,B,C,D)=(4,0,10,3) diff=1e-209.14 digits/term=0.305237 VERIFIED
+G1 (a:-7,13,-3) [arccos(1/t)(zeta3*pi^0)] b=[-1,0,-14] (c0..cK) (A,B,C,D)=(9,5,-7,-5) diff=1e-13.07 digits/term=nan VERIFIED-ACCEL
+G1 (a:-7,13,-3) [arccos(1/t)(zeta3*pi^0)] b=[1,0,14] (c0..cK) (A,B,C,D)=(9,5,7,5) diff=1e-13.07 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,-12,15) [log(zeta3*pi^0)] b=[-1,-14,14] (c0..cK) (A,B,C,D)=(5,-10,9,4) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,-12,15) [log(zeta3*pi^0)] b=[1,14,-14] (c0..cK) (A,B,C,D)=(5,-10,-9,-4) diff=1e-13.03 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,-4,-1) [arctan(zeta3*pi^-2)] b=[-1,-19,4] (c0..cK) (A,B,C,D)=(3,-7,-8,-9) diff=1e-13.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,-4,-1) [arctan(zeta3*pi^-2)] b=[1,19,-4] (c0..cK) (A,B,C,D)=(3,-7,8,9) diff=1e-13.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,2,-16) [pi] b=[-2,-18,13] (c0..cK) (A,B,C,D)=(7,-2,-9,8) diff=1e-13.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:-6,2,-16) [pi] b=[2,18,-13] (c0..cK) (A,B,C,D)=(7,-2,9,-8) diff=1e-13.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-18,14) [arctan(zeta3*pi^-3)] b=[-5,-8,-16] (c0..cK) (A,B,C,D)=(6,0,-1,-7) diff=1e-12.92 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-18,14) [arctan(zeta3*pi^-3)] b=[5,8,16] (c0..cK) (A,B,C,D)=(6,0,1,7) diff=1e-12.92 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-18,18) [sin(zeta3*pi^-3)] b=[-1,-1,-5] (c0..cK) (A,B,C,D)=(2,-9,-6,-8) diff=1e-13.23 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-18,18) [sin(zeta3*pi^-3)] b=[1,1,5] (c0..cK) (A,B,C,D)=(2,-9,6,8) diff=1e-13.23 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-10,-4) [e] b=[-19,-18,-4] (c0..cK) (A,B,C,D)=(8,-4,-8,3) diff=1e-207.68 digits/term=3.60101 VERIFIED
+G1 (a:-4,-10,-4) [e] b=[19,18,4] (c0..cK) (A,B,C,D)=(8,-4,8,-3) diff=1e-207.68 digits/term=3.60101 VERIFIED
+G1 (a:-4,-6,0) [e] b=[-11,-14,-4] (c0..cK) (A,B,C,D)=(3,0,-3,1) diff=1e-207.87 digits/term=3.58605 VERIFIED
+G1 (a:-4,-6,0) [e] b=[11,14,4] (c0..cK) (A,B,C,D)=(3,0,3,-1) diff=1e-207.87 digits/term=3.58605 VERIFIED
+G1 (a:-4,-3,3) [tan(zeta3*pi^-1)] b=[-3,17,6] (c0..cK) (A,B,C,D)=(10,10,-8,9) diff=1e-12.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-3,3) [tan(zeta3*pi^-1)] b=[3,-17,-6] (c0..cK) (A,B,C,D)=(10,10,8,-9) diff=1e-12.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,-2,2) [e] b=[-5,-10,-4] (c0..cK) (A,B,C,D)=(2,-2,-2,1) diff=1e-209.52 digits/term=3.57078 VERIFIED
+G1 (a:-4,-2,2) [e] b=[5,10,4] (c0..cK) (A,B,C,D)=(2,-2,2,-1) diff=1e-209.52 digits/term=3.57078 VERIFIED
+G1 (a:-4,2,15) [arcsinh(zeta3*pi^-2)] b=[-1,-1,9] (c0..cK) (A,B,C,D)=(9,2,10,9) diff=1e-13.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,2,15) [arcsinh(zeta3*pi^-2)] b=[1,1,-9] (c0..cK) (A,B,C,D)=(9,2,-10,-9) diff=1e-13.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,6,0) [e] b=[-1,2,4] (c0..cK) (A,B,C,D)=(1,0,1,-1) diff=1e-210.02 digits/term=3.53924 VERIFIED
+G1 (a:-4,6,0) [e] b=[1,-2,-4] (c0..cK) (A,B,C,D)=(1,0,-1,1) diff=1e-210.02 digits/term=3.53924 VERIFIED
+G1 (a:-4,11,11) [sinh(zeta3*pi^0)] b=[-9,-3,18] (c0..cK) (A,B,C,D)=(6,-10,3,-1) diff=1e-12.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:-4,11,11) [sinh(zeta3*pi^0)] b=[9,3,-18] (c0..cK) (A,B,C,D)=(6,-10,-3,1) diff=1e-12.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-16,-20) [arctan(zeta3*pi^-2)] b=[-2,-12,-5] (c0..cK) (A,B,C,D)=(3,-10,9,-7) diff=1e-13.35 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-16,-20) [arctan(zeta3*pi^-2)] b=[2,12,5] (c0..cK) (A,B,C,D)=(3,-10,-9,7) diff=1e-13.35 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-13,-12) [cos(zeta3*pi^-1)] b=[-8,-20,6] (c0..cK) (A,B,C,D)=(8,3,3,-5) diff=1e-12.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-13,-12) [cos(zeta3*pi^-1)] b=[8,20,-6] (c0..cK) (A,B,C,D)=(8,3,-3,5) diff=1e-12.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-7,-20) [arcsinh(zeta3*pi^-3)] b=[-7,-7,-14] (c0..cK) (A,B,C,D)=(8,5,-1,-10) diff=1e-12.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,-7,-20) [arcsinh(zeta3*pi^-3)] b=[7,7,14] (c0..cK) (A,B,C,D)=(8,5,1,10) diff=1e-12.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,3,-12) [tan(zeta3*pi^-3)] b=[-1,-9,-17] (c0..cK) (A,B,C,D)=(1,6,-2,-6) diff=1e-14.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,3,-12) [tan(zeta3*pi^-3)] b=[1,9,17] (c0..cK) (A,B,C,D)=(1,6,2,6) diff=1e-14.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,8,15) [log(t-1)(zeta3*pi^0)] b=[-15,9,14] (c0..cK) (A,B,C,D)=(8,-6,5,4) diff=1e-12.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,8,15) [log(t-1)(zeta3*pi^0)] b=[15,-9,-14] (c0..cK) (A,B,C,D)=(8,-6,-5,-4) diff=1e-12.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,9,18) [tanh(zeta3*pi^-2)] b=[0,-14,-19] (c0..cK) (A,B,C,D)=(6,-4,-8,3) diff=1e-13.79 digits/term=nan VERIFIED-ACCEL
+G1 (a:-3,9,18) [tanh(zeta3*pi^-2)] b=[0,14,19] (c0..cK) (A,B,C,D)=(6,-4,8,-3) diff=1e-13.79 digits/term=nan VERIFIED-ACCEL
+G1 (a:-2,-9,-9) [pi] b=[-8,-3,0] (c0..cK) (A,B,C,D)=(0,9,4,-3) diff=1e-208.97 digits/term=0.298059 VERIFIED
+G1 (a:-2,-9,-9) [pi] b=[8,3,0] (c0..cK) (A,B,C,D)=(0,9,-4,3) diff=1e-208.97 digits/term=0.298059 VERIFIED
+G1 (a:-2,-7,-3) [pi] b=[-8,-3,0] (c0..cK) (A,B,C,D)=(0,3,8,-3) diff=1e-207.68 digits/term=0.316577 VERIFIED
+G1 (a:-2,-7,-3) [pi] b=[8,3,0] (c0..cK) (A,B,C,D)=(0,3,-8,3) diff=1e-207.68 digits/term=0.316577 VERIFIED
+G1 (a:-2,-5,-2) [pi] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(4,0,-4,1) diff=1e-208.00 digits/term=0.310433 VERIFIED
+G1 (a:-2,-5,-2) [pi] b=[-5,-3,0] (c0..cK) (A,B,C,D)=(4,2,0,-1) diff=1e-208.39 digits/term=0.297987 VERIFIED
+G1 (a:-2,-5,-2) [pi] b=[5,3,0] (c0..cK) (A,B,C,D)=(4,2,0,1) diff=1e-208.39 digits/term=0.297987 VERIFIED
+G1 (a:-2,-5,-2) [pi] b=[6,3,0] (c0..cK) (A,B,C,D)=(4,0,4,-1) diff=1e-208.00 digits/term=0.310433 VERIFIED
+G1 (a:-2,-3,-1) [pi] b=[-5,-3,0] (c0..cK) (A,B,C,D)=(2,-1,-6,2) diff=1e-208.24 digits/term=0.316288 VERIFIED
+G1 (a:-2,-3,-1) [pi] b=[-4,-3,0] (c0..cK) (A,B,C,D)=(0,1,2,-1) diff=1e-208.84 digits/term=0.304119 VERIFIED
+G1 (a:-2,-3,-1) [pi] b=[4,3,0] (c0..cK) (A,B,C,D)=(0,1,-2,1) diff=1e-208.84 digits/term=0.304119 VERIFIED
+G1 (a:-2,-3,-1) [pi] b=[5,3,0] (c0..cK) (A,B,C,D)=(2,-1,6,-2) diff=1e-208.24 digits/term=0.316288 VERIFIED
+G1 (a:-2,-3,0) [pi] b=[-5,-3,0] (c0..cK) (A,B,C,D)=(6,0,8,-3) diff=1e-207.94 digits/term=0.316525 VERIFIED
+G1 (a:-2,-3,0) [pi] b=[5,3,0] (c0..cK) (A,B,C,D)=(6,0,-8,3) diff=1e-207.94 digits/term=0.316525 VERIFIED
+G1 (a:-2,-3,2) [pi] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(8,0,8,-3) diff=1e-207.85 digits/term=0.328366 VERIFIED
+G1 (a:-2,-3,2) [pi] b=[-5,-3,0] (c0..cK) (A,B,C,D)=(8,2,0,-1) diff=1e-207.62 digits/term=0.316996 VERIFIED
+G1 (a:-2,-3,2) [pi] b=[5,3,0] (c0..cK) (A,B,C,D)=(8,2,0,1) diff=1e-207.62 digits/term=0.316996 VERIFIED
+G1 (a:-2,-3,2) [pi] b=[6,3,0] (c0..cK) (A,B,C,D)=(8,0,-8,3) diff=1e-207.85 digits/term=0.328366 VERIFIED
+G1 (a:-2,-1,0) [pi] b=[-4,-3,0] (c0..cK) (A,B,C,D)=(2,0,-10,3) diff=1e-208.15 digits/term=0.322341 VERIFIED
+G1 (a:-2,-1,0) [pi] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(2,0,-4,1) diff=1e-208.24 digits/term=0.310433 VERIFIED
+G1 (a:-2,-1,0) [pi] b=[3,3,0] (c0..cK) (A,B,C,D)=(2,0,4,-1) diff=1e-208.24 digits/term=0.310433 VERIFIED
+G1 (a:-2,-1,0) [pi] b=[4,3,0] (c0..cK) (A,B,C,D)=(2,0,10,-3) diff=1e-208.15 digits/term=0.322341 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[-4,-3,0] (c0..cK) (A,B,C,D)=(0,1,-4,1) diff=1e-209.04 digits/term=0.322577 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(2,1,-2,0) diff=1e-208.48 digits/term=0.310691 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[-2,-3,0] (c0..cK) (A,B,C,D)=(4,1,-2,-1) diff=1e-208.68 digits/term=0.297909 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[2,3,0] (c0..cK) (A,B,C,D)=(4,1,2,1) diff=1e-208.68 digits/term=0.297909 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[3,3,0] (c0..cK) (A,B,C,D)=(2,1,2,0) diff=1e-208.48 digits/term=0.310691 VERIFIED
+G1 (a:-2,-1,1) [pi] b=[4,3,0] (c0..cK) (A,B,C,D)=(0,1,4,-1) diff=1e-209.04 digits/term=0.322577 VERIFIED
+G1 (a:-2,1,0) [pi] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(4,0,8,-3) diff=1e-208.15 digits/term=0.328366 VERIFIED
+G1 (a:-2,1,0) [pi] b=[-2,-3,0] (c0..cK) (A,B,C,D)=(2,0,2,-1) diff=1e-208.96 digits/term=0.316685 VERIFIED
+G1 (a:-2,1,0) [pi] b=[-1,-3,0] (c0..cK) (A,B,C,D)=(2,0,0,-1) diff=1e-208.70 digits/term=0.304201 VERIFIED
+G1 (a:-2,1,0) [pi] b=[1,3,0] (c0..cK) (A,B,C,D)=(2,0,0,1) diff=1e-208.70 digits/term=0.304201 VERIFIED
+G1 (a:-2,1,0) [pi] b=[2,3,0] (c0..cK) (A,B,C,D)=(2,0,-2,1) diff=1e-208.96 digits/term=0.316685 VERIFIED
+G1 (a:-2,1,0) [pi] b=[3,3,0] (c0..cK) (A,B,C,D)=(4,0,-8,3) diff=1e-208.15 digits/term=0.328366 VERIFIED
+G1 (a:-2,1,3) [pi] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(4,3,-4,0) diff=1e-208.89 digits/term=0.329077 VERIFIED
+G1 (a:-2,1,3) [pi] b=[-2,-3,0] (c0..cK) (A,B,C,D)=(8,3,-4,-1) diff=1e-207.82 digits/term=0.317453 VERIFIED
+G1 (a:-2,1,3) [pi] b=[-1,-3,0] (c0..cK) (A,B,C,D)=(10,3,-6,-2) diff=1e-208.41 digits/term=0.305058 VERIFIED
+G1 (a:-2,1,3) [pi] b=[0,-3,0] (c0..cK) (A,B,C,D)=(8,3,-10,-3) diff=1e-209.72 digits/term=0.291573 VERIFIED
+G1 (a:-2,1,3) [pi] b=[0,3,0] (c0..cK) (A,B,C,D)=(8,3,10,3) diff=1e-209.72 digits/term=0.291573 VERIFIED
+G1 (a:-2,1,3) [pi] b=[1,3,0] (c0..cK) (A,B,C,D)=(10,3,6,2) diff=1e-208.41 digits/term=0.305058 VERIFIED
+G1 (a:-2,1,3) [pi] b=[2,3,0] (c0..cK) (A,B,C,D)=(8,3,4,1) diff=1e-207.82 digits/term=0.317453 VERIFIED
+G1 (a:-2,1,3) [pi] b=[3,3,0] (c0..cK) (A,B,C,D)=(4,3,4,0) diff=1e-208.89 digits/term=0.329077 VERIFIED
+G1 (a:-2,3,0) [pi] b=[-1,-3,0] (c0..cK) (A,B,C,D)=(4,0,0,-1) diff=1e-208.89 digits/term=0.323151 VERIFIED
+G1 (a:-2,3,0) [pi] b=[-1,3,0] (c0..cK) (A,B,C,D)=(2,0,-4,-1) diff=1e-209.17 digits/term=0.297826 VERIFIED
+G1 (a:-2,3,0) [pi] b=[0,-3,0] (c0..cK) (A,B,C,D)=(2,0,-2,-1) diff=1e-209.31 digits/term=0.310974 VERIFIED
+G1 (a:-2,3,0) [pi] b=[0,3,0] (c0..cK) (A,B,C,D)=(2,0,2,1) diff=1e-209.31 digits/term=0.310974 VERIFIED
+G1 (a:-2,3,0) [pi] b=[1,-3,0] (c0..cK) (A,B,C,D)=(2,0,4,1) diff=1e-209.17 digits/term=0.297826 VERIFIED
+G1 (a:-2,3,0) [pi] b=[1,3,0] (c0..cK) (A,B,C,D)=(4,0,0,1) diff=1e-208.89 digits/term=0.323151 VERIFIED
+G1 (a:-2,5,0) [pi] b=[-3,3,0] (c0..cK) (A,B,C,D)=(6,0,8,3) diff=1e-209.34 digits/term=0.291329 VERIFIED
+G1 (a:-2,5,0) [pi] b=[-2,3,0] (c0..cK) (A,B,C,D)=(2,0,-10,-3) diff=1e-209.44 digits/term=0.305237 VERIFIED
+G1 (a:-2,5,0) [pi] b=[-1,3,0] (c0..cK) (A,B,C,D)=(4,0,8,3) diff=1e-209.23 digits/term=0.317957 VERIFIED
+G1 (a:-2,5,0) [pi] b=[1,-3,0] (c0..cK) (A,B,C,D)=(4,0,-8,-3) diff=1e-209.23 digits/term=0.317957 VERIFIED
+G1 (a:-2,5,0) [pi] b=[2,-3,0] (c0..cK) (A,B,C,D)=(2,0,10,3) diff=1e-209.44 digits/term=0.305237 VERIFIED
+G1 (a:-2,5,0) [pi] b=[3,-3,0] (c0..cK) (A,B,C,D)=(6,0,-8,-3) diff=1e-209.34 digits/term=0.291329 VERIFIED
+G1 (a:-2,11,-10) [log(t-1)(zeta3*pi^0)] b=[-1,-15,9] (c0..cK) (A,B,C,D)=(6,9,10,0) diff=1e-13.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:-2,11,-10) [log(t-1)(zeta3*pi^0)] b=[1,15,-9] (c0..cK) (A,B,C,D)=(6,9,-10,0) diff=1e-13.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:-2,11,4) [e] b=[-14,20,2] (c0..cK) (A,B,C,D)=(4,9,-5,1) diff=1e-12.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:-2,11,4) [e] b=[14,-20,-2] (c0..cK) (A,B,C,D)=(4,9,5,-1) diff=1e-12.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,6,9) [cos(zeta3*pi^0)] b=[-3,10,19] (c0..cK) (A,B,C,D)=(5,8,-5,5) diff=1e-12.77 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,6,9) [cos(zeta3*pi^0)] b=[3,-10,-19] (c0..cK) (A,B,C,D)=(5,8,5,-5) diff=1e-12.77 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,8,-14) [pi] b=[-2,18,3] (c0..cK) (A,B,C,D)=(6,1,-7,1) diff=1e-12.77 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,8,-14) [pi] b=[2,-18,-3] (c0..cK) (A,B,C,D)=(6,1,7,-1) diff=1e-12.77 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,19,-7) [t^t(zeta3*pi^-2)] b=[-6,3,8] (c0..cK) (A,B,C,D)=(9,-1,-2,0) diff=1e-12.54 digits/term=nan VERIFIED-ACCEL
+G1 (a:-1,19,-7) [t^t(zeta3*pi^-2)] b=[6,-3,-8] (c0..cK) (A,B,C,D)=(9,-1,2,0) diff=1e-12.54 digits/term=nan VERIFIED-ACCEL
+G1 (a:0,-16,-16) [e] b=[-20,-4,0] (c0..cK) (A,B,C,D)=(8,-4,-8,3) diff=1e-207.82 digits/term=1.75349 VERIFIED
+G1 (a:0,-16,-16) [e] b=[-16,-4,0] (c0..cK) (A,B,C,D)=(4,0,-3,1) diff=1e-208.37 digits/term=1.73392 VERIFIED
+G1 (a:0,-16,-16) [e] b=[-12,-4,0] (c0..cK) (A,B,C,D)=(4,-4,-2,1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-16,-16) [e] b=[12,4,0] (c0..cK) (A,B,C,D)=(4,-4,2,-1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-16,-16) [e] b=[16,4,0] (c0..cK) (A,B,C,D)=(4,0,3,-1) diff=1e-208.37 digits/term=1.73392 VERIFIED
+G1 (a:0,-16,-16) [e] b=[20,4,0] (c0..cK) (A,B,C,D)=(8,-4,8,-3) diff=1e-207.82 digits/term=1.75349 VERIFIED
+G1 (a:0,-16,0) [e] b=[-20,-4,0] (c0..cK) (A,B,C,D)=(0,2,-3,1) diff=1e-208.31 digits/term=1.76438 VERIFIED
+G1 (a:0,-16,0) [e] b=[-16,-4,0] (c0..cK) (A,B,C,D)=(0,4,2,-1) diff=1e-207.95 digits/term=1.74487 VERIFIED
+G1 (a:0,-16,0) [e] b=[-12,-4,0] (c0..cK) (A,B,C,D)=(0,4,-1,0) diff=1e-208.74 digits/term=1.72467 VERIFIED
+G1 (a:0,-16,0) [e] b=[-8,-4,0] (c0..cK) (A,B,C,D)=(0,4,1,-1) diff=1e-208.40 digits/term=1.7037 VERIFIED
+G1 (a:0,-16,0) [e] b=[8,4,0] (c0..cK) (A,B,C,D)=(0,4,-1,1) diff=1e-208.40 digits/term=1.7037 VERIFIED
+G1 (a:0,-16,0) [e] b=[12,4,0] (c0..cK) (A,B,C,D)=(0,4,1,0) diff=1e-208.74 digits/term=1.72467 VERIFIED
+G1 (a:0,-16,0) [e] b=[16,4,0] (c0..cK) (A,B,C,D)=(0,4,-2,1) diff=1e-207.95 digits/term=1.74487 VERIFIED
+G1 (a:0,-16,0) [e] b=[20,4,0] (c0..cK) (A,B,C,D)=(0,2,3,-1) diff=1e-208.31 digits/term=1.76438 VERIFIED
+G1 (a:0,-9,-9) [e] b=[-15,-3,0] (c0..cK) (A,B,C,D)=(6,-3,-8,3) diff=1e-208.61 digits/term=1.75349 VERIFIED
+G1 (a:0,-9,-9) [e] b=[-12,-3,0] (c0..cK) (A,B,C,D)=(3,0,-3,1) diff=1e-208.31 digits/term=1.73392 VERIFIED
+G1 (a:0,-9,-9) [e] b=[-9,-3,0] (c0..cK) (A,B,C,D)=(3,-3,-2,1) diff=1e-208.52 digits/term=1.71366 VERIFIED
+G1 (a:0,-9,-9) [e] b=[9,3,0] (c0..cK) (A,B,C,D)=(3,-3,2,-1) diff=1e-208.52 digits/term=1.71366 VERIFIED
+G1 (a:0,-9,-9) [e] b=[12,3,0] (c0..cK) (A,B,C,D)=(3,0,3,-1) diff=1e-208.31 digits/term=1.73392 VERIFIED
+G1 (a:0,-9,-9) [e] b=[15,3,0] (c0..cK) (A,B,C,D)=(6,-3,8,-3) diff=1e-208.61 digits/term=1.75349 VERIFIED
+G1 (a:0,-9,0) [e] b=[-18,-3,0] (c0..cK) (A,B,C,D)=(0,1,8,-3) diff=1e-207.61 digits/term=1.78328 VERIFIED
+G1 (a:0,-9,0) [e] b=[-15,-3,0] (c0..cK) (A,B,C,D)=(0,3,-6,2) diff=1e-207.87 digits/term=1.76438 VERIFIED
+G1 (a:0,-9,0) [e] b=[-12,-3,0] (c0..cK) (A,B,C,D)=(0,3,2,-1) diff=1e-207.89 digits/term=1.74487 VERIFIED
+G1 (a:0,-9,0) [e] b=[-9,-3,0] (c0..cK) (A,B,C,D)=(0,3,-1,0) diff=1e-207.88 digits/term=1.72467 VERIFIED
+G1 (a:0,-9,0) [e] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(0,3,1,-1) diff=1e-208.86 digits/term=1.7037 VERIFIED
+G1 (a:0,-9,0) [e] b=[6,3,0] (c0..cK) (A,B,C,D)=(0,3,-1,1) diff=1e-208.86 digits/term=1.7037 VERIFIED
+G1 (a:0,-9,0) [e] b=[9,3,0] (c0..cK) (A,B,C,D)=(0,3,1,0) diff=1e-207.88 digits/term=1.72467 VERIFIED
+G1 (a:0,-9,0) [e] b=[12,3,0] (c0..cK) (A,B,C,D)=(0,3,-2,1) diff=1e-207.89 digits/term=1.74487 VERIFIED
+G1 (a:0,-9,0) [e] b=[15,3,0] (c0..cK) (A,B,C,D)=(0,3,6,-2) diff=1e-207.87 digits/term=1.76438 VERIFIED
+G1 (a:0,-9,0) [e] b=[18,3,0] (c0..cK) (A,B,C,D)=(0,1,-8,3) diff=1e-207.61 digits/term=1.78328 VERIFIED
+G1 (a:0,-4,-8) [e] b=[-8,-2,0] (c0..cK) (A,B,C,D)=(8,-4,-5,2) diff=1e-209.34 digits/term=1.72331 VERIFIED
+G1 (a:0,-4,-8) [e] b=[8,2,0] (c0..cK) (A,B,C,D)=(8,-4,5,-2) diff=1e-209.34 digits/term=1.72331 VERIFIED
+G1 (a:0,-4,-4) [e] b=[-10,-2,0] (c0..cK) (A,B,C,D)=(4,-2,-8,3) diff=1e-208.12 digits/term=1.75349 VERIFIED
+G1 (a:0,-4,-4) [e] b=[-8,-2,0] (c0..cK) (A,B,C,D)=(2,0,-3,1) diff=1e-208.67 digits/term=1.73392 VERIFIED
+G1 (a:0,-4,-4) [e] b=[-6,-2,0] (c0..cK) (A,B,C,D)=(2,-2,-2,1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-4,-4) [e] b=[6,2,0] (c0..cK) (A,B,C,D)=(2,-2,2,-1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-4,-4) [e] b=[8,2,0] (c0..cK) (A,B,C,D)=(2,0,3,-1) diff=1e-208.67 digits/term=1.73392 VERIFIED
+G1 (a:0,-4,-4) [e] b=[10,2,0] (c0..cK) (A,B,C,D)=(4,-2,8,-3) diff=1e-208.12 digits/term=1.75349 VERIFIED
+G1 (a:0,-4,0) [e] b=[-10,-2,0] (c0..cK) (A,B,C,D)=(0,1,-3,1) diff=1e-208.61 digits/term=1.76438 VERIFIED
+G1 (a:0,-4,0) [e] b=[-8,-2,0] (c0..cK) (A,B,C,D)=(0,2,2,-1) diff=1e-208.25 digits/term=1.74487 VERIFIED
+G1 (a:0,-4,0) [e] b=[-6,-2,0] (c0..cK) (A,B,C,D)=(0,2,-1,0) diff=1e-209.04 digits/term=1.72467 VERIFIED
+G1 (a:0,-4,0) [e] b=[-4,-2,0] (c0..cK) (A,B,C,D)=(0,2,1,-1) diff=1e-208.70 digits/term=1.7037 VERIFIED
+G1 (a:0,-4,0) [e] b=[4,2,0] (c0..cK) (A,B,C,D)=(0,2,-1,1) diff=1e-208.70 digits/term=1.7037 VERIFIED
+G1 (a:0,-4,0) [e] b=[6,2,0] (c0..cK) (A,B,C,D)=(0,2,1,0) diff=1e-209.04 digits/term=1.72467 VERIFIED
+G1 (a:0,-4,0) [e] b=[8,2,0] (c0..cK) (A,B,C,D)=(0,2,-2,1) diff=1e-208.25 digits/term=1.74487 VERIFIED
+G1 (a:0,-4,0) [e] b=[10,2,0] (c0..cK) (A,B,C,D)=(0,1,3,-1) diff=1e-208.61 digits/term=1.76438 VERIFIED
+G1 (a:0,-1,-2) [e] b=[-4,-1,0] (c0..cK) (A,B,C,D)=(4,-2,-5,2) diff=1e-209.64 digits/term=1.72331 VERIFIED
+G1 (a:0,-1,-2) [e] b=[4,1,0] (c0..cK) (A,B,C,D)=(4,-2,5,-2) diff=1e-209.64 digits/term=1.72331 VERIFIED
+G1 (a:0,-1,-1) [e] b=[-5,-1,0] (c0..cK) (A,B,C,D)=(2,-1,-8,3) diff=1e-208.42 digits/term=1.75349 VERIFIED
+G1 (a:0,-1,-1) [e] b=[-4,-1,0] (c0..cK) (A,B,C,D)=(1,0,-3,1) diff=1e-208.97 digits/term=1.73392 VERIFIED
+G1 (a:0,-1,-1) [e] b=[-3,-1,0] (c0..cK) (A,B,C,D)=(1,-1,-2,1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-1,-1) [e] b=[3,1,0] (c0..cK) (A,B,C,D)=(1,-1,2,-1) diff=0 digits/term=1.71366 VERIFIED
+G1 (a:0,-1,-1) [e] b=[4,1,0] (c0..cK) (A,B,C,D)=(1,0,3,-1) diff=1e-208.97 digits/term=1.73392 VERIFIED
+G1 (a:0,-1,-1) [e] b=[5,1,0] (c0..cK) (A,B,C,D)=(2,-1,8,-3) diff=1e-208.42 digits/term=1.75349 VERIFIED
+G1 (a:0,-1,0) [e] b=[-5,-1,0] (c0..cK) (A,B,C,D)=(0,1,-6,2) diff=1e-208.91 digits/term=1.76438 VERIFIED
+G1 (a:0,-1,0) [e] b=[-4,-1,0] (c0..cK) (A,B,C,D)=(0,1,2,-1) diff=1e-208.55 digits/term=1.74487 VERIFIED
+G1 (a:0,-1,0) [e] b=[-3,-1,0] (c0..cK) (A,B,C,D)=(0,1,-1,0) diff=1e-209.34 digits/term=1.72467 VERIFIED
+G1 (a:0,-1,0) [e] b=[-2,-1,0] (c0..cK) (A,B,C,D)=(0,1,1,-1) diff=1e-209.00 digits/term=1.7037 VERIFIED
+G1 (a:0,-1,0) [e] b=[2,1,0] (c0..cK) (A,B,C,D)=(0,1,-1,1) diff=1e-209.00 digits/term=1.7037 VERIFIED
+G1 (a:0,-1,0) [e] b=[3,1,0] (c0..cK) (A,B,C,D)=(0,1,1,0) diff=1e-209.34 digits/term=1.72467 VERIFIED
+G1 (a:0,-1,0) [e] b=[4,1,0] (c0..cK) (A,B,C,D)=(0,1,-2,1) diff=1e-208.55 digits/term=1.74487 VERIFIED
+G1 (a:0,-1,0) [e] b=[5,1,0] (c0..cK) (A,B,C,D)=(0,1,6,-2) diff=1e-208.91 digits/term=1.76438 VERIFIED
+G1 (a:0,0,1) [e] b=[-6,-4,0] (c0..cK) (A,B,C,D)=(1,-1,3,-1) diff=1e-208.09 digits/term=4.03517 VERIFIED
+G1 (a:0,0,1) [e] b=[-2,-4,0] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.94 digits/term=3.99889 VERIFIED
+G1 (a:0,0,1) [e] b=[-2,4,0] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-209.42 digits/term=3.96079 VERIFIED
+G1 (a:0,0,1) [e] b=[2,-4,0] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-209.42 digits/term=3.96079 VERIFIED
+G1 (a:0,0,1) [e] b=[2,4,0] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.94 digits/term=3.99889 VERIFIED
+G1 (a:0,0,1) [e] b=[6,4,0] (c0..cK) (A,B,C,D)=(1,-1,-3,1) diff=1e-208.09 digits/term=4.03517 VERIFIED
+G1 (a:0,0,4) [e] b=[-12,-8,0] (c0..cK) (A,B,C,D)=(2,-2,3,-1) diff=1e-207.79 digits/term=4.03517 VERIFIED
+G1 (a:0,0,4) [e] b=[-4,-8,0] (c0..cK) (A,B,C,D)=(2,2,1,-1) diff=1e-208.64 digits/term=3.99889 VERIFIED
+G1 (a:0,0,4) [e] b=[-4,8,0] (c0..cK) (A,B,C,D)=(6,2,-1,-1) diff=1e-209.12 digits/term=3.96079 VERIFIED
+G1 (a:0,0,4) [e] b=[4,-8,0] (c0..cK) (A,B,C,D)=(6,2,1,1) diff=1e-209.12 digits/term=3.96079 VERIFIED
+G1 (a:0,0,4) [e] b=[4,8,0] (c0..cK) (A,B,C,D)=(2,2,-1,1) diff=1e-208.64 digits/term=3.99889 VERIFIED
+G1 (a:0,0,4) [e] b=[12,8,0] (c0..cK) (A,B,C,D)=(2,-2,-3,1) diff=1e-207.79 digits/term=4.03517 VERIFIED
+G1 (a:0,0,9) [e] b=[-18,-12,0] (c0..cK) (A,B,C,D)=(3,-3,3,-1) diff=1e-208.26 digits/term=4.03517 VERIFIED
+G1 (a:0,0,9) [e] b=[-6,-12,0] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:0,0,9) [e] b=[-6,12,0] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-208.91 digits/term=3.96079 VERIFIED
+G1 (a:0,0,9) [e] b=[6,-12,0] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-208.91 digits/term=3.96079 VERIFIED
+G1 (a:0,0,9) [e] b=[6,12,0] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:0,0,9) [e] b=[18,12,0] (c0..cK) (A,B,C,D)=(3,-3,-3,1) diff=1e-208.26 digits/term=4.03517 VERIFIED
+G1 (a:0,0,16) [e] b=[-8,-16,0] (c0..cK) (A,B,C,D)=(4,4,1,-1) diff=1e-208.34 digits/term=3.99889 VERIFIED
+G1 (a:0,0,16) [e] b=[8,16,0] (c0..cK) (A,B,C,D)=(4,4,-1,1) diff=1e-208.34 digits/term=3.99889 VERIFIED
+G1 (a:0,1,0) [e] b=[-2,-1,0] (c0..cK) (A,B,C,D)=(1,0,5,-2) diff=1e-209.16 digits/term=1.74191 VERIFIED
+G1 (a:0,1,0) [e] b=[-1,-1,0] (c0..cK) (A,B,C,D)=(1,0,2,-1) diff=1e-208.59 digits/term=1.72276 VERIFIED
+G1 (a:0,1,0) [e] b=[0,-1,0] (c0..cK) (A,B,C,D)=(1,0,1,-1) diff=1e-208.97 digits/term=1.70305 VERIFIED
+G1 (a:0,1,0) [e] b=[0,1,0] (c0..cK) (A,B,C,D)=(1,0,-1,1) diff=1e-208.97 digits/term=1.70305 VERIFIED
+G1 (a:0,1,0) [e] b=[1,1,0] (c0..cK) (A,B,C,D)=(1,0,-2,1) diff=1e-208.59 digits/term=1.72276 VERIFIED
+G1 (a:0,1,0) [e] b=[2,1,0] (c0..cK) (A,B,C,D)=(1,0,-5,2) diff=1e-209.16 digits/term=1.74191 VERIFIED
+G1 (a:0,1,1) [e] b=[-2,-1,0] (c0..cK) (A,B,C,D)=(2,-1,3,-1) diff=1e-208.42 digits/term=1.73217 VERIFIED
+G1 (a:0,1,1) [e] b=[-1,-1,0] (c0..cK) (A,B,C,D)=(1,-1,1,0) diff=1e-208.52 digits/term=1.71306 VERIFIED
+G1 (a:0,1,1) [e] b=[1,1,0] (c0..cK) (A,B,C,D)=(1,-1,-1,0) diff=1e-208.52 digits/term=1.71306 VERIFIED
+G1 (a:0,1,1) [e] b=[2,1,0] (c0..cK) (A,B,C,D)=(2,-1,-3,1) diff=1e-208.42 digits/term=1.73217 VERIFIED
+G1 (a:0,1,2) [e] b=[-3,-1,0] (c0..cK) (A,B,C,D)=(6,-2,8,-3) diff=1e-208.29 digits/term=1.74131 VERIFIED
+G1 (a:0,1,2) [e] b=[-2,-1,0] (c0..cK) (A,B,C,D)=(2,0,2,-1) diff=1e-208.15 digits/term=1.72276 VERIFIED
+G1 (a:0,1,2) [e] b=[2,1,0] (c0..cK) (A,B,C,D)=(2,0,-2,1) diff=1e-208.15 digits/term=1.72276 VERIFIED
+G1 (a:0,1,2) [e] b=[3,1,0] (c0..cK) (A,B,C,D)=(6,-2,-8,3) diff=1e-208.29 digits/term=1.74131 VERIFIED
+G1 (a:0,1,3) [e] b=[-3,-1,0] (c0..cK) (A,B,C,D)=(6,-3,6,-2) diff=1e-208.28 digits/term=1.73217 VERIFIED
+G1 (a:0,1,3) [e] b=[3,1,0] (c0..cK) (A,B,C,D)=(6,-3,-6,2) diff=1e-208.28 digits/term=1.73217 VERIFIED
+G1 (a:0,4,0) [e] b=[-6,-2,0] (c0..cK) (A,B,C,D)=(1,0,8,-3) diff=1e-208.00 digits/term=1.76054 VERIFIED
+G1 (a:0,4,0) [e] b=[-4,-2,0] (c0..cK) (A,B,C,D)=(2,0,5,-2) diff=1e-208.86 digits/term=1.74191 VERIFIED
+G1 (a:0,4,0) [e] b=[-2,-2,0] (c0..cK) (A,B,C,D)=(2,0,2,-1) diff=1e-208.29 digits/term=1.72276 VERIFIED
+G1 (a:0,4,0) [e] b=[0,-2,0] (c0..cK) (A,B,C,D)=(2,0,1,-1) diff=1e-208.67 digits/term=1.70305 VERIFIED
+G1 (a:0,4,0) [e] b=[0,2,0] (c0..cK) (A,B,C,D)=(2,0,-1,1) diff=1e-208.67 digits/term=1.70305 VERIFIED
+G1 (a:0,4,0) [e] b=[2,2,0] (c0..cK) (A,B,C,D)=(2,0,-2,1) diff=1e-208.29 digits/term=1.72276 VERIFIED
+G1 (a:0,4,0) [e] b=[4,2,0] (c0..cK) (A,B,C,D)=(2,0,-5,2) diff=1e-208.86 digits/term=1.74191 VERIFIED
+G1 (a:0,4,0) [e] b=[6,2,0] (c0..cK) (A,B,C,D)=(1,0,-8,3) diff=1e-208.00 digits/term=1.76054 VERIFIED
+G1 (a:0,4,4) [e] b=[-4,-2,0] (c0..cK) (A,B,C,D)=(4,-2,3,-1) diff=1e-208.12 digits/term=1.73217 VERIFIED
+G1 (a:0,4,4) [e] b=[-2,-2,0] (c0..cK) (A,B,C,D)=(2,-2,1,0) diff=1e-208.22 digits/term=1.71306 VERIFIED
+G1 (a:0,4,4) [e] b=[2,2,0] (c0..cK) (A,B,C,D)=(2,-2,-1,0) diff=1e-208.22 digits/term=1.71306 VERIFIED
+G1 (a:0,4,4) [e] b=[4,2,0] (c0..cK) (A,B,C,D)=(4,-2,-3,1) diff=1e-208.12 digits/term=1.73217 VERIFIED
+G1 (a:0,4,8) [e] b=[-4,-2,0] (c0..cK) (A,B,C,D)=(4,0,2,-1) diff=1e-207.85 digits/term=1.72276 VERIFIED
+G1 (a:0,4,8) [e] b=[4,2,0] (c0..cK) (A,B,C,D)=(4,0,-2,1) diff=1e-207.85 digits/term=1.72276 VERIFIED
+G1 (a:0,4,12) [e] b=[-6,-2,0] (c0..cK) (A,B,C,D)=(6,-3,3,-1) diff=1e-207.98 digits/term=1.73217 VERIFIED
+G1 (a:0,4,12) [e] b=[6,2,0] (c0..cK) (A,B,C,D)=(6,-3,-3,1) diff=1e-207.98 digits/term=1.73217 VERIFIED
+G1 (a:0,9,0) [e] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(3,0,5,-2) diff=1e-209.82 digits/term=1.74191 VERIFIED
+G1 (a:0,9,0) [e] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(3,0,2,-1) diff=1e-208.19 digits/term=1.72276 VERIFIED
+G1 (a:0,9,0) [e] b=[0,-3,0] (c0..cK) (A,B,C,D)=(3,0,1,-1) diff=1e-208.81 digits/term=1.70305 VERIFIED
+G1 (a:0,9,0) [e] b=[0,3,0] (c0..cK) (A,B,C,D)=(3,0,-1,1) diff=1e-208.81 digits/term=1.70305 VERIFIED
+G1 (a:0,9,0) [e] b=[3,3,0] (c0..cK) (A,B,C,D)=(3,0,-2,1) diff=1e-208.19 digits/term=1.72276 VERIFIED
+G1 (a:0,9,0) [e] b=[6,3,0] (c0..cK) (A,B,C,D)=(3,0,-5,2) diff=1e-209.82 digits/term=1.74191 VERIFIED
+G1 (a:0,9,9) [e] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(6,-3,3,-1) diff=1e-207.84 digits/term=1.73217 VERIFIED
+G1 (a:0,9,9) [e] b=[-3,-3,0] (c0..cK) (A,B,C,D)=(3,-3,1,0) diff=1e-208.91 digits/term=1.71306 VERIFIED
+G1 (a:0,9,9) [e] b=[3,3,0] (c0..cK) (A,B,C,D)=(3,-3,-1,0) diff=1e-208.91 digits/term=1.71306 VERIFIED
+G1 (a:0,9,9) [e] b=[6,3,0] (c0..cK) (A,B,C,D)=(6,-3,-3,1) diff=1e-207.84 digits/term=1.73217 VERIFIED
+G1 (a:0,9,18) [e] b=[-6,-3,0] (c0..cK) (A,B,C,D)=(6,0,2,-1) diff=1e-209.52 digits/term=1.72276 VERIFIED
+G1 (a:0,9,18) [e] b=[6,3,0] (c0..cK) (A,B,C,D)=(6,0,-2,1) diff=1e-209.52 digits/term=1.72276 VERIFIED
+G1 (a:0,16,0) [e] b=[-12,-4,0] (c0..cK) (A,B,C,D)=(2,0,8,-3) diff=1e-207.70 digits/term=1.76054 VERIFIED
+G1 (a:0,16,0) [e] b=[-8,-4,0] (c0..cK) (A,B,C,D)=(4,0,5,-2) diff=1e-208.56 digits/term=1.74191 VERIFIED
+G1 (a:0,16,0) [e] b=[-4,-4,0] (c0..cK) (A,B,C,D)=(4,0,2,-1) diff=1e-207.99 digits/term=1.72276 VERIFIED
+G1 (a:0,16,0) [e] b=[0,-4,0] (c0..cK) (A,B,C,D)=(4,0,1,-1) diff=1e-208.37 digits/term=1.70305 VERIFIED
+G1 (a:0,16,0) [e] b=[0,4,0] (c0..cK) (A,B,C,D)=(4,0,-1,1) diff=1e-208.37 digits/term=1.70305 VERIFIED
+G1 (a:0,16,0) [e] b=[4,4,0] (c0..cK) (A,B,C,D)=(4,0,-2,1) diff=1e-207.99 digits/term=1.72276 VERIFIED
+G1 (a:0,16,0) [e] b=[8,4,0] (c0..cK) (A,B,C,D)=(4,0,-5,2) diff=1e-208.56 digits/term=1.74191 VERIFIED
+G1 (a:0,16,0) [e] b=[12,4,0] (c0..cK) (A,B,C,D)=(2,0,-8,3) diff=1e-207.70 digits/term=1.76054 VERIFIED
+G1 (a:0,16,16) [e] b=[-8,-4,0] (c0..cK) (A,B,C,D)=(8,-4,3,-1) diff=1e-207.82 digits/term=1.73217 VERIFIED
+G1 (a:0,16,16) [e] b=[-4,-4,0] (c0..cK) (A,B,C,D)=(4,-4,1,0) diff=1e-207.91 digits/term=1.71306 VERIFIED
+G1 (a:0,16,16) [e] b=[4,4,0] (c0..cK) (A,B,C,D)=(4,-4,-1,0) diff=1e-207.91 digits/term=1.71306 VERIFIED
+G1 (a:0,16,16) [e] b=[8,4,0] (c0..cK) (A,B,C,D)=(8,-4,-3,1) diff=1e-207.82 digits/term=1.73217 VERIFIED
+G1 (a:0,17,14) [tan(zeta3*pi^-2)] b=[-8,6,-20] (c0..cK) (A,B,C,D)=(5,6,0,-5) diff=1e-13.37 digits/term=nan VERIFIED-ACCEL
+G1 (a:0,17,14) [tan(zeta3*pi^-2)] b=[8,-6,20] (c0..cK) (A,B,C,D)=(5,6,0,5) diff=1e-13.37 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,-16,-3) [tanh(zeta3*pi^-1)] b=[-8,8,-5] (c0..cK) (A,B,C,D)=(3,9,8,0) diff=1e-13.47 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,-16,-3) [tanh(zeta3*pi^-1)] b=[8,-8,5] (c0..cK) (A,B,C,D)=(3,9,-8,0) diff=1e-13.47 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,0,0) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(6,0,8,-3) diff=1e-25.42 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,0,0) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(2,0,-4,1) diff=1e-26.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,0,0) [pi] b=[-1,-2,0] (c0..cK) (A,B,C,D)=(4,0,0,-1) diff=1e-209.14 digits/term=0.765518 VERIFIED
+G1 (a:1,0,0) [pi] b=[1,2,0] (c0..cK) (A,B,C,D)=(4,0,0,1) diff=1e-209.14 digits/term=0.765518 VERIFIED
+G1 (a:1,0,0) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(2,0,4,-1) diff=1e-26.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,0,0) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(6,0,-8,3) diff=1e-25.42 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,1,0) [e] b=[-6,-10,-4] (c0..cK) (A,B,C,D)=(1,-1,3,-1) diff=1e-208.16 digits/term=4.03517 VERIFIED
+G1 (a:1,1,0) [pi] b=[-3,0,0] (c0..cK) (A,B,C,D)=(2,0,-10,3) diff=1e-24.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,1,0) [e] b=[-2,-6,-4] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.91 digits/term=3.99889 VERIFIED
+G1 (a:1,1,0) [e] b=[-2,2,4] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-209.08 digits/term=3.96079 VERIFIED
+G1 (a:1,1,0) [pi] b=[-1,0,0] (c0..cK) (A,B,C,D)=(2,0,2,-1) diff=1e-23.87 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,1,0) [pi] b=[1,0,0] (c0..cK) (A,B,C,D)=(2,0,-2,1) diff=1e-23.87 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,1,0) [e] b=[2,-2,-4] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-209.08 digits/term=3.96079 VERIFIED
+G1 (a:1,1,0) [e] b=[2,6,4] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.91 digits/term=3.99889 VERIFIED
+G1 (a:1,1,0) [pi] b=[3,0,0] (c0..cK) (A,B,C,D)=(2,0,10,-3) diff=1e-24.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,1,0) [e] b=[6,10,4] (c0..cK) (A,B,C,D)=(1,-1,-3,1) diff=1e-208.16 digits/term=4.03517 VERIFIED
+G1 (a:1,2,0) [pi] b=[-3,-2,0] (c0..cK) (A,B,C,D)=(4,0,2,-1) diff=1e-208.89 digits/term=0.765642 VERIFIED
+G1 (a:1,2,0) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(4,0,8,-3) diff=1e-23.88 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,2,0) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(4,0,-8,3) diff=1e-23.88 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,2,0) [pi] b=[3,2,0] (c0..cK) (A,B,C,D)=(4,0,-2,1) diff=1e-208.89 digits/term=0.765642 VERIFIED
+G1 (a:1,2,1) [pi] b=[-3,-2,0] (c0..cK) (A,B,C,D)=(0,1,-4,1) diff=1e-209.08 digits/term=0.765521 VERIFIED
+G1 (a:1,2,1) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(4,-1,6,-2) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,2,1) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(4,-1,-6,2) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:1,2,1) [pi] b=[3,2,0] (c0..cK) (A,B,C,D)=(0,1,4,-1) diff=1e-209.08 digits/term=0.765521 VERIFIED
+G1 (a:1,3,2) [e] b=[-12,-14,-4] (c0..cK) (A,B,C,D)=(2,-2,3,-1) diff=1e-207.88 digits/term=4.03517 VERIFIED
+G1 (a:1,3,2) [e] b=[-4,-10,-4] (c0..cK) (A,B,C,D)=(2,2,1,-1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:1,3,2) [e] b=[-4,6,4] (c0..cK) (A,B,C,D)=(6,2,-1,-1) diff=1e-208.47 digits/term=3.96079 VERIFIED
+G1 (a:1,3,2) [e] b=[4,-6,-4] (c0..cK) (A,B,C,D)=(6,2,1,1) diff=1e-208.47 digits/term=3.96079 VERIFIED
+G1 (a:1,3,2) [e] b=[4,10,4] (c0..cK) (A,B,C,D)=(2,2,-1,1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:1,3,2) [e] b=[12,14,4] (c0..cK) (A,B,C,D)=(2,-2,-3,1) diff=1e-207.88 digits/term=4.03517 VERIFIED
+G1 (a:1,4,0) [pi] b=[-5,-2,0] (c0..cK) (A,B,C,D)=(8,0,8,-3) diff=1e-209.12 digits/term=0.765972 VERIFIED
+G1 (a:1,4,0) [pi] b=[5,2,0] (c0..cK) (A,B,C,D)=(8,0,-8,3) diff=1e-209.12 digits/term=0.765972 VERIFIED
+G1 (a:1,4,3) [pi] b=[-5,-2,0] (c0..cK) (A,B,C,D)=(6,-3,10,-3) diff=1e-208.86 digits/term=0.765635 VERIFIED
+G1 (a:1,4,3) [pi] b=[5,2,0] (c0..cK) (A,B,C,D)=(6,-3,-10,3) diff=1e-208.86 digits/term=0.765635 VERIFIED
+G1 (a:1,4,4) [pi] b=[-5,-2,0] (c0..cK) (A,B,C,D)=(4,-1,3,-1) diff=1e-208.91 digits/term=0.765523 VERIFIED
+G1 (a:1,4,4) [pi] b=[5,2,0] (c0..cK) (A,B,C,D)=(4,-1,-3,1) diff=1e-208.91 digits/term=0.765523 VERIFIED
+G1 (a:1,5,6) [e] b=[-18,-18,-4] (c0..cK) (A,B,C,D)=(3,-3,3,-1) diff=1e-209.22 digits/term=4.03517 VERIFIED
+G1 (a:1,5,6) [e] b=[-6,-14,-4] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=0 digits/term=3.99889 VERIFIED
+G1 (a:1,5,6) [e] b=[-6,10,4] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-209.22 digits/term=3.96079 VERIFIED
+G1 (a:1,5,6) [e] b=[6,-10,-4] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-209.22 digits/term=3.96079 VERIFIED
+G1 (a:1,5,6) [e] b=[6,14,4] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=0 digits/term=3.99889 VERIFIED
+G1 (a:1,5,6) [e] b=[18,18,4] (c0..cK) (A,B,C,D)=(3,-3,-3,1) diff=1e-209.22 digits/term=4.03517 VERIFIED
+G1 (a:1,7,12) [e] b=[-8,-18,-4] (c0..cK) (A,B,C,D)=(4,4,1,-1) diff=1e-208.56 digits/term=3.99889 VERIFIED
+G1 (a:1,7,12) [e] b=[8,18,4] (c0..cK) (A,B,C,D)=(4,4,-1,1) diff=1e-208.56 digits/term=3.99889 VERIFIED
+G1 (a:2,-11,-15) [t^t(zeta3*pi^-1)] b=[-18,0,12] (c0..cK) (A,B,C,D)=(5,-4,-5,7) diff=1e-12.36 digits/term=nan VERIFIED-ACCEL
+G1 (a:2,-11,-15) [t^t(zeta3*pi^-1)] b=[18,0,-12] (c0..cK) (A,B,C,D)=(5,-4,5,-7) diff=1e-12.36 digits/term=nan VERIFIED-ACCEL
+G1 (a:2,13,5) [Gamma(zeta3*pi^0)] b=[-17,-17,11] (c0..cK) (A,B,C,D)=(10,2,3,-4) diff=1e-11.96 digits/term=nan VERIFIED-ACCEL
+G1 (a:2,13,5) [Gamma(zeta3*pi^0)] b=[17,17,-11] (c0..cK) (A,B,C,D)=(10,2,-3,4) diff=1e-11.96 digits/term=nan VERIFIED-ACCEL
+G1 (a:3,-10,-2) [Gamma(zeta3*pi^-3)] b=[-5,-17,-7] (c0..cK) (A,B,C,D)=(8,4,2,-1) diff=1e-12.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:3,-10,-2) [Gamma(zeta3*pi^-3)] b=[5,17,7] (c0..cK) (A,B,C,D)=(8,4,-2,1) diff=1e-12.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:3,-5,4) [sin(zeta3*pi^-3)] b=[-3,-6,-19] (c0..cK) (A,B,C,D)=(10,-8,-3,-4) diff=1e-12.74 digits/term=nan VERIFIED-ACCEL
+G1 (a:3,-5,4) [sin(zeta3*pi^-3)] b=[3,6,19] (c0..cK) (A,B,C,D)=(10,-8,3,4) diff=1e-12.74 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-19,2) [sinh(zeta3*pi^0)] b=[-1,-7,-4] (c0..cK) (A,B,C,D)=(2,1,9,10) diff=1e-13.16 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-19,2) [sinh(zeta3*pi^0)] b=[1,7,4] (c0..cK) (A,B,C,D)=(2,1,-9,-10) diff=1e-13.16 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-16,-13) [cosh(zeta3*pi^-1)] b=[-2,-10,6] (c0..cK) (A,B,C,D)=(3,2,7,-10) diff=1e-13.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-16,-13) [cosh(zeta3*pi^-1)] b=[2,10,-6] (c0..cK) (A,B,C,D)=(3,2,-7,10) diff=1e-13.10 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-16,15) [e] b=[-18,0,8] (c0..cK) (A,B,C,D)=(3,-3,3,-1) diff=1e-207.64 digits/term=4.03517 VERIFIED
+G1 (a:4,-16,15) [e] b=[-6,-8,8] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-208.26 digits/term=3.99889 VERIFIED
+G1 (a:4,-16,15) [e] b=[-6,16,-8] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-208.78 digits/term=3.96079 VERIFIED
+G1 (a:4,-16,15) [e] b=[6,-16,8] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-208.78 digits/term=3.96079 VERIFIED
+G1 (a:4,-16,15) [e] b=[6,8,-8] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-208.26 digits/term=3.99889 VERIFIED
+G1 (a:4,-16,15) [e] b=[18,0,-8] (c0..cK) (A,B,C,D)=(3,-3,-3,1) diff=1e-207.64 digits/term=4.03517 VERIFIED
+G1 (a:4,-12,5) [e] b=[-8,16,-8] (c0..cK) (A,B,C,D)=(8,3,-1,0) diff=1e-208.44 digits/term=3.9418 VERIFIED
+G1 (a:4,-12,5) [e] b=[8,-16,8] (c0..cK) (A,B,C,D)=(8,3,1,0) diff=1e-208.44 digits/term=3.9418 VERIFIED
+G1 (a:4,-12,9) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(8,3,-4,-1) diff=1e-29.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-12,9) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(8,3,4,1) diff=1e-29.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-8,-5) [e] b=[-6,-8,8] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-208.82 digits/term=3.96079 VERIFIED
+G1 (a:4,-8,-5) [e] b=[6,8,-8] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-208.82 digits/term=3.96079 VERIFIED
+G1 (a:4,-8,3) [e] b=[-6,8,8] (c0..cK) (A,B,C,D)=(1,-1,3,-1) diff=1e-208.03 digits/term=4.03517 VERIFIED
+G1 (a:4,-8,3) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(10,3,-2,-1) diff=1e-29.98 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-8,3) [e] b=[-2,0,8] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.91 digits/term=3.99889 VERIFIED
+G1 (a:4,-8,3) [e] b=[-2,8,-8] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-208.74 digits/term=3.96079 VERIFIED
+G1 (a:4,-8,3) [e] b=[2,-8,8] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-208.74 digits/term=3.96079 VERIFIED
+G1 (a:4,-8,3) [e] b=[2,0,-8] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.91 digits/term=3.99889 VERIFIED
+G1 (a:4,-8,3) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(10,3,2,1) diff=1e-29.98 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-8,3) [e] b=[6,-8,-8] (c0..cK) (A,B,C,D)=(1,-1,-3,1) diff=1e-208.03 digits/term=4.03517 VERIFIED
+G1 (a:4,-4,-3) [pi] b=[-10,0,0] (c0..cK) (A,B,C,D)=(10,3,-2,0) diff=1e-26.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,-3) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(8,3,0,-1) diff=1e-26.87 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,-3) [e] b=[-4,0,8] (c0..cK) (A,B,C,D)=(2,1,-1,0) diff=1e-208.34 digits/term=3.97984 VERIFIED
+G1 (a:4,-4,-3) [e] b=[0,0,-8] (c0..cK) (A,B,C,D)=(1,0,0,1) diff=1e-209.77 digits/term=3.9808 VERIFIED
+G1 (a:4,-4,-3) [e] b=[0,0,8] (c0..cK) (A,B,C,D)=(1,0,0,-1) diff=1e-209.77 digits/term=3.9808 VERIFIED
+G1 (a:4,-4,-3) [e] b=[4,0,-8] (c0..cK) (A,B,C,D)=(2,1,1,0) diff=1e-208.34 digits/term=3.97984 VERIFIED
+G1 (a:4,-4,-3) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(8,3,0,1) diff=1e-26.87 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,-3) [pi] b=[10,0,0] (c0..cK) (A,B,C,D)=(10,3,2,0) diff=1e-26.62 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,1) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(3,1,-1,0) diff=1e-27.64 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,1) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(4,1,0,-1) diff=1e-27.76 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,1) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(4,1,0,1) diff=1e-27.76 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,-4,1) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(3,1,1,0) diff=1e-27.64 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-9) [e] b=[-6,8,8] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-209.22 digits/term=3.99889 VERIFIED
+G1 (a:4,0,-9) [e] b=[6,-8,-8] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-209.22 digits/term=3.99889 VERIFIED
+G1 (a:4,0,-1) [pi] b=[-12,0,0] (c0..cK) (A,B,C,D)=(8,3,8,-3) diff=1e-25.05 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-1) [pi] b=[-8,0,0] (c0..cK) (A,B,C,D)=(4,1,-4,1) diff=1e-25.23 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-1) [e] b=[-6,-16,-8] (c0..cK) (A,B,C,D)=(1,-1,3,-1) diff=1e-209.52 digits/term=4.03517 VERIFIED
+G1 (a:4,0,-1) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(2,1,2,-1) diff=1e-26.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-1) [e] b=[-2,-8,-8] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.66 digits/term=3.99889 VERIFIED
+G1 (a:4,0,-1) [e] b=[-2,0,8] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-208.88 digits/term=3.96079 VERIFIED
+G1 (a:4,0,-1) [e] b=[2,0,-8] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-208.88 digits/term=3.96079 VERIFIED
+G1 (a:4,0,-1) [e] b=[2,8,8] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.66 digits/term=3.99889 VERIFIED
+G1 (a:4,0,-1) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(2,1,-2,1) diff=1e-26.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-1) [e] b=[6,16,8] (c0..cK) (A,B,C,D)=(1,-1,-3,1) diff=1e-209.52 digits/term=4.03517 VERIFIED
+G1 (a:4,0,-1) [pi] b=[8,0,0] (c0..cK) (A,B,C,D)=(4,1,4,-1) diff=1e-25.23 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,-1) [pi] b=[12,0,0] (c0..cK) (A,B,C,D)=(8,3,-8,3) diff=1e-25.05 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,0) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(4,0,-4,1) diff=1e-25.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,0,0) [pi] b=[-2,-4,0] (c0..cK) (A,B,C,D)=(8,0,0,-1) diff=1e-208.84 digits/term=0.765518 VERIFIED
+G1 (a:4,0,0) [pi] b=[2,4,0] (c0..cK) (A,B,C,D)=(8,0,0,1) diff=1e-208.84 digits/term=0.765518 VERIFIED
+G1 (a:4,0,0) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(4,0,4,-1) diff=1e-25.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,1,-11) [cos(zeta3*pi^-1)] b=[-8,10,16] (c0..cK) (A,B,C,D)=(6,5,8,-10) diff=1e-12.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,1,-11) [cos(zeta3*pi^-1)] b=[8,-10,-16] (c0..cK) (A,B,C,D)=(6,5,-8,10) diff=1e-12.25 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,-3) [pi] b=[-10,0,0] (c0..cK) (A,B,C,D)=(6,0,-10,3) diff=1e-23.93 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,-3) [e] b=[-8,-16,-8] (c0..cK) (A,B,C,D)=(0,3,-1,0) diff=1e-207.96 digits/term=4.0179 VERIFIED
+G1 (a:4,4,-3) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(0,3,8,-3) diff=1e-24.04 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,-3) [e] b=[-4,-16,-8] (c0..cK) (A,B,C,D)=(3,0,2,-1) diff=1e-208.33 digits/term=4.01703 VERIFIED
+G1 (a:4,4,-3) [e] b=[4,16,8] (c0..cK) (A,B,C,D)=(3,0,-2,1) diff=1e-208.33 digits/term=4.01703 VERIFIED
+G1 (a:4,4,-3) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(0,3,-8,3) diff=1e-24.04 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,-3) [e] b=[8,16,8] (c0..cK) (A,B,C,D)=(0,3,1,0) diff=1e-207.96 digits/term=4.0179 VERIFIED
+G1 (a:4,4,-3) [pi] b=[10,0,0] (c0..cK) (A,B,C,D)=(6,0,10,-3) diff=1e-23.93 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,0) [e] b=[-12,-20,-8] (c0..cK) (A,B,C,D)=(2,-2,3,-1) diff=1e-207.85 digits/term=4.03517 VERIFIED
+G1 (a:4,4,0) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(4,0,-10,3) diff=1e-23.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,0) [e] b=[-4,-12,-8] (c0..cK) (A,B,C,D)=(2,2,1,-1) diff=1e-208.61 digits/term=3.99889 VERIFIED
+G1 (a:4,4,0) [e] b=[-4,4,8] (c0..cK) (A,B,C,D)=(6,2,-1,-1) diff=1e-208.78 digits/term=3.96079 VERIFIED
+G1 (a:4,4,0) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(4,0,2,-1) diff=1e-23.57 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,0) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(4,0,-2,1) diff=1e-23.57 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,0) [e] b=[4,-4,-8] (c0..cK) (A,B,C,D)=(6,2,1,1) diff=1e-208.78 digits/term=3.96079 VERIFIED
+G1 (a:4,4,0) [e] b=[4,12,8] (c0..cK) (A,B,C,D)=(2,2,-1,1) diff=1e-208.61 digits/term=3.99889 VERIFIED
+G1 (a:4,4,0) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(4,0,10,-3) diff=1e-23.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,0) [e] b=[12,20,8] (c0..cK) (A,B,C,D)=(2,-2,-3,1) diff=1e-207.85 digits/term=4.03517 VERIFIED
+G1 (a:4,4,1) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(1,0,3,-1) diff=1e-23.81 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,1) [pi] b=[-2,0,0] (c0..cK) (A,B,C,D)=(0,1,-4,1) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,1) [pi] b=[2,0,0] (c0..cK) (A,B,C,D)=(0,1,4,-1) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,4,1) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(1,0,-3,1) diff=1e-23.81 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,0) [pi] b=[-6,-4,0] (c0..cK) (A,B,C,D)=(8,0,2,-1) diff=1e-208.59 digits/term=0.765642 VERIFIED
+G1 (a:4,8,0) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(8,0,8,-3) diff=1e-23.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,0) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(8,0,-8,3) diff=1e-23.58 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,0) [pi] b=[6,4,0] (c0..cK) (A,B,C,D)=(8,0,-2,1) diff=1e-208.59 digits/term=0.765642 VERIFIED
+G1 (a:4,8,3) [e] b=[-6,-16,-8] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-208.44 digits/term=3.99889 VERIFIED
+G1 (a:4,8,3) [e] b=[-6,8,8] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-209.34 digits/term=3.96079 VERIFIED
+G1 (a:4,8,3) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(6,-3,10,-3) diff=1e-23.28 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,3) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(6,-3,-10,3) diff=1e-23.28 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,3) [e] b=[6,-8,-8] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-209.34 digits/term=3.96079 VERIFIED
+G1 (a:4,8,3) [e] b=[6,16,8] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-208.44 digits/term=3.99889 VERIFIED
+G1 (a:4,8,4) [pi] b=[-6,-4,0] (c0..cK) (A,B,C,D)=(0,2,-4,1) diff=1e-208.78 digits/term=0.765521 VERIFIED
+G1 (a:4,8,4) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(4,-1,3,-1) diff=1e-23.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,4) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(4,-1,-3,1) diff=1e-23.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:4,8,4) [pi] b=[6,4,0] (c0..cK) (A,B,C,D)=(0,2,4,-1) diff=1e-208.78 digits/term=0.765521 VERIFIED
+G1 (a:4,12,8) [e] b=[-8,-20,-8] (c0..cK) (A,B,C,D)=(4,4,1,-1) diff=1e-208.52 digits/term=3.99889 VERIFIED
+G1 (a:4,12,8) [e] b=[8,20,8] (c0..cK) (A,B,C,D)=(4,4,-1,1) diff=1e-208.52 digits/term=3.99889 VERIFIED
+G1 (a:4,16,16) [pi] b=[-10,-4,0] (c0..cK) (A,B,C,D)=(8,-2,3,-1) diff=1e-208.61 digits/term=0.765523 VERIFIED
+G1 (a:4,16,16) [pi] b=[10,4,0] (c0..cK) (A,B,C,D)=(8,-2,-3,1) diff=1e-208.61 digits/term=0.765523 VERIFIED
+G1 (a:5,1,9) [tan(zeta3*pi^-3)] b=[-16,7,9] (c0..cK) (A,B,C,D)=(6,8,8,5) diff=1e-13.11 digits/term=nan VERIFIED-ACCEL
+G1 (a:5,1,9) [tan(zeta3*pi^-3)] b=[16,-7,-9] (c0..cK) (A,B,C,D)=(6,8,-8,-5) diff=1e-13.11 digits/term=nan VERIFIED-ACCEL
+G1 (a:5,5,-16) [cos(zeta3*pi^-1)] b=[-1,-7,-15] (c0..cK) (A,B,C,D)=(2,8,-9,-4) diff=1e-13.17 digits/term=nan VERIFIED-ACCEL
+G1 (a:5,5,-16) [cos(zeta3*pi^-1)] b=[1,7,15] (c0..cK) (A,B,C,D)=(2,8,9,4) diff=1e-13.17 digits/term=nan VERIFIED-ACCEL
+G1 (a:5,5,-14) [sin(zeta3*pi^-2)] b=[-11,12,6] (c0..cK) (A,B,C,D)=(5,5,0,-4) diff=1e-12.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:5,5,-14) [sin(zeta3*pi^-2)] b=[11,-12,-6] (c0..cK) (A,B,C,D)=(5,5,0,4) diff=1e-12.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,-19,0) [arctan(zeta3*pi^-2)] b=[-14,-16,20] (c0..cK) (A,B,C,D)=(7,6,0,-5) diff=1e-12.14 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,-19,0) [arctan(zeta3*pi^-2)] b=[14,16,-20] (c0..cK) (A,B,C,D)=(7,6,0,5) diff=1e-12.14 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,-18,9) [exp(1/t)(zeta3*pi^-1)] b=[-1,3,-11] (c0..cK) (A,B,C,D)=(9,3,-7,-5) diff=1e-13.01 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,-18,9) [exp(1/t)(zeta3*pi^-1)] b=[1,-3,11] (c0..cK) (A,B,C,D)=(9,3,7,5) diff=1e-13.01 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,20,18) [arcsin(1/t)(zeta3*pi^0)] b=[-3,16,12] (c0..cK) (A,B,C,D)=(3,5,-8,2) diff=1e-13.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:6,20,18) [arcsin(1/t)(zeta3*pi^0)] b=[3,-16,-12] (c0..cK) (A,B,C,D)=(3,5,8,-2) diff=1e-13.85 digits/term=nan VERIFIED-ACCEL
+G1 (a:7,-10,9) [tanh(zeta3*pi^-1)] b=[-9,15,-11] (c0..cK) (A,B,C,D)=(8,3,-2,3) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:7,-10,9) [tanh(zeta3*pi^-1)] b=[9,-15,11] (c0..cK) (A,B,C,D)=(8,3,2,-3) diff=1e-12.83 digits/term=nan VERIFIED-ACCEL
+G1 (a:7,-4,-2) [exp(zeta3*pi^-3)] b=[-1,-11,-17] (c0..cK) (A,B,C,D)=(1,-9,6,2) diff=1e-13.70 digits/term=nan VERIFIED-ACCEL
+G1 (a:7,-4,-2) [exp(zeta3*pi^-3)] b=[1,11,17] (c0..cK) (A,B,C,D)=(1,-9,-6,-2) diff=1e-13.70 digits/term=nan VERIFIED-ACCEL
+G1 (a:8,6,19) [tan(zeta3*pi^0)] b=[-3,3,3] (c0..cK) (A,B,C,D)=(0,8,-3,5) diff=1e-14.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:8,6,19) [tan(zeta3*pi^0)] b=[3,-3,-3] (c0..cK) (A,B,C,D)=(0,8,3,-5) diff=1e-14.19 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,-15,4) [e] b=[-6,14,12] (c0..cK) (A,B,C,D)=(1,-1,3,-1) diff=1e-208.70 digits/term=4.03517 VERIFIED
+G1 (a:9,-15,4) [e] b=[-2,2,12] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:9,-15,4) [e] b=[-2,10,-12] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-209.42 digits/term=3.96079 VERIFIED
+G1 (a:9,-15,4) [e] b=[2,-10,12] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-209.42 digits/term=3.96079 VERIFIED
+G1 (a:9,-15,4) [e] b=[2,-2,-12] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.82 digits/term=3.99889 VERIFIED
+G1 (a:9,-15,4) [e] b=[6,-14,-12] (c0..cK) (A,B,C,D)=(1,-1,-3,1) diff=1e-208.70 digits/term=4.03517 VERIFIED
+G1 (a:9,-3,-2) [e] b=[-2,-10,-12] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.63 digits/term=3.99889 VERIFIED
+G1 (a:9,-3,-2) [e] b=[-2,-2,12] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-208.61 digits/term=3.96079 VERIFIED
+G1 (a:9,-3,-2) [e] b=[2,2,-12] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-208.61 digits/term=3.96079 VERIFIED
+G1 (a:9,-3,-2) [e] b=[2,10,12] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.63 digits/term=3.99889 VERIFIED
+G1 (a:9,0,0) [pi] b=[-6,0,0] (c0..cK) (A,B,C,D)=(6,0,-4,1) diff=1e-25.68 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,0,0) [pi] b=[6,0,0] (c0..cK) (A,B,C,D)=(6,0,4,-1) diff=1e-25.68 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,3,-2) [e] b=[-4,-14,-12] (c0..cK) (A,B,C,D)=(2,2,1,-1) diff=1e-208.61 digits/term=3.99889 VERIFIED
+G1 (a:9,3,-2) [e] b=[-4,2,12] (c0..cK) (A,B,C,D)=(6,2,-1,-1) diff=1e-208.63 digits/term=3.96079 VERIFIED
+G1 (a:9,3,-2) [e] b=[4,-2,-12] (c0..cK) (A,B,C,D)=(6,2,1,1) diff=1e-208.63 digits/term=3.96079 VERIFIED
+G1 (a:9,3,-2) [e] b=[4,14,12] (c0..cK) (A,B,C,D)=(2,2,-1,1) diff=1e-208.61 digits/term=3.99889 VERIFIED
+G1 (a:9,9,0) [pi] b=[-9,0,0] (c0..cK) (A,B,C,D)=(6,0,-10,3) diff=1e-23.68 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,9,0) [e] b=[-6,-18,-12] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-207.95 digits/term=3.99889 VERIFIED
+G1 (a:9,9,0) [e] b=[-6,6,12] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-209.04 digits/term=3.96079 VERIFIED
+G1 (a:9,9,0) [pi] b=[-3,0,0] (c0..cK) (A,B,C,D)=(6,0,2,-1) diff=1e-23.39 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,9,0) [pi] b=[3,0,0] (c0..cK) (A,B,C,D)=(6,0,-2,1) diff=1e-23.39 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,9,0) [e] b=[6,-6,-12] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-209.04 digits/term=3.96079 VERIFIED
+G1 (a:9,9,0) [e] b=[6,18,12] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-207.95 digits/term=3.99889 VERIFIED
+G1 (a:9,9,0) [pi] b=[9,0,0] (c0..cK) (A,B,C,D)=(6,0,10,-3) diff=1e-23.68 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,9,1) [Gamma(zeta3*pi^-1)] b=[-3,0,0] (c0..cK) (A,B,C,D)=(5,-9,-4,3) diff=1e-8.45 digits/term=nan rejected
+G1 (a:9,9,1) [Gamma(zeta3*pi^-1)] b=[3,0,0] (c0..cK) (A,B,C,D)=(5,-9,4,-3) diff=1e-8.45 digits/term=nan rejected
+G1 (a:9,9,9) [arcsinh(zeta3*pi^-1)] b=[-8,0,0] (c0..cK) (A,B,C,D)=(8,-1,0,-2) diff=1e-8.03 digits/term=nan rejected
+G1 (a:9,9,9) [arcsinh(zeta3*pi^-1)] b=[8,0,0] (c0..cK) (A,B,C,D)=(8,-1,0,2) diff=1e-8.03 digits/term=nan rejected
+G1 (a:9,16,0) [arcsinh(zeta3*pi^-1)] b=[-16,-11,-8] (c0..cK) (A,B,C,D)=(1,9,-4,10) diff=1e-11.99 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,16,0) [arcsinh(zeta3*pi^-1)] b=[16,11,8] (c0..cK) (A,B,C,D)=(1,9,4,-10) diff=1e-11.99 digits/term=nan VERIFIED-ACCEL
+G1 (a:9,18,9) [pi] b=[-9,-6,0] (c0..cK) (A,B,C,D)=(0,3,-4,1) diff=1e-208.12 digits/term=0.765521 VERIFIED
+G1 (a:9,18,9) [pi] b=[9,6,0] (c0..cK) (A,B,C,D)=(0,3,4,-1) diff=1e-208.12 digits/term=0.765521 VERIFIED
+G1 (a:11,-6,11) [exp(zeta3*pi^0)] b=[-7,19,-4] (c0..cK) (A,B,C,D)=(1,6,-10,2) diff=1e-13.07 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,-6,11) [exp(zeta3*pi^0)] b=[7,-19,4] (c0..cK) (A,B,C,D)=(1,6,10,-2) diff=1e-13.07 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,1,-6) [exp(zeta3*pi^0)] b=[-1,-4,20] (c0..cK) (A,B,C,D)=(1,4,0,-7) diff=1e-13.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,1,-6) [exp(zeta3*pi^0)] b=[1,4,-20] (c0..cK) (A,B,C,D)=(1,4,0,7) diff=1e-13.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,4,14) [exp(1/t)(zeta3*pi^-1)] b=[-17,12,-3] (c0..cK) (A,B,C,D)=(3,4,-3,0) diff=1e-11.82 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,4,14) [exp(1/t)(zeta3*pi^-1)] b=[17,-12,3] (c0..cK) (A,B,C,D)=(3,4,3,0) diff=1e-11.82 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,8,-3) [arcsinh(zeta3*pi^-2)] b=[-9,0,0] (c0..cK) (A,B,C,D)=(5,-8,-1,5) diff=1e-9.12 digits/term=nan VERIFIED-ACCEL
+G1 (a:11,8,-3) [arcsinh(zeta3*pi^-2)] b=[9,0,0] (c0..cK) (A,B,C,D)=(5,-8,1,-5) diff=1e-9.12 digits/term=nan VERIFIED-ACCEL
+G1 (a:12,-20,-3) [exp(zeta3*pi^-2)] b=[-9,0,0] (c0..cK) (A,B,C,D)=(8,1,9,-9) diff=1e-10.27 digits/term=nan VERIFIED-ACCEL
+G1 (a:12,-20,-3) [exp(zeta3*pi^-2)] b=[9,0,0] (c0..cK) (A,B,C,D)=(8,1,-9,9) diff=1e-10.27 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-18,-17) [sinh(zeta3*pi^-3)] b=[-19,2,16] (c0..cK) (A,B,C,D)=(5,-7,2,-4) diff=1e-13.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-18,-17) [sinh(zeta3*pi^-3)] b=[19,-2,-16] (c0..cK) (A,B,C,D)=(5,-7,-2,4) diff=1e-13.33 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-3,-11) [e] b=[-1,16,-17] (c0..cK) (A,B,C,D)=(1,6,-10,-6) diff=1e-13.01 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-3,-11) [e] b=[1,-16,17] (c0..cK) (A,B,C,D)=(1,6,10,6) diff=1e-13.01 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-2,17) [t^t(zeta3*pi^-3)] b=[-19,7,17] (c0..cK) (A,B,C,D)=(9,5,7,-9) diff=1e-13.53 digits/term=nan VERIFIED-ACCEL
+G1 (a:13,-2,17) [t^t(zeta3*pi^-3)] b=[19,-7,-17] (c0..cK) (A,B,C,D)=(9,5,-7,9) diff=1e-13.53 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,2,2) [log(zeta3*pi^-1)] b=[-13,-15,14] (c0..cK) (A,B,C,D)=(9,0,9,10) diff=1e-11.91 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,2,2) [log(zeta3*pi^-1)] b=[13,15,-14] (c0..cK) (A,B,C,D)=(9,0,-9,-10) diff=1e-11.91 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,7,10) [cos(zeta3*pi^0)] b=[-5,0,1] (c0..cK) (A,B,C,D)=(4,9,8,-10) diff=1e-12.80 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,7,10) [cos(zeta3*pi^0)] b=[5,0,-1] (c0..cK) (A,B,C,D)=(4,9,-8,10) diff=1e-12.80 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,10,3) [sinh(zeta3*pi^-1)] b=[-12,0,0] (c0..cK) (A,B,C,D)=(9,3,2,-7) diff=1e-10.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:14,10,3) [sinh(zeta3*pi^-1)] b=[12,0,0] (c0..cK) (A,B,C,D)=(9,3,-2,7) diff=1e-10.15 digits/term=nan VERIFIED-ACCEL
+G1 (a:15,8,16) [t^t(zeta3*pi^-3)] b=[-10,0,0] (c0..cK) (A,B,C,D)=(10,2,7,-9) diff=1e-8.20 digits/term=nan rejected
+G1 (a:15,8,16) [t^t(zeta3*pi^-3)] b=[10,0,0] (c0..cK) (A,B,C,D)=(10,2,-7,9) diff=1e-8.20 digits/term=nan rejected
+G1 (a:16,-16,-12) [pi] b=[-20,0,0] (c0..cK) (A,B,C,D)=(10,3,-1,0) diff=1e-26.32 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-16,-12) [e] b=[-8,0,16] (c0..cK) (A,B,C,D)=(4,2,-1,0) diff=1e-208.04 digits/term=3.97984 VERIFIED
+G1 (a:16,-16,-12) [e] b=[0,0,-16] (c0..cK) (A,B,C,D)=(2,0,0,1) diff=1e-209.47 digits/term=3.9808 VERIFIED
+G1 (a:16,-16,-12) [e] b=[0,0,16] (c0..cK) (A,B,C,D)=(2,0,0,-1) diff=1e-209.47 digits/term=3.9808 VERIFIED
+G1 (a:16,-16,-12) [e] b=[8,0,-16] (c0..cK) (A,B,C,D)=(4,2,1,0) diff=1e-208.04 digits/term=3.97984 VERIFIED
+G1 (a:16,-16,-12) [pi] b=[20,0,0] (c0..cK) (A,B,C,D)=(10,3,1,0) diff=1e-26.32 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-16,4) [pi] b=[-12,0,0] (c0..cK) (A,B,C,D)=(6,2,-1,0) diff=1e-27.34 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-16,4) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(8,2,0,-1) diff=1e-27.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-16,4) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(8,2,0,1) diff=1e-27.46 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-16,4) [pi] b=[12,0,0] (c0..cK) (A,B,C,D)=(6,2,1,0) diff=1e-27.34 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-12,-20) [arccosh(zeta3*pi^0)] b=[-2,4,-13] (c0..cK) (A,B,C,D)=(7,-7,-10,9) diff=1e-15.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-12,-20) [arccosh(zeta3*pi^0)] b=[2,-4,13] (c0..cK) (A,B,C,D)=(7,-7,10,-9) diff=1e-15.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-11,2) [tanh(zeta3*pi^-1)] b=[0,-17,-5] (c0..cK) (A,B,C,D)=(4,-2,-7,-10) diff=1e-13.75 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-11,2) [tanh(zeta3*pi^-1)] b=[0,17,5] (c0..cK) (A,B,C,D)=(4,-2,7,10) diff=1e-13.75 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-8,-3) [e] b=[-2,-12,-16] (c0..cK) (A,B,C,D)=(1,1,1,-1) diff=1e-208.60 digits/term=3.99889 VERIFIED
+G1 (a:16,-8,-3) [e] b=[-2,-4,16] (c0..cK) (A,B,C,D)=(3,1,-1,-1) diff=1e-208.68 digits/term=3.96079 VERIFIED
+G1 (a:16,-8,-3) [e] b=[2,4,-16] (c0..cK) (A,B,C,D)=(3,1,1,1) diff=1e-208.68 digits/term=3.96079 VERIFIED
+G1 (a:16,-8,-3) [e] b=[2,12,16] (c0..cK) (A,B,C,D)=(1,1,-1,1) diff=1e-208.60 digits/term=3.99889 VERIFIED
+G1 (a:16,-8,6) [exp(zeta3*pi^0)] b=[-4,0,0] (c0..cK) (A,B,C,D)=(4,5,3,-2) diff=1e-9.65 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-8,6) [exp(zeta3*pi^0)] b=[4,0,0] (c0..cK) (A,B,C,D)=(4,5,-3,2) diff=1e-9.65 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-2,7) [exp(zeta3*pi^-1)] b=[-4,0,0] (c0..cK) (A,B,C,D)=(4,-9,0,1) diff=1e-9.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,-2,7) [exp(zeta3*pi^-1)] b=[4,0,0] (c0..cK) (A,B,C,D)=(4,-9,0,-1) diff=1e-9.20 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,-4) [pi] b=[-16,0,0] (c0..cK) (A,B,C,D)=(8,2,-4,1) diff=1e-24.92 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,-4) [pi] b=[-8,0,0] (c0..cK) (A,B,C,D)=(4,2,2,-1) diff=1e-25.95 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,-4) [e] b=[-4,-16,-16] (c0..cK) (A,B,C,D)=(2,2,1,-1) diff=1e-208.36 digits/term=3.99889 VERIFIED
+G1 (a:16,0,-4) [e] b=[-4,0,16] (c0..cK) (A,B,C,D)=(6,2,-1,-1) diff=1e-208.57 digits/term=3.96079 VERIFIED
+G1 (a:16,0,-4) [e] b=[4,0,-16] (c0..cK) (A,B,C,D)=(6,2,1,1) diff=1e-208.57 digits/term=3.96079 VERIFIED
+G1 (a:16,0,-4) [e] b=[4,16,16] (c0..cK) (A,B,C,D)=(2,2,-1,1) diff=1e-208.36 digits/term=3.99889 VERIFIED
+G1 (a:16,0,-4) [pi] b=[8,0,0] (c0..cK) (A,B,C,D)=(4,2,-2,1) diff=1e-25.95 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,-4) [pi] b=[16,0,0] (c0..cK) (A,B,C,D)=(8,2,4,-1) diff=1e-24.92 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,0) [pi] b=[-8,0,0] (c0..cK) (A,B,C,D)=(8,0,-4,1) diff=1e-25.55 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,0,0) [pi] b=[8,0,0] (c0..cK) (A,B,C,D)=(8,0,4,-1) diff=1e-25.55 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,8,-3) [e] b=[-6,-20,-16] (c0..cK) (A,B,C,D)=(3,3,1,-1) diff=1e-208.54 digits/term=3.99889 VERIFIED
+G1 (a:16,8,-3) [e] b=[-6,4,16] (c0..cK) (A,B,C,D)=(9,3,-1,-1) diff=1e-209.22 digits/term=3.96079 VERIFIED
+G1 (a:16,8,-3) [e] b=[6,-4,-16] (c0..cK) (A,B,C,D)=(9,3,1,1) diff=1e-209.22 digits/term=3.96079 VERIFIED
+G1 (a:16,8,-3) [e] b=[6,20,16] (c0..cK) (A,B,C,D)=(3,3,-1,1) diff=1e-208.54 digits/term=3.99889 VERIFIED
+G1 (a:16,15,3) [e] b=[-4,0,0] (c0..cK) (A,B,C,D)=(3,-3,-2,1) diff=1e-8.82 digits/term=nan rejected
+G1 (a:16,15,3) [e] b=[4,0,0] (c0..cK) (A,B,C,D)=(3,-3,2,-1) diff=1e-8.82 digits/term=nan rejected
+G1 (a:16,16,-12) [pi] b=[-12,0,0] (c0..cK) (A,B,C,D)=(0,6,8,-3) diff=1e-23.74 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,-12) [pi] b=[12,0,0] (c0..cK) (A,B,C,D)=(0,6,-8,3) diff=1e-23.74 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,0) [pi] b=[-12,0,0] (c0..cK) (A,B,C,D)=(8,0,-10,3) diff=1e-23.55 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,0) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(8,0,2,-1) diff=1e-23.27 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,0) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(8,0,-2,1) diff=1e-23.27 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,0) [pi] b=[12,0,0] (c0..cK) (A,B,C,D)=(8,0,10,-3) diff=1e-23.55 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,4) [pi] b=[-12,0,0] (c0..cK) (A,B,C,D)=(2,0,3,-1) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,4) [pi] b=[-4,0,0] (c0..cK) (A,B,C,D)=(0,2,-4,1) diff=1e-23.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,4) [pi] b=[4,0,0] (c0..cK) (A,B,C,D)=(0,2,4,-1) diff=1e-23.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:16,16,4) [pi] b=[12,0,0] (c0..cK) (A,B,C,D)=(2,0,-3,1) diff=1e-23.51 digits/term=nan VERIFIED-ACCEL
+G1 (a:17,14,15) [sinh(zeta3*pi^-2)] b=[-6,-19,5] (c0..cK) (A,B,C,D)=(5,7,0,-8) diff=1e-12.26 digits/term=nan VERIFIED-ACCEL
+G1 (a:17,14,15) [sinh(zeta3*pi^-2)] b=[6,19,-5] (c0..cK) (A,B,C,D)=(5,7,0,8) diff=1e-12.26 digits/term=nan VERIFIED-ACCEL
+G1 (a:18,-7,20) [cos(zeta3*pi^-2)] b=[-19,13,5] (c0..cK) (A,B,C,D)=(5,-4,0,-4) diff=1e-13.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:18,-7,20) [cos(zeta3*pi^-2)] b=[19,-13,-5] (c0..cK) (A,B,C,D)=(5,-4,0,4) diff=1e-13.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:18,17,-2) [Gamma(zeta3*pi^0)] b=[0,-14,17] (c0..cK) (A,B,C,D)=(10,6,9,-7) diff=1e-12.80 digits/term=nan VERIFIED-ACCEL
+G1 (a:18,17,-2) [Gamma(zeta3*pi^0)] b=[0,14,-17] (c0..cK) (A,B,C,D)=(10,6,-9,7) diff=1e-12.80 digits/term=nan VERIFIED-ACCEL
+G1 (a:20,2,11) [sin(zeta3*pi^-1)] b=[-6,-4,15] (c0..cK) (A,B,C,D)=(9,-1,-3,-10) diff=1e-13.43 digits/term=nan VERIFIED-ACCEL
+G1 (a:20,2,11) [sin(zeta3*pi^-1)] b=[6,4,-15] (c0..cK) (A,B,C,D)=(9,-1,3,10) diff=1e-13.43 digits/term=nan VERIFIED-ACCEL
+G1 (a:20,9,17) [t^t(zeta3*pi^-2)] b=[-6,1,0] (c0..cK) (A,B,C,D)=(6,7,4,3) diff=1e-13.21 digits/term=nan VERIFIED-ACCEL
+G1 (a:20,9,17) [t^t(zeta3*pi^-2)] b=[6,-1,0] (c0..cK) (A,B,C,D)=(6,7,-4,-3) diff=1e-13.21 digits/term=nan VERIFIED-ACCEL
+SUMMARY G1: stage-2 hits=660 verified=652
+  [Gamma(zeta3*pi^-3)] (A,B,C,D)=(8,4,-2,1) x1
+  [Gamma(zeta3*pi^-3)] (A,B,C,D)=(8,4,2,-1) x1
+  [Gamma(zeta3*pi^0)] (A,B,C,D)=(10,2,-3,4) x1
+  [Gamma(zeta3*pi^0)] (A,B,C,D)=(10,2,3,-4) x1
+  [Gamma(zeta3*pi^0)] (A,B,C,D)=(10,6,-9,7) x1
+  [Gamma(zeta3*pi^0)] (A,B,C,D)=(10,6,9,-7) x1
+  [arccos(1/t)(zeta3*pi^0)] (A,B,C,D)=(2,4,-3,-1) x1
+  [arccos(1/t)(zeta3*pi^0)] (A,B,C,D)=(2,4,3,1) x1
+  [arccos(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,5,-7,-5) x1
+  [arccos(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,5,7,5) x1
+  [arccosh(zeta3*pi^0)] (A,B,C,D)=(5,10,-1,5) x1
+  [arccosh(zeta3*pi^0)] (A,B,C,D)=(5,10,1,-5) x1
+  [arccosh(zeta3*pi^0)] (A,B,C,D)=(7,-7,-10,9) x1
+  [arccosh(zeta3*pi^0)] (A,B,C,D)=(7,-7,10,-9) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(3,5,-8,2) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(3,5,8,-2) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,3,-10,8) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,3,10,-8) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,8,-1,-1) x1
+  [arcsin(1/t)(zeta3*pi^0)] (A,B,C,D)=(9,8,1,1) x1
+  [arcsinh(zeta3*pi^-1)] (A,B,C,D)=(1,9,-4,10) x1
+  [arcsinh(zeta3*pi^-1)] (A,B,C,D)=(1,9,4,-10) x1
+  [arcsinh(zeta3*pi^-2)] (A,B,C,D)=(5,-8,-1,5) x1
+  [arcsinh(zeta3*pi^-2)] (A,B,C,D)=(5,-8,1,-5) x1
+  [arcsinh(zeta3*pi^-2)] (A,B,C,D)=(9,2,-10,-9) x1
+  [arcsinh(zeta3*pi^-2)] (A,B,C,D)=(9,2,10,9) x1
+  [arcsinh(zeta3*pi^-3)] (A,B,C,D)=(8,5,-1,-10) x1
+  [arcsinh(zeta3*pi^-3)] (A,B,C,D)=(8,5,1,10) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-10,-9,7) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-10,9,-7) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-7,-8,-9) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-7,-4,0) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-7,4,0) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(3,-7,8,9) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(7,6,0,-5) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(7,6,0,5) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(10,4,-5,7) x1
+  [arctan(zeta3*pi^-2)] (A,B,C,D)=(10,4,5,-7) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(1,8,-8,-10) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(1,8,8,10) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(3,-1,0,-5) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(3,-1,0,5) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(6,0,-1,-7) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(6,0,1,7) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(9,-5,-1,-5) x1
+  [arctan(zeta3*pi^-3)] (A,B,C,D)=(9,-5,1,5) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(2,8,-9,-4) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(2,8,9,4) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(6,5,-8,10) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(6,5,8,-10) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(8,3,-3,5) x1
+  [cos(zeta3*pi^-1)] (A,B,C,D)=(8,3,3,-5) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(4,4,-5,7) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(4,4,5,-7) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(5,-4,0,-4) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(5,-4,0,4) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(8,10,-9,8) x1
+  [cos(zeta3*pi^-2)] (A,B,C,D)=(8,10,9,-8) x1
+  [cos(zeta3*pi^0)] (A,B,C,D)=(4,9,-8,10) x1
+  [cos(zeta3*pi^0)] (A,B,C,D)=(4,9,8,-10) x1
+  [cos(zeta3*pi^0)] (A,B,C,D)=(5,8,-5,5) x1
+  [cos(zeta3*pi^0)] (A,B,C,D)=(5,8,5,-5) x1
+  [cosh(zeta3*pi^-1)] (A,B,C,D)=(3,2,-7,10) x1
+  [cosh(zeta3*pi^-1)] (A,B,C,D)=(3,2,7,-10) x1
+  [cosh(zeta3*pi^-1)] (A,B,C,D)=(8,3,-2,-2) x1
+  [cosh(zeta3*pi^-1)] (A,B,C,D)=(8,3,2,2) x1
+  [cosh(zeta3*pi^-3)] (A,B,C,D)=(2,1,-7,-6) x1
+  [cosh(zeta3*pi^-3)] (A,B,C,D)=(2,1,7,6) x1
+  [cosh(zeta3*pi^-3)] (A,B,C,D)=(8,10,-3,-9) x1
+  [cosh(zeta3*pi^-3)] (A,B,C,D)=(8,10,3,9) x1
+  [cosh(zeta3*pi^0)] (A,B,C,D)=(1,8,-7,3) x1
+  [cosh(zeta3*pi^0)] (A,B,C,D)=(1,8,7,-3) x1
+  [e] (A,B,C,D)=(0,1,-8,3) x1
+  [e] (A,B,C,D)=(0,1,-6,2) x1
+  [e] (A,B,C,D)=(0,1,-3,1) x1
+  [e] (A,B,C,D)=(0,1,-2,1) x1
+  [e] (A,B,C,D)=(0,1,-1,0) x1
+  [e] (A,B,C,D)=(0,1,-1,1) x1
+  [e] (A,B,C,D)=(0,1,1,-1) x1
+  [e] (A,B,C,D)=(0,1,1,0) x1
+  [e] (A,B,C,D)=(0,1,2,-1) x1
+  [e] (A,B,C,D)=(0,1,3,-1) x1
+  [e] (A,B,C,D)=(0,1,6,-2) x1
+  [e] (A,B,C,D)=(0,1,8,-3) x1
+  [e] (A,B,C,D)=(0,2,-3,1) x1
+  [e] (A,B,C,D)=(0,2,-2,1) x1
+  [e] (A,B,C,D)=(0,2,-1,0) x1
+  [e] (A,B,C,D)=(0,2,-1,1) x1
+  [e] (A,B,C,D)=(0,2,1,-1) x1
+  [e] (A,B,C,D)=(0,2,1,0) x1
+  [e] (A,B,C,D)=(0,2,2,-1) x1
+  [e] (A,B,C,D)=(0,2,3,-1) x1
+  [e] (A,B,C,D)=(0,3,-6,2) x1
+  [e] (A,B,C,D)=(0,3,-2,1) x1
+  [e] (A,B,C,D)=(0,3,-1,0) x2
+  [e] (A,B,C,D)=(0,3,-1,1) x1
+  [e] (A,B,C,D)=(0,3,1,-1) x1
+  [e] (A,B,C,D)=(0,3,1,0) x2
+  [e] (A,B,C,D)=(0,3,2,-1) x1
+  [e] (A,B,C,D)=(0,3,6,-2) x1
+  [e] (A,B,C,D)=(0,4,-2,1) x1
+  [e] (A,B,C,D)=(0,4,-1,0) x1
+  [e] (A,B,C,D)=(0,4,-1,1) x1
+  [e] (A,B,C,D)=(0,4,1,-1) x1
+  [e] (A,B,C,D)=(0,4,1,0) x1
+  [e] (A,B,C,D)=(0,4,2,-1) x1
+  [e] (A,B,C,D)=(1,-1,-3,1) x5
+  [e] (A,B,C,D)=(1,-1,-2,1) x1
+  [e] (A,B,C,D)=(1,-1,-1,0) x1
+  [e] (A,B,C,D)=(1,-1,1,0) x1
+  [e] (A,B,C,D)=(1,-1,2,-1) x1
+  [e] (A,B,C,D)=(1,-1,3,-1) x5
+  [e] (A,B,C,D)=(1,0,-8,3) x1
+  [e] (A,B,C,D)=(1,0,-5,2) x1
+  [e] (A,B,C,D)=(1,0,-3,1) x1
+  [e] (A,B,C,D)=(1,0,-2,1) x1
+  [e] (A,B,C,D)=(1,0,-1,1) x2
+  [e] (A,B,C,D)=(1,0,0,-1) x1
+  [e] (A,B,C,D)=(1,0,0,1) x1
+  [e] (A,B,C,D)=(1,0,1,-1) x2
+  [e] (A,B,C,D)=(1,0,2,-1) x1
+  [e] (A,B,C,D)=(1,0,3,-1) x1
+  [e] (A,B,C,D)=(1,0,5,-2) x1
+  [e] (A,B,C,D)=(1,0,8,-3) x1
+  [e] (A,B,C,D)=(1,1,-1,1) x7
+  [e] (A,B,C,D)=(1,1,1,-1) x7
+  [e] (A,B,C,D)=(1,6,-10,-6) x1
+  [e] (A,B,C,D)=(1,6,10,6) x1
+  [e] (A,B,C,D)=(2,-2,-3,1) x3
+  [e] (A,B,C,D)=(2,-2,-2,1) x2
+  [e] (A,B,C,D)=(2,-2,-1,0) x1
+  [e] (A,B,C,D)=(2,-2,1,0) x1
+  [e] (A,B,C,D)=(2,-2,2,-1) x2
+  [e] (A,B,C,D)=(2,-2,3,-1) x3
+  [e] (A,B,C,D)=(2,-1,-8,3) x1
+  [e] (A,B,C,D)=(2,-1,-3,1) x1
+  [e] (A,B,C,D)=(2,-1,3,-1) x1
+  [e] (A,B,C,D)=(2,-1,8,-3) x1
+  [e] (A,B,C,D)=(2,0,-8,3) x1
+  [e] (A,B,C,D)=(2,0,-5,2) x1
+  [e] (A,B,C,D)=(2,0,-3,1) x1
+  [e] (A,B,C,D)=(2,0,-2,1) x2
+  [e] (A,B,C,D)=(2,0,-1,1) x1
+  [e] (A,B,C,D)=(2,0,0,-1) x1
+  [e] (A,B,C,D)=(2,0,0,1) x1
+  [e] (A,B,C,D)=(2,0,1,-1) x1
+  [e] (A,B,C,D)=(2,0,2,-1) x2
+  [e] (A,B,C,D)=(2,0,3,-1) x1
+  [e] (A,B,C,D)=(2,0,5,-2) x1
+  [e] (A,B,C,D)=(2,0,8,-3) x1
+  [e] (A,B,C,D)=(2,1,-1,0) x1
+  [e] (A,B,C,D)=(2,1,1,0) x1
+  [e] (A,B,C,D)=(2,2,-1,1) x5
+  [e] (A,B,C,D)=(2,2,1,-1) x5
+  [e] (A,B,C,D)=(3,-3,-3,1) x3
+  [e] (A,B,C,D)=(3,-3,-2,1) x1
+  [e] (A,B,C,D)=(3,-3,-1,0) x1
+  [e] (A,B,C,D)=(3,-3,1,0) x1
+  [e] (A,B,C,D)=(3,-3,2,-1) x1
+  [e] (A,B,C,D)=(3,-3,3,-1) x3
+  [e] (A,B,C,D)=(3,0,-5,2) x1
+  [e] (A,B,C,D)=(3,0,-3,1) x2
+  [e] (A,B,C,D)=(3,0,-2,1) x2
+  [e] (A,B,C,D)=(3,0,-1,1) x1
+  [e] (A,B,C,D)=(3,0,1,-1) x1
+  [e] (A,B,C,D)=(3,0,2,-1) x2
+  [e] (A,B,C,D)=(3,0,3,-1) x2
+  [e] (A,B,C,D)=(3,0,5,-2) x1
+  [e] (A,B,C,D)=(3,1,-1,-1) x7
+  [e] (A,B,C,D)=(3,1,1,1) x7
+  [e] (A,B,C,D)=(3,3,-1,1) x7
+  [e] (A,B,C,D)=(3,3,1,-1) x7
+  [e] (A,B,C,D)=(4,-4,-2,1) x2
+  [e] (A,B,C,D)=(4,-4,-1,0) x1
+  [e] (A,B,C,D)=(4,-4,1,0) x1
+  [e] (A,B,C,D)=(4,-4,2,-1) x2
+  [e] (A,B,C,D)=(4,-2,-8,3) x1
+  [e] (A,B,C,D)=(4,-2,-5,2) x1
+  [e] (A,B,C,D)=(4,-2,-3,1) x1
+  [e] (A,B,C,D)=(4,-2,3,-1) x1
+  [e] (A,B,C,D)=(4,-2,5,-2) x1
+  [e] (A,B,C,D)=(4,-2,8,-3) x1
+  [e] (A,B,C,D)=(4,0,-5,2) x1
+  [e] (A,B,C,D)=(4,0,-3,1) x1
+  [e] (A,B,C,D)=(4,0,-2,1) x2
+  [e] (A,B,C,D)=(4,0,-1,1) x1
+  [e] (A,B,C,D)=(4,0,1,-1) x1
+  [e] (A,B,C,D)=(4,0,2,-1) x2
+  [e] (A,B,C,D)=(4,0,3,-1) x1
+  [e] (A,B,C,D)=(4,0,5,-2) x1
+  [e] (A,B,C,D)=(4,2,-1,0) x1
+  [e] (A,B,C,D)=(4,2,1,0) x1
+  [e] (A,B,C,D)=(4,4,-1,1) x3
+  [e] (A,B,C,D)=(4,4,1,-1) x3
+  [e] (A,B,C,D)=(4,9,-5,1) x1
+  [e] (A,B,C,D)=(4,9,5,-1) x1
+  [e] (A,B,C,D)=(6,-3,-8,3) x1
+  [e] (A,B,C,D)=(6,-3,-6,2) x1
+  [e] (A,B,C,D)=(6,-3,-3,1) x2
+  [e] (A,B,C,D)=(6,-3,3,-1) x2
+  [e] (A,B,C,D)=(6,-3,6,-2) x1
+  [e] (A,B,C,D)=(6,-3,8,-3) x1
+  [e] (A,B,C,D)=(6,-2,-8,3) x1
+  [e] (A,B,C,D)=(6,-2,8,-3) x1
+  [e] (A,B,C,D)=(6,0,-2,1) x1
+  [e] (A,B,C,D)=(6,0,2,-1) x1
+  [e] (A,B,C,D)=(6,2,-1,-1) x5
+  [e] (A,B,C,D)=(6,2,1,1) x5
+  [e] (A,B,C,D)=(8,-4,-8,3) x2
+  [e] (A,B,C,D)=(8,-4,-5,2) x1
+  [e] (A,B,C,D)=(8,-4,-3,1) x1
+  [e] (A,B,C,D)=(8,-4,3,-1) x1
+  [e] (A,B,C,D)=(8,-4,5,-2) x1
+  [e] (A,B,C,D)=(8,-4,8,-3) x2
+  [e] (A,B,C,D)=(8,3,-1,0) x1
+  [e] (A,B,C,D)=(8,3,1,0) x1
+  [e] (A,B,C,D)=(9,3,-1,-1) x7
+  [e] (A,B,C,D)=(9,3,1,1) x7
+  [exp(1/t)(zeta3*pi^-1)] (A,B,C,D)=(3,4,-3,0) x1
+  [exp(1/t)(zeta3*pi^-1)] (A,B,C,D)=(3,4,3,0) x1
+  [exp(1/t)(zeta3*pi^-1)] (A,B,C,D)=(9,3,-7,-5) x1
+  [exp(1/t)(zeta3*pi^-1)] (A,B,C,D)=(9,3,7,5) x1
+  [exp(1/t)(zeta3*pi^-2)] (A,B,C,D)=(1,7,-8,-2) x1
+  [exp(1/t)(zeta3*pi^-2)] (A,B,C,D)=(1,7,8,2) x1
+  [exp(1/t)(zeta3*pi^0)] (A,B,C,D)=(10,2,-8,3) x1
+  [exp(1/t)(zeta3*pi^0)] (A,B,C,D)=(10,2,8,-3) x1
+  [exp(zeta3*pi^-1)] (A,B,C,D)=(4,-9,0,-1) x1
+  [exp(zeta3*pi^-1)] (A,B,C,D)=(4,-9,0,1) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(2,7,-10,7) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(2,7,10,-7) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(6,-6,-1,-4) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(6,-6,1,4) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(8,1,-9,9) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(8,1,9,-9) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(8,8,-9,0) x1
+  [exp(zeta3*pi^-2)] (A,B,C,D)=(8,8,9,0) x1
+  [exp(zeta3*pi^-3)] (A,B,C,D)=(1,-9,-6,-2) x1
+  [exp(zeta3*pi^-3)] (A,B,C,D)=(1,-9,6,2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(1,4,0,-7) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(1,4,0,7) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(1,6,-10,2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(1,6,10,-2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(2,-7,-3,2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(2,-7,3,-2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(4,5,-3,2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(4,5,3,-2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(5,5,0,-2) x1
+  [exp(zeta3*pi^0)] (A,B,C,D)=(5,5,0,2) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(6,9,-10,0) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(6,9,10,0) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(7,-4,-8,0) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(7,-4,8,0) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(8,-6,-5,-4) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(8,-6,5,4) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(8,-5,-7,-1) x1
+  [log(t-1)(zeta3*pi^0)] (A,B,C,D)=(8,-5,7,1) x1
+  [log(zeta3*pi^-1)] (A,B,C,D)=(9,0,-9,-10) x1
+  [log(zeta3*pi^-1)] (A,B,C,D)=(9,0,9,10) x1
+  [log(zeta3*pi^-2)] (A,B,C,D)=(4,4,-5,-3) x1
+  [log(zeta3*pi^-2)] (A,B,C,D)=(4,4,5,3) x1
+  [log(zeta3*pi^0)] (A,B,C,D)=(5,-10,-9,-4) x1
+  [log(zeta3*pi^0)] (A,B,C,D)=(5,-10,9,4) x1
+  [pi] (A,B,C,D)=(0,1,-4,1) x3
+  [pi] (A,B,C,D)=(0,1,-2,1) x1
+  [pi] (A,B,C,D)=(0,1,2,-1) x1
+  [pi] (A,B,C,D)=(0,1,4,-1) x3
+  [pi] (A,B,C,D)=(0,2,-4,1) x3
+  [pi] (A,B,C,D)=(0,2,-2,1) x1
+  [pi] (A,B,C,D)=(0,2,2,-1) x1
+  [pi] (A,B,C,D)=(0,2,4,-1) x3
+  [pi] (A,B,C,D)=(0,3,-8,3) x2
+  [pi] (A,B,C,D)=(0,3,-4,1) x2
+  [pi] (A,B,C,D)=(0,3,4,-1) x2
+  [pi] (A,B,C,D)=(0,3,8,-3) x2
+  [pi] (A,B,C,D)=(0,6,-8,3) x1
+  [pi] (A,B,C,D)=(0,6,8,-3) x1
+  [pi] (A,B,C,D)=(0,9,-4,3) x1
+  [pi] (A,B,C,D)=(0,9,4,-3) x1
+  [pi] (A,B,C,D)=(1,0,-3,1) x1
+  [pi] (A,B,C,D)=(1,0,3,-1) x1
+  [pi] (A,B,C,D)=(2,-1,-6,2) x1
+  [pi] (A,B,C,D)=(2,-1,-3,1) x1
+  [pi] (A,B,C,D)=(2,-1,3,-1) x1
+  [pi] (A,B,C,D)=(2,-1,6,-2) x1
+  [pi] (A,B,C,D)=(2,0,-10,-3) x1
+  [pi] (A,B,C,D)=(2,0,-10,3) x2
+  [pi] (A,B,C,D)=(2,0,-4,-1) x1
+  [pi] (A,B,C,D)=(2,0,-4,1) x2
+  [pi] (A,B,C,D)=(2,0,-3,1) x1
+  [pi] (A,B,C,D)=(2,0,-2,-1) x1
+  [pi] (A,B,C,D)=(2,0,-2,1) x2
+  [pi] (A,B,C,D)=(2,0,0,-1) x1
+  [pi] (A,B,C,D)=(2,0,0,1) x1
+  [pi] (A,B,C,D)=(2,0,2,-1) x2
+  [pi] (A,B,C,D)=(2,0,2,1) x1
+  [pi] (A,B,C,D)=(2,0,3,-1) x1
+  [pi] (A,B,C,D)=(2,0,4,-1) x2
+  [pi] (A,B,C,D)=(2,0,4,1) x1
+  [pi] (A,B,C,D)=(2,0,10,-3) x2
+  [pi] (A,B,C,D)=(2,0,10,3) x1
+  [pi] (A,B,C,D)=(2,1,-2,0) x1
+  [pi] (A,B,C,D)=(2,1,-2,1) x1
+  [pi] (A,B,C,D)=(2,1,-1,0) x1
+  [pi] (A,B,C,D)=(2,1,1,0) x1
+  [pi] (A,B,C,D)=(2,1,2,-1) x1
+  [pi] (A,B,C,D)=(2,1,2,0) x1
+  [pi] (A,B,C,D)=(3,1,-1,0) x1
+  [pi] (A,B,C,D)=(3,1,1,0) x1
+  [pi] (A,B,C,D)=(4,-3,-10,3) x1
+  [pi] (A,B,C,D)=(4,-3,10,-3) x1
+  [pi] (A,B,C,D)=(4,-1,-6,2) x1
+  [pi] (A,B,C,D)=(4,-1,-3,1) x2
+  [pi] (A,B,C,D)=(4,-1,3,-1) x2
+  [pi] (A,B,C,D)=(4,-1,6,-2) x1
+  [pi] (A,B,C,D)=(4,0,-10,-3) x1
+  [pi] (A,B,C,D)=(4,0,-10,3) x2
+  [pi] (A,B,C,D)=(4,0,-8,-3) x1
+  [pi] (A,B,C,D)=(4,0,-8,3) x2
+  [pi] (A,B,C,D)=(4,0,-4,-1) x1
+  [pi] (A,B,C,D)=(4,0,-4,1) x3
+  [pi] (A,B,C,D)=(4,0,-2,-1) x1
+  [pi] (A,B,C,D)=(4,0,-2,1) x3
+  [pi] (A,B,C,D)=(4,0,0,-1) x3
+  [pi] (A,B,C,D)=(4,0,0,1) x3
+  [pi] (A,B,C,D)=(4,0,2,-1) x3
+  [pi] (A,B,C,D)=(4,0,2,1) x1
+  [pi] (A,B,C,D)=(4,0,4,-1) x3
+  [pi] (A,B,C,D)=(4,0,4,1) x1
+  [pi] (A,B,C,D)=(4,0,8,-3) x2
+  [pi] (A,B,C,D)=(4,0,8,3) x1
+  [pi] (A,B,C,D)=(4,0,10,-3) x2
+  [pi] (A,B,C,D)=(4,0,10,3) x1
+  [pi] (A,B,C,D)=(4,1,-4,1) x1
+  [pi] (A,B,C,D)=(4,1,-2,-1) x1
+  [pi] (A,B,C,D)=(4,1,0,-1) x1
+  [pi] (A,B,C,D)=(4,1,0,1) x1
+  [pi] (A,B,C,D)=(4,1,2,1) x1
+  [pi] (A,B,C,D)=(4,1,4,-1) x1
+  [pi] (A,B,C,D)=(4,2,-2,1) x1
+  [pi] (A,B,C,D)=(4,2,0,-1) x1
+  [pi] (A,B,C,D)=(4,2,0,1) x1
+  [pi] (A,B,C,D)=(4,2,2,-1) x1
+  [pi] (A,B,C,D)=(4,3,-4,0) x1
+  [pi] (A,B,C,D)=(4,3,-2,0) x1
+  [pi] (A,B,C,D)=(4,3,2,0) x1
+  [pi] (A,B,C,D)=(4,3,4,0) x1
+  [pi] (A,B,C,D)=(6,-3,-10,3) x2
+  [pi] (A,B,C,D)=(6,-3,10,-3) x2
+  [pi] (A,B,C,D)=(6,0,-10,3) x3
+  [pi] (A,B,C,D)=(6,0,-8,-3) x1
+  [pi] (A,B,C,D)=(6,0,-8,3) x2
+  [pi] (A,B,C,D)=(6,0,-4,1) x2
+  [pi] (A,B,C,D)=(6,0,-2,1) x2
+  [pi] (A,B,C,D)=(6,0,0,-1) x1
+  [pi] (A,B,C,D)=(6,0,0,1) x1
+  [pi] (A,B,C,D)=(6,0,2,-1) x2
+  [pi] (A,B,C,D)=(6,0,4,-1) x2
+  [pi] (A,B,C,D)=(6,0,8,-3) x2
+  [pi] (A,B,C,D)=(6,0,8,3) x1
+  [pi] (A,B,C,D)=(6,0,10,-3) x3
+  [pi] (A,B,C,D)=(6,1,-7,1) x1
+  [pi] (A,B,C,D)=(6,1,7,-1) x1
+  [pi] (A,B,C,D)=(6,2,-1,0) x1
+  [pi] (A,B,C,D)=(6,2,1,0) x1
+  [pi] (A,B,C,D)=(6,3,-2,0) x1
+  [pi] (A,B,C,D)=(6,3,2,0) x1
+  [pi] (A,B,C,D)=(7,-2,-9,8) x1
+  [pi] (A,B,C,D)=(7,-2,9,-8) x1
+  [pi] (A,B,C,D)=(8,-2,-3,1) x1
+  [pi] (A,B,C,D)=(8,-2,3,-1) x1
+  [pi] (A,B,C,D)=(8,0,-10,3) x1
+  [pi] (A,B,C,D)=(8,0,-8,-3) x1
+  [pi] (A,B,C,D)=(8,0,-8,3) x4
+  [pi] (A,B,C,D)=(8,0,-4,1) x2
+  [pi] (A,B,C,D)=(8,0,-2,1) x2
+  [pi] (A,B,C,D)=(8,0,0,-1) x2
+  [pi] (A,B,C,D)=(8,0,0,1) x2
+  [pi] (A,B,C,D)=(8,0,2,-1) x2
+  [pi] (A,B,C,D)=(8,0,4,-1) x2
+  [pi] (A,B,C,D)=(8,0,8,-3) x4
+  [pi] (A,B,C,D)=(8,0,8,3) x1
+  [pi] (A,B,C,D)=(8,0,10,-3) x1
+  [pi] (A,B,C,D)=(8,2,-4,1) x1
+  [pi] (A,B,C,D)=(8,2,-2,-1) x1
+  [pi] (A,B,C,D)=(8,2,0,-1) x2
+  [pi] (A,B,C,D)=(8,2,0,1) x2
+  [pi] (A,B,C,D)=(8,2,2,1) x1
+  [pi] (A,B,C,D)=(8,2,4,-1) x1
+  [pi] (A,B,C,D)=(8,3,-10,-3) x1
+  [pi] (A,B,C,D)=(8,3,-8,3) x1
+  [pi] (A,B,C,D)=(8,3,-4,-1) x2
+  [pi] (A,B,C,D)=(8,3,0,-1) x1
+  [pi] (A,B,C,D)=(8,3,0,1) x1
+  [pi] (A,B,C,D)=(8,3,4,1) x2
+  [pi] (A,B,C,D)=(8,3,8,-3) x1
+  [pi] (A,B,C,D)=(8,3,10,3) x1
+  [pi] (A,B,C,D)=(8,4,0,-1) x1
+  [pi] (A,B,C,D)=(8,4,0,1) x1
+  [pi] (A,B,C,D)=(10,3,-6,-2) x1
+  [pi] (A,B,C,D)=(10,3,-3,-1) x1
+  [pi] (A,B,C,D)=(10,3,-2,-1) x1
+  [pi] (A,B,C,D)=(10,3,-2,0) x1
+  [pi] (A,B,C,D)=(10,3,-1,0) x1
+  [pi] (A,B,C,D)=(10,3,1,0) x1
+  [pi] (A,B,C,D)=(10,3,2,0) x1
+  [pi] (A,B,C,D)=(10,3,2,1) x1
+  [pi] (A,B,C,D)=(10,3,3,1) x1
+  [pi] (A,B,C,D)=(10,3,6,2) x1
+  [sin(zeta3*pi^-1)] (A,B,C,D)=(1,-9,-1,-8) x1
+  [sin(zeta3*pi^-1)] (A,B,C,D)=(1,-9,1,8) x1
+  [sin(zeta3*pi^-1)] (A,B,C,D)=(9,-1,-3,-10) x1
+  [sin(zeta3*pi^-1)] (A,B,C,D)=(9,-1,3,10) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(1,-10,-2,7) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(1,-10,2,-7) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(5,5,0,-4) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(5,5,0,4) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(8,7,-2,0) x1
+  [sin(zeta3*pi^-2)] (A,B,C,D)=(8,7,2,0) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(2,-9,-6,-8) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(2,-9,6,8) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(10,-8,-3,-4) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(10,-8,3,4) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(10,9,-7,5) x1
+  [sin(zeta3*pi^-3)] (A,B,C,D)=(10,9,7,-5) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(6,9,-3,10) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(6,9,3,-10) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(7,0,-1,1) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(7,0,1,-1) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(9,3,-2,7) x1
+  [sinh(zeta3*pi^-1)] (A,B,C,D)=(9,3,2,-7) x1
+  [sinh(zeta3*pi^-2)] (A,B,C,D)=(5,7,0,-8) x1
+  [sinh(zeta3*pi^-2)] (A,B,C,D)=(5,7,0,8) x1
+  [sinh(zeta3*pi^-2)] (A,B,C,D)=(10,-2,-1,0) x1
+  [sinh(zeta3*pi^-2)] (A,B,C,D)=(10,-2,1,0) x1
+  [sinh(zeta3*pi^-3)] (A,B,C,D)=(5,-7,-2,4) x1
+  [sinh(zeta3*pi^-3)] (A,B,C,D)=(5,-7,2,-4) x1
+  [sinh(zeta3*pi^0)] (A,B,C,D)=(2,1,-9,-10) x1
+  [sinh(zeta3*pi^0)] (A,B,C,D)=(2,1,9,10) x1
+  [sinh(zeta3*pi^0)] (A,B,C,D)=(6,-10,-3,1) x1
+  [sinh(zeta3*pi^0)] (A,B,C,D)=(6,-10,3,-1) x1
+  [t^t(zeta3*pi^-1)] (A,B,C,D)=(5,-4,-5,7) x1
+  [t^t(zeta3*pi^-1)] (A,B,C,D)=(5,-4,5,-7) x1
+  [t^t(zeta3*pi^-1)] (A,B,C,D)=(7,-5,-5,4) x1
+  [t^t(zeta3*pi^-1)] (A,B,C,D)=(7,-5,5,-4) x1
+  [t^t(zeta3*pi^-2)] (A,B,C,D)=(6,7,-4,-3) x1
+  [t^t(zeta3*pi^-2)] (A,B,C,D)=(6,7,4,3) x1
+  [t^t(zeta3*pi^-2)] (A,B,C,D)=(9,-1,-2,0) x1
+  [t^t(zeta3*pi^-2)] (A,B,C,D)=(9,-1,2,0) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(2,10,-1,8) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(2,10,1,-8) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(9,5,-7,9) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(9,5,7,-9) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(9,6,-8,-6) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(9,6,8,6) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(10,10,-5,3) x1
+  [t^t(zeta3*pi^-3)] (A,B,C,D)=(10,10,5,-3) x1
+  [tan(zeta3*pi^-1)] (A,B,C,D)=(0,4,-4,-3) x1
+  [tan(zeta3*pi^-1)] (A,B,C,D)=(0,4,4,3) x1
+  [tan(zeta3*pi^-1)] (A,B,C,D)=(10,10,-8,9) x1
+  [tan(zeta3*pi^-1)] (A,B,C,D)=(10,10,8,-9) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(5,6,0,-5) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(5,6,0,-2) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(5,6,0,2) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(5,6,0,5) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(10,9,-2,-3) x1
+  [tan(zeta3*pi^-2)] (A,B,C,D)=(10,9,2,3) x1
+  [tan(zeta3*pi^-3)] (A,B,C,D)=(1,6,-2,-6) x1
+  [tan(zeta3*pi^-3)] (A,B,C,D)=(1,6,2,6) x1
+  [tan(zeta3*pi^-3)] (A,B,C,D)=(6,8,-8,-5) x1
+  [tan(zeta3*pi^-3)] (A,B,C,D)=(6,8,8,5) x1
+  [tan(zeta3*pi^0)] (A,B,C,D)=(0,8,-3,5) x1
+  [tan(zeta3*pi^0)] (A,B,C,D)=(0,8,3,-5) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(3,9,-8,0) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(3,9,8,0) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(4,-2,-7,-10) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(4,-2,7,10) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(7,-5,-8,-3) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(7,-5,8,3) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(8,3,-2,3) x1
+  [tanh(zeta3*pi^-1)] (A,B,C,D)=(8,3,2,-3) x1
+  [tanh(zeta3*pi^-2)] (A,B,C,D)=(4,3,0,-8) x1
+  [tanh(zeta3*pi^-2)] (A,B,C,D)=(4,3,0,8) x1
+  [tanh(zeta3*pi^-2)] (A,B,C,D)=(6,-4,-8,3) x1
+  [tanh(zeta3*pi^-2)] (A,B,C,D)=(6,-4,8,-3) x1
+PER-TARGET (stage-2 hits / verified):
+  exp(zeta3*pi^-3): 2 / 2
+  exp(zeta3*pi^-2): 8 / 8
+  exp(zeta3*pi^-1): 2 / 2
+  exp(zeta3*pi^0): 10 / 10
+  log(zeta3*pi^-3): 0 / 0
+  log(zeta3*pi^-2): 2 / 2
+  log(zeta3*pi^-1): 2 / 2
+  log(zeta3*pi^0): 2 / 2
+  sin(zeta3*pi^-3): 6 / 6
+  sin(zeta3*pi^-2): 6 / 6
+  sin(zeta3*pi^-1): 4 / 4
+  sin(zeta3*pi^0): 0 / 0
+  cos(zeta3*pi^-3): 0 / 0
+  cos(zeta3*pi^-2): 6 / 6
+  cos(zeta3*pi^-1): 6 / 6
+  cos(zeta3*pi^0): 4 / 4
+  tan(zeta3*pi^-3): 4 / 4
+  tan(zeta3*pi^-2): 6 / 6
+  tan(zeta3*pi^-1): 4 / 4
+  tan(zeta3*pi^0): 2 / 2
+  sinh(zeta3*pi^-3): 2 / 2
+  sinh(zeta3*pi^-2): 4 / 4
+  sinh(zeta3*pi^-1): 6 / 6
+  sinh(zeta3*pi^0): 4 / 4
+  cosh(zeta3*pi^-3): 4 / 4
+  cosh(zeta3*pi^-2): 0 / 0
+  cosh(zeta3*pi^-1): 4 / 4
+  cosh(zeta3*pi^0): 2 / 2
+  tanh(zeta3*pi^-3): 0 / 0
+  tanh(zeta3*pi^-2): 4 / 4
+  tanh(zeta3*pi^-1): 8 / 8
+  tanh(zeta3*pi^0): 0 / 0
+  arctan(zeta3*pi^-3): 8 / 8
+  arctan(zeta3*pi^-2): 10 / 10
+  arctan(zeta3*pi^-1): 0 / 0
+  arctan(zeta3*pi^0): 0 / 0
+  arcsinh(zeta3*pi^-3): 2 / 2
+  arcsinh(zeta3*pi^-2): 4 / 4
+  arcsinh(zeta3*pi^-1): 4 / 2
+  arcsinh(zeta3*pi^0): 0 / 0
+  arccosh(zeta3*pi^0): 4 / 4
+  arcsin(1/t)(zeta3*pi^0): 6 / 6
+  arccos(1/t)(zeta3*pi^0): 4 / 4
+  log(t-1)(zeta3*pi^0): 8 / 8
+  t^t(zeta3*pi^-3): 10 / 8
+  t^t(zeta3*pi^-2): 4 / 4
+  t^t(zeta3*pi^-1): 4 / 4
+  t^t(zeta3*pi^0): 0 / 0
+  Gamma(zeta3*pi^-3): 2 / 2
+  Gamma(zeta3*pi^-2): 0 / 0
+  Gamma(zeta3*pi^-1): 2 / 0
+  Gamma(zeta3*pi^0): 4 / 4
+  exp(1/t)(zeta3*pi^-3): 0 / 0
+  exp(1/t)(zeta3*pi^-2): 2 / 2
+  exp(1/t)(zeta3*pi^-1): 4 / 4
+  exp(1/t)(zeta3*pi^0): 2 / 2
+  zeta3: 0 / 0
+  e: 252 / 250
+  pi: 210 / 210
+elapsed 3677.77 s

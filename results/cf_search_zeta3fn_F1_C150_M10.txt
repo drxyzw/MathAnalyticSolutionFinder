@@ -1,0 +1,116 @@
+cf_search family=F1 (multi-target) C=150 M=10 threads=10 stride=1
+skip target arccosh(zeta3*pi^-3) (outside the domain)
+skip target arccosh(zeta3*pi^-2) (outside the domain)
+skip target arccosh(zeta3*pi^-1) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-3) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-2) (outside the domain)
+skip target arcsin(1/t)(zeta3*pi^-1) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-3) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-2) (outside the domain)
+skip target arccos(1/t)(zeta3*pi^-1) (outside the domain)
+skip target log(t-1)(zeta3*pi^-3) (outside the domain)
+skip target log(t-1)(zeta3*pi^-2) (outside the domain)
+skip target log(t-1)(zeta3*pi^-1) (outside the domain)
+targets = 59
+mobius table size = 5055522 entries (77 MB); dropped near-rational images: 83614
+SELFTEST F1 (required: Apery 34n^3+51n^2+27n+5 -> 6/zeta(3))
+  selftest case Apery b=[5,27,51,34] (c0..cK): [zeta3] (A,B,C,D)=(6,0,0,1) diff=1e-209.34 digits/term=3.06172 VERIFIED; 
+SELFTEST F1 (informational: 2n^3+3n^2+3n+1)
+  selftest case n^3+(n+1)^3 b=[1,3,3,2] (c0..cK): NO HIT
+SELFTEST PASS
+
+=== search F1: a_n=-n^6, deg b=3, |c_i|<=150, tasks=90601 ===
+candidates tested = 8208541201  search time = 1256.75 s (1.53103 us/candidate/thread)
+stage-2 hits = 26
+F1 [cosh(zeta3*pi^-2)] b=[-133,35,-140,53] (c0..cK) (A,B,C,D)=(8,-5,3,-3) diff=1e-12.87 digits/term=3.30506 rejected
+F1 [tanh(zeta3*pi^-1)] b=[-85,75,50,61] (c0..cK) (A,B,C,D)=(9,-6,-3,8) diff=1e-13.14 digits/term=3.54897 rejected
+F1 [sinh(zeta3*pi^-3)] b=[-28,86,-69,99] (c0..cK) (A,B,C,D)=(9,-8,0,-8) diff=1e-13.19 digits/term=3.90869 rejected
+F1 [zeta3] b=[-13,-27,-3,-2] (c0..cK) (A,B,C,D)=(8,0,9,-8) diff=1e-32.14 digits/term=0.0653454 rejected
+F1 [cosh(zeta3*pi^-3)] b=[-12,-65,-121,-24] (c0..cK) (A,B,C,D)=(6,6,0,-1) diff=1e-13.04 digits/term=2.8534 rejected
+F1 [zeta3] b=[-11,-16,-57,-33] (c0..cK) (A,B,C,D)=(6,6,0,-1) diff=1e-13.84 digits/term=3.04237 rejected
+F1 [exp(zeta3*pi^-1)] b=[-10,46,-12,-76] (c0..cK) (A,B,C,D)=(2,10,-9,5) diff=1e-14.23 digits/term=3.70917 rejected
+F1 [exp(1/t)(zeta3*pi^-2)] b=[-10,100,-18,112] (c0..cK) (A,B,C,D)=(10,10,1,-1) diff=1e-14.81 digits/term=4.03679 rejected
+F1 [zeta3] b=[-5,-27,-51,-34] (c0..cK) (A,B,C,D)=(6,0,0,-1) diff=1e-209.34 digits/term=3.06172 VERIFIED
+F1 [zeta3] b=[-5,-11,-3,-2] (c0..cK) (A,B,C,D)=(1,0,1,-1) diff=1e-19.80 digits/term=0.039241 rejected
+F1 [tanh(zeta3*pi^-1)] b=[-3,-84,35,-71] (c0..cK) (A,B,C,D)=(4,4,0,-5) diff=1e-13.57 digits/term=3.6285 rejected
+F1 [exp(zeta3*pi^-1)] b=[-2,-118,45,-29] (c0..cK) (A,B,C,D)=(5,5,7,-9) diff=1e-14.19 digits/term=2.83677 rejected
+F1 [zeta3] b=[-1,-5,-9,-6] (c0..cK) (A,B,C,D)=(8,0,0,-7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F1 [zeta3] b=[1,5,9,6] (c0..cK) (A,B,C,D)=(8,0,0,7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F1 [exp(zeta3*pi^-1)] b=[2,118,-45,29] (c0..cK) (A,B,C,D)=(5,5,-7,9) diff=1e-14.19 digits/term=2.83677 rejected
+F1 [tanh(zeta3*pi^-1)] b=[3,84,-35,71] (c0..cK) (A,B,C,D)=(4,4,0,5) diff=1e-13.57 digits/term=3.6285 rejected
+F1 [zeta3] b=[5,11,3,2] (c0..cK) (A,B,C,D)=(1,0,-1,1) diff=1e-19.80 digits/term=0.039241 rejected
+F1 [zeta3] b=[5,27,51,34] (c0..cK) (A,B,C,D)=(6,0,0,1) diff=1e-209.34 digits/term=3.06172 VERIFIED
+F1 [exp(1/t)(zeta3*pi^-2)] b=[10,-100,18,-112] (c0..cK) (A,B,C,D)=(10,10,-1,1) diff=1e-14.81 digits/term=4.03679 rejected
+F1 [exp(zeta3*pi^-1)] b=[10,-46,12,76] (c0..cK) (A,B,C,D)=(2,10,9,-5) diff=1e-14.23 digits/term=3.70917 rejected
+F1 [zeta3] b=[11,16,57,33] (c0..cK) (A,B,C,D)=(6,6,0,1) diff=1e-13.84 digits/term=3.04237 rejected
+F1 [cosh(zeta3*pi^-3)] b=[12,65,121,24] (c0..cK) (A,B,C,D)=(6,6,0,1) diff=1e-13.04 digits/term=2.8534 rejected
+F1 [zeta3] b=[13,27,3,2] (c0..cK) (A,B,C,D)=(8,0,-9,8) diff=1e-32.14 digits/term=0.0653454 rejected
+F1 [sinh(zeta3*pi^-3)] b=[28,-86,69,-99] (c0..cK) (A,B,C,D)=(9,-8,0,8) diff=1e-13.19 digits/term=3.90869 rejected
+F1 [tanh(zeta3*pi^-1)] b=[85,-75,-50,-61] (c0..cK) (A,B,C,D)=(9,-6,3,-8) diff=1e-13.14 digits/term=3.54897 rejected
+F1 [cosh(zeta3*pi^-2)] b=[133,-35,140,-53] (c0..cK) (A,B,C,D)=(8,-5,-3,3) diff=1e-12.87 digits/term=3.30506 rejected
+SUMMARY F1: stage-2 hits=26 verified=4
+  [zeta3] (A,B,C,D)=(6,0,0,-1) x1
+  [zeta3] (A,B,C,D)=(6,0,0,1) x1
+  [zeta3] (A,B,C,D)=(8,0,0,-7) x1
+  [zeta3] (A,B,C,D)=(8,0,0,7) x1
+PER-TARGET (stage-2 hits / verified):
+  exp(zeta3*pi^-3): 0 / 0
+  exp(zeta3*pi^-2): 0 / 0
+  exp(zeta3*pi^-1): 4 / 0
+  exp(zeta3*pi^0): 0 / 0
+  log(zeta3*pi^-3): 0 / 0
+  log(zeta3*pi^-2): 0 / 0
+  log(zeta3*pi^-1): 0 / 0
+  log(zeta3*pi^0): 0 / 0
+  sin(zeta3*pi^-3): 0 / 0
+  sin(zeta3*pi^-2): 0 / 0
+  sin(zeta3*pi^-1): 0 / 0
+  sin(zeta3*pi^0): 0 / 0
+  cos(zeta3*pi^-3): 0 / 0
+  cos(zeta3*pi^-2): 0 / 0
+  cos(zeta3*pi^-1): 0 / 0
+  cos(zeta3*pi^0): 0 / 0
+  tan(zeta3*pi^-3): 0 / 0
+  tan(zeta3*pi^-2): 0 / 0
+  tan(zeta3*pi^-1): 0 / 0
+  tan(zeta3*pi^0): 0 / 0
+  sinh(zeta3*pi^-3): 2 / 0
+  sinh(zeta3*pi^-2): 0 / 0
+  sinh(zeta3*pi^-1): 0 / 0
+  sinh(zeta3*pi^0): 0 / 0
+  cosh(zeta3*pi^-3): 2 / 0
+  cosh(zeta3*pi^-2): 2 / 0
+  cosh(zeta3*pi^-1): 0 / 0
+  cosh(zeta3*pi^0): 0 / 0
+  tanh(zeta3*pi^-3): 0 / 0
+  tanh(zeta3*pi^-2): 0 / 0
+  tanh(zeta3*pi^-1): 4 / 0
+  tanh(zeta3*pi^0): 0 / 0
+  arctan(zeta3*pi^-3): 0 / 0
+  arctan(zeta3*pi^-2): 0 / 0
+  arctan(zeta3*pi^-1): 0 / 0
+  arctan(zeta3*pi^0): 0 / 0
+  arcsinh(zeta3*pi^-3): 0 / 0
+  arcsinh(zeta3*pi^-2): 0 / 0
+  arcsinh(zeta3*pi^-1): 0 / 0
+  arcsinh(zeta3*pi^0): 0 / 0
+  arccosh(zeta3*pi^0): 0 / 0
+  arcsin(1/t)(zeta3*pi^0): 0 / 0
+  arccos(1/t)(zeta3*pi^0): 0 / 0
+  log(t-1)(zeta3*pi^0): 0 / 0
+  t^t(zeta3*pi^-3): 0 / 0
+  t^t(zeta3*pi^-2): 0 / 0
+  t^t(zeta3*pi^-1): 0 / 0
+  t^t(zeta3*pi^0): 0 / 0
+  Gamma(zeta3*pi^-3): 0 / 0
+  Gamma(zeta3*pi^-2): 0 / 0
+  Gamma(zeta3*pi^-1): 0 / 0
+  Gamma(zeta3*pi^0): 0 / 0
+  exp(1/t)(zeta3*pi^-3): 0 / 0
+  exp(1/t)(zeta3*pi^-2): 2 / 0
+  exp(1/t)(zeta3*pi^-1): 0 / 0
+  exp(1/t)(zeta3*pi^0): 0 / 0
+  zeta3: 10 / 4
+  e: 0 / 0
+  pi: 0 / 0
+elapsed 1257.37 s

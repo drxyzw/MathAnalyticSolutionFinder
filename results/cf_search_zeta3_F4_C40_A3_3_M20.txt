@@ -1,0 +1,25 @@
+cf_search family=F4 C=40 M=20 threads=10 stride=1
+mobius table size = 1293248
+SELFTEST F4 (required: (al,be,ga)=(1,0,0) Apery -> 6/zeta(3);
+  shifted Apery (1,2,1), b'_n=b_{n+1}=[117,231,153,34] -> zeta3/(5 zeta3-6) = (0,1,-6,5))
+  selftest case Apery(1,0,0) b=[5,27,51,34] (c0..cK): hit (A,B,C,D)=(6,0,0,1) diff=1e-209.34 digits/term=3.06172 VERIFIED; 
+  selftest case shifted(1,2,1) b=[117,231,153,34] (c0..cK): hit (A,B,C,D)=(0,1,-6,5) diff=1e-206.39 digits/term=3.06177 VERIFIED; 
+SELFTEST PASS
+
+=== search F4: a_n=-(al n^2+be n+ga)^3, al<=3, |be|,|ga|<=3, deg b=3, tasks=11907 ===
+candidates tested = 5466933567  search time = 831.243 s (1.52049 us/candidate/thread)
+stage-2 hits = 10
+F4 (al,be,ga)=(1,0,0) b=[-13,-27,-3,-2] (c0..cK) (A,B,C,D)=(8,0,9,-8) diff=1e-32.14 digits/term=0.0653454 rejected
+F4 (al,be,ga)=(1,0,0) b=[-5,-11,-3,-2] (c0..cK) (A,B,C,D)=(1,0,1,-1) diff=1e-19.80 digits/term=0.039241 rejected
+F4 (al,be,ga)=(1,0,0) b=[-1,-5,-9,-6] (c0..cK) (A,B,C,D)=(8,0,0,-7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F4 (al,be,ga)=(1,0,0) b=[1,5,9,6] (c0..cK) (A,B,C,D)=(8,0,0,7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F4 (al,be,ga)=(1,0,0) b=[5,11,3,2] (c0..cK) (A,B,C,D)=(1,0,-1,1) diff=1e-19.80 digits/term=0.039241 rejected
+F4 (al,be,ga)=(1,0,0) b=[13,27,3,2] (c0..cK) (A,B,C,D)=(8,0,-9,8) diff=1e-32.14 digits/term=0.0653454 rejected
+F4 (al,be,ga)=(1,2,1) b=[-21,-23,-9,-2] (c0..cK) (A,B,C,D)=(1,-1,-6,5) diff=1e-17.21 digits/term=0.0381699 rejected
+F4 (al,be,ga)=(1,2,1) b=[21,23,9,2] (c0..cK) (A,B,C,D)=(1,-1,6,-5) diff=1e-17.21 digits/term=0.0381699 rejected
+F4 (al,be,ga)=(2,3,-1) b=[-2,-18,-26,-14] (c0..cK) (A,B,C,D)=(13,-16,17,-7) diff=1e-14.03 digits/term=1.3159 rejected
+F4 (al,be,ga)=(2,3,-1) b=[2,18,26,14] (c0..cK) (A,B,C,D)=(13,-16,-17,7) diff=1e-14.03 digits/term=1.3159 rejected
+SUMMARY F4: stage-2 hits=10 verified=2
+  (A,B,C,D)=(8,0,0,-7) x1
+  (A,B,C,D)=(8,0,0,7) x1
+elapsed 831.404 s

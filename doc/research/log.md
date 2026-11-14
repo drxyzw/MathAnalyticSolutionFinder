@@ -22,3 +22,5 @@
 | 2026-11-14 | 1 | ζ(3) = π, log2, log3, G の重さ3の積（13個）の有理1次結合 | 線形 PSLQ | 3000桁、n=14 | なし（検証：Li₃(1/2)、Li₃(±1/3) の既知恒等式を再発見・6000桁で検算済み） | 2.8×10¹⁷¹ | results/zeta3_additive_elementary_3000digits_log23.txt |
 | 2026-11-14 | 1 | 同上 + log5（24個） | 線形 PSLQ | 3000桁、n=25 | なし（検証同上） | 1.0×10⁹⁶ | results/zeta3_additive_elementary_3000digits_log235.txt |
 | 2026-11-14 | 2 | π², ζ(3), …, ζ(23) の重さ w の同次多項式関係（w=6..24） | 線形 PSLQ（並列） | 2000桁、n=2〜66 | なし（全 w で検証ケース PASS：偶数 w は ζ(w)∝π^w、奇数 w は構成値） | w=10で1.2×10³²⁰、w=16で1.4×10⁹⁴、w=20で5.4×10⁴⁵、w=24で3.3×10²² | results/zeta_weight_homogeneous_2000digits_w6to24.txt |
+| 2026-11-14 | 1 | ζ(3) の多項式連分数 F1：a_n=−n⁶、b_n=3次（\|c\|≤100）、値が (A+Bζ(3))/(C+Dζ(3))（\|A..D\|≤20） | cf_search（Ramanujan Machine 型） | 1.6×10⁹ 通り、210桁で検算 | 既知の Apéry 6/ζ(3) と Ramanujan Machine の 8/(7ζ(3)) のみ（自己テスト PASS） | 幾何収束（約0.07桁/項以上）で照合範囲内のもの | results/cf_search_zeta3_F1_C100_M20.txt |
+| 2026-11-14 | 2 | ζ(5) の多項式連分数 F3：a_n=−n¹⁰、b_n=5次（\|c\|≤20） | cf_search | 4.75×10⁹ 通り | なし（このファミリーに既知例なし、照合機構は F1/F2 で検証済み） | 同上 | results/cf_search_zeta5_F3_C20_M20.txt |

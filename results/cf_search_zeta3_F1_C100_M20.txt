@@ -1,0 +1,37 @@
+cf_search family=F1 C=100 M=20 threads=10 stride=1
+mobius table size = 1293248
+SELFTEST F1 (required: Apery 34n^3+51n^2+27n+5 -> 6/zeta(3))
+  selftest case Apery b=[5,27,51,34] (c0..cK): hit (A,B,C,D)=(6,0,0,1) diff=1e-209.34 digits/term=3.06172 VERIFIED; 
+SELFTEST F1 (informational: 2n^3+3n^2+3n+1)
+  selftest case n^3+(n+1)^3 b=[1,3,3,2] (c0..cK): NO HIT
+SELFTEST PASS
+
+=== search F1: a_n=-n^6, deg b=3, tasks=40401 ===
+candidates tested = 1632240801  search time = 228.504 s (1.39994 us/candidate/thread)
+stage-2 hits = 20
+F1 b=[-23,6,-69,-31] (c0..cK) (A,B,C,D)=(6,18,0,-1) diff=1e-13.36 digits/term=3.0023 rejected
+F1 b=[-17,-5,-63,-32] (c0..cK) (A,B,C,D)=(6,12,0,-1) diff=1e-13.54 digits/term=3.02257 rejected
+F1 b=[-13,-27,-3,-2] (c0..cK) (A,B,C,D)=(8,0,9,-8) diff=1e-32.14 digits/term=0.0653454 rejected
+F1 b=[-13,60,33,37] (c0..cK) (A,B,C,D)=(6,-18,0,1) diff=1e-13.37 digits/term=3.11726 rejected
+F1 b=[-11,-16,-57,-33] (c0..cK) (A,B,C,D)=(6,6,0,-1) diff=1e-13.84 digits/term=3.04237 rejected
+F1 b=[-7,49,39,36] (c0..cK) (A,B,C,D)=(6,-12,0,1) diff=1e-13.54 digits/term=3.09915 rejected
+F1 b=[-5,-27,-51,-34] (c0..cK) (A,B,C,D)=(6,0,0,-1) diff=1e-209.34 digits/term=3.06172 VERIFIED
+F1 b=[-5,-11,-3,-2] (c0..cK) (A,B,C,D)=(1,0,1,-1) diff=1e-19.80 digits/term=0.039241 rejected
+F1 b=[-1,-5,-9,-6] (c0..cK) (A,B,C,D)=(8,0,0,-7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F1 b=[-1,32,50,34] (c0..cK) (A,B,C,D)=(6,-4,-12,9) diff=1e-14.31 digits/term=3.061 rejected
+F1 b=[1,-32,-50,-34] (c0..cK) (A,B,C,D)=(6,-4,12,-9) diff=1e-14.31 digits/term=3.061 rejected
+F1 b=[1,5,9,6] (c0..cK) (A,B,C,D)=(8,0,0,7) diff=1e-209.03 digits/term=1.53089 VERIFIED
+F1 b=[5,11,3,2] (c0..cK) (A,B,C,D)=(1,0,-1,1) diff=1e-19.80 digits/term=0.039241 rejected
+F1 b=[5,27,51,34] (c0..cK) (A,B,C,D)=(6,0,0,1) diff=1e-209.34 digits/term=3.06172 VERIFIED
+F1 b=[7,-49,-39,-36] (c0..cK) (A,B,C,D)=(6,-12,0,-1) diff=1e-13.54 digits/term=3.09915 rejected
+F1 b=[11,16,57,33] (c0..cK) (A,B,C,D)=(6,6,0,1) diff=1e-13.84 digits/term=3.04237 rejected
+F1 b=[13,-60,-33,-37] (c0..cK) (A,B,C,D)=(6,-18,0,-1) diff=1e-13.37 digits/term=3.11726 rejected
+F1 b=[13,27,3,2] (c0..cK) (A,B,C,D)=(8,0,-9,8) diff=1e-32.14 digits/term=0.0653454 rejected
+F1 b=[17,5,63,32] (c0..cK) (A,B,C,D)=(6,12,0,1) diff=1e-13.54 digits/term=3.02257 rejected
+F1 b=[23,-6,69,31] (c0..cK) (A,B,C,D)=(6,18,0,1) diff=1e-13.36 digits/term=3.0023 rejected
+SUMMARY F1: stage-2 hits=20 verified=4
+  (A,B,C,D)=(6,0,0,-1) x1
+  (A,B,C,D)=(6,0,0,1) x1
+  (A,B,C,D)=(8,0,0,-7) x1
+  (A,B,C,D)=(8,0,0,7) x1
+elapsed 228.699 s

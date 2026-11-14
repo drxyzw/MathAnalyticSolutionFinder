@@ -1,0 +1,12 @@
+cf_search family=F3 C=20 M=20 threads=10 stride=1
+mobius table size = 1293248
+SELFTEST F3: none known (skipped)
+SELFTEST PASS
+
+=== search F3: a_n=-n^10, deg b=5, tasks=1681 ===
+candidates tested = 4750104241  search time = 939.088 s (1.97698 us/candidate/thread)
+stage-2 hits = 2
+F3 b=[-2,16,-12,-19,10,16] (c0..cK) (A,B,C,D)=(17,19,-14,-3) diff=1e-13.79 digits/term=2.35223 rejected
+F3 b=[2,-16,12,19,-10,-16] (c0..cK) (A,B,C,D)=(17,19,14,3) diff=1e-13.79 digits/term=2.35223 rejected
+SUMMARY F3: stage-2 hits=2 verified=0
+elapsed 939.225 s

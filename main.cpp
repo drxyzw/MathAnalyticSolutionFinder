@@ -39,7 +39,9 @@ int main()
 
 	//test_pslq_zeta_weight_homogeneous(2000, 6, 24, 23);
 
-	test_pslq_zeta_central_binomial(3000, 3);
+	//test_pslq_zeta_central_binomial(3000, 3);
+
+	test_pslq_zeta_central_binomial(3000, 5);
 
 	//test_mpreal();
 

@@ -25,3 +25,5 @@
 | 2026-11-14 | 1 | ζ(3) の多項式連分数 F1：a_n=−n⁶、b_n=3次（\|c\|≤100）、値が (A+Bζ(3))/(C+Dζ(3))（\|A..D\|≤20） | cf_search（Ramanujan Machine 型） | 1.6×10⁹ 通り、210桁で検算 | 既知の Apéry 6/ζ(3) と Ramanujan Machine の 8/(7ζ(3)) のみ（自己テスト PASS） | 幾何収束（約0.07桁/項以上）で照合範囲内のもの | results/cf_search_zeta3_F1_C100_M20.txt |
 | 2026-11-14 | 2 | ζ(5) の多項式連分数 F3：a_n=−n¹⁰、b_n=5次（\|c\|≤20） | cf_search | 4.75×10⁹ 通り | なし（このファミリーに既知例なし、照合機構は F1/F2 で検証済み） | 同上 | results/cf_search_zeta5_F3_C20_M20.txt |
 | 2026-11-14 | 1 | ζ(3) の多項式連分数 F4：a_n=−(αn²+βn+γ)³（α≤3, \|β\|,\|γ\|≤3）、b_n=3次（\|c\|≤40） | cf_search | 5.5×10⁹ 通り | 既知の 8/(7ζ(3)) のみ（自己テスト：Apéry とそのシフト版 PASS） | 幾何収束で照合範囲内のもの | results/cf_search_zeta3_F4_C40_A3_3_M20.txt |
+| 2026-11-14 | 1 | ζ(3) = Σ s^n/(n³C(2n,n)^k)（s∈{1,±2,±3}, k=1; s∈{±1,±4}, k=2）と π³, π²log2, log³2 の有理1次結合（Koecher 級数 S(−1,3,1) は除外） | 線形 PSLQ | 3000桁、n=13 | なし（検証：Koecher 2ζ(3)+5S(−1,3,1)=0、Σ1/(n²C)=π²/18 を再発見） | 4.9×10¹⁸⁴ | results/zeta3_central_binomial_3000digits.txt |
+| 2026-11-14 | 2 | ζ(5) = 同型の重さ5の級数 + π²ζ(3), ζ(3)log²2, π⁴log2, π²log³2, log⁵2（Koecher 型を除外） | 線形 PSLQ | 3000桁、n=15 | なし（検証：Koecher の ζ(5) 式を再発見） | 1.0×10¹⁶⁰ | results/zeta5_central_binomial_3000digits.txt |

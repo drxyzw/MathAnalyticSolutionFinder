@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(g++:*)",
+      "Bash(./main:*)",
+      "Bash(./main)",
+      "Bash(mkdir -p results)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(nproc)",
+      "Bash(ps:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push origin master)",
+      "WebSearch"
+    ]
+  }
+}

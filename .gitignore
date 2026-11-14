@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # Large data
 *.tsv
+
+# Result files too large even after zip (>10MB)
+results/results.tsv

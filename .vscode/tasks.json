@@ -15,7 +15,8 @@
                 "-o",
                 "${workspaceFolder}/main",
                 "-lmpfr",
-                "-lgmp"
+                "-lgmp",
+                "-pthread"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

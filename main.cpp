@@ -7,7 +7,11 @@ int main()
 {
 	//test_check_recurring_decimal_performance();
 
-	test_pslq_apery_over_pi_cubed();
+	//test_pslq_apery_over_pi_cubed();
+
+	//test_pslq_apery_multiplicative();
+
+	test_pslq_apery_algebraic_exp_pi_grid();
 
 	//test_mpreal();
 

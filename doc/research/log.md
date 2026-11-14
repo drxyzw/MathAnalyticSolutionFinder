@@ -19,3 +19,5 @@
 | 2026-11-14 | 2 | ζ(3,5,7,11)、π の積の関係 | log PSLQ | 2000桁、素数≤100 | なし | 1.2×10⁴⁷ | results/zeta3_5_7_11_pi_multiplicative_2000digits_p100.txt |
 | 2026-11-14 | 2 | ζ(3,5,7,9,11)、π の積の関係 | log PSLQ | 2000桁、素数≤100 | なし | 5.2×10⁴⁵ | results/zeta3_5_7_9_11_pi_multiplicative_2000digits_p100.txt |
 | 2026-11-14 | 2 | ζ(3,5,7,9,11)、π、γ の積の関係 | log PSLQ | 2000桁、素数≤100 | なし | 3.0×10⁴⁴ | results/zeta3_5_7_9_11_pi_gamma_multiplicative_2000digits_p100.txt |
+| 2026-11-14 | 1 | ζ(3) = π, log2, log3, G の重さ3の積（13個）の有理1次結合 | 線形 PSLQ | 3000桁、n=14 | なし（検証：Li₃(1/2)、Li₃(±1/3) の既知恒等式を再発見・6000桁で検算済み） | 2.8×10¹⁷¹ | results/zeta3_additive_elementary_3000digits_log23.txt |
+| 2026-11-14 | 1 | 同上 + log5（24個） | 線形 PSLQ | 3000桁、n=25 | なし（検証同上） | 1.0×10⁹⁶ | results/zeta3_additive_elementary_3000digits_log235.txt |

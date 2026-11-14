@@ -1,7 +1,17 @@
 {
   "permissions": {
     "defaultMode": "acceptEdits",
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push origin +*)"
+    ],
     "allow": [
+      "Bash",
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit(./**)",
       "Bash(g++:*)",
       "Bash(./main:*)",
       "Bash(./main)",

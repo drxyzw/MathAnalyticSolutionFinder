@@ -1,0 +1,22 @@
+=== V1 [sanity] Li3(1/2), zeta3, pi^2 log2, log2^3  expect (24,-21,2,-4) (n = 4, digits = 3000)
+status = Found, iterations = 12, normBound = 1.847e+01
+relation: -24*Li3(1/2) +21*zeta(3) -2*pi^2*log2 +4*log2^3
+residual at 6000 digits = 2.699e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e600
+elapsed 46.426003387000001509932189947 s
+=== V2 [sanity] Li3(1/2), zeta3, full basis  expect same as V1 (n = 26, digits = 3000)
+status = Found, iterations = 1763, normBound = 6.318e+00
+relation: +24*Li3(1/2) -21*zeta(3) +2*pi*pi*log2 -4*log2*log2*log2
+residual at 6000 digits = 2.699e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e92
+elapsed 48.4309689930000004665089363698 s
+=== V3 [sanity] Li3(1/3), Li3(-1/3), zeta3, full basis  expect (-12, 6, 13) & pi^2 log3 -1, log3^3 +1 (n = 27, digits = 3000)
+status = Found, iterations = 1671, normBound = 5.129e+00
+relation: +12*Li3(1/3) -6*Li3(-1/3) -13*zeta(3) +1*pi*pi*log3 -1*log3*log3*log3
+residual at 6000 digits = 1.127e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e88
+elapsed 48.7096264150000024528708308935 s
+=== M zeta3, full basis (n = 25, digits = 3000)
+status = PrecisionExhausted, iterations = 113702, normBound = 1.034e+96
+power estimate 10^(0.8*D/n) = 1e96
+elapsed 267.435661916000015025929315016 s

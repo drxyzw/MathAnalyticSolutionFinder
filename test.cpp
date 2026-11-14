@@ -959,3 +959,100 @@ void test_pslq_zeta_weight_homogeneous(int digits, int minWeight, int maxWeight,
 	}
 	std::cout << "elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
 }
+
+// S(s,j,k) = sum_{n>=1} s^n / (n^j C(2n,n)^k); if h2, the extra factor H_{n-1}^{(2)} is inserted.
+static mpreal centralBinomialSeries(long s, int j, int k, bool h2 = false)
+{
+	const mpreal eps = mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() - 40);
+	mpreal sum = 0, q = 1, H = 0;
+	for (long n = 1;; ++n)
+	{
+		// q_n = s^n / C(2n,n)^k
+		q *= mpreal(s);
+		for (int i = 0; i < k; ++i) q = q * mpreal(n) / mpreal(2 * (2 * n - 1));
+		mpreal nj = 1;
+		for (int i = 0; i < j; ++i) nj *= mpreal(n);
+		if (n > 1) H += mpreal(1) / (mpreal(n - 1) * mpreal(n - 1));
+		const mpreal term = h2 ? q * H / nj : q / nj;
+		sum += term;
+		if (n > 10 && mpfr::abs(term) < eps) break;
+	}
+	return sum;
+}
+
+// zeta(3) (or zeta(5)) against central-binomial series S(s,w,k) and weight-w elementary constants.
+// Sanity: V1/V2 (Koecher zeta(3), pi^2/18), V1b (Koecher zeta(5) with H^(2) series), and the main basis once with and once without the Koecher series.
+void test_pslq_zeta_central_binomial(int digits, int targetZeta)
+{
+	std::cout.precision(30);
+	const int w = targetZeta;
+	struct Ser { long s; int j, k; bool h2; };
+	typedef std::vector<std::string> Labels;
+	auto lab = [](const Ser& x) {
+		return std::string(x.h2 ? "H2*" : "") + "S(" + std::to_string(x.s) + "," + std::to_string(x.j) + "," + std::to_string(x.k) + ")";
+	};
+	auto zt = [w](int) { return mpfr::zeta(mpreal(w)); };
+	// elementary constants of weight w
+	Labels eLab;
+	std::function<std::vector<mpreal>()> elem;
+	if (w == 3)
+	{
+		eLab = { "pi^3", "pi^2*log2", "log2^3" };
+		elem = []() { const mpreal pi = mpfr::const_pi(), l = mpfr::log(mpreal(2)); return std::vector<mpreal>{ pi * pi * pi, pi * pi * l, l * l * l }; };
+	}
+	else
+	{
+		eLab = { "pi^2*zeta3", "zeta3*log2^2", "pi^4*log2", "pi^2*log2^3", "log2^5" };
+		elem = []() {
+			const mpreal pi = mpfr::const_pi(), l = mpfr::log(mpreal(2)), z3 = mpfr::zeta(mpreal(3));
+			const mpreal pi2 = pi * pi;
+			return std::vector<mpreal>{ pi2 * z3, z3 * l * l, pi2 * pi2 * l, pi2 * l * l * l, l * l * l * l * l };
+		};
+	}
+	auto build = [&](const std::vector<Ser>& sers, bool useElem, bool useZeta) {
+		Labels L;
+		if (useZeta) L.push_back("zeta(" + std::to_string(w) + ")");
+		for (auto& x : sers) L.push_back(lab(x));
+		if (useElem) L.insert(L.end(), eLab.begin(), eLab.end());
+		auto f = [=](int d) {
+			std::vector<mpreal> v;
+			if (useZeta) v.push_back(mpfr::zeta(mpreal(w)));
+			for (auto& x : sers) v.push_back(centralBinomialSeries(x.s, x.j, x.k, x.h2));
+			if (useElem) { auto e = elem(); v.insert(v.end(), e.begin(), e.end()); }
+			return v;
+		};
+		return std::make_pair(L, std::function<std::vector<mpreal>(int)>(f));
+	};
+	auto run = [&](const std::string& name, const std::vector<Ser>& sers, bool useElem, bool useZeta) {
+		auto p = build(sers, useElem, useZeta);
+		reportLinearRelationSearch(name, p.second, p.first, digits);
+	};
+	// sanity
+	if (w == 3)
+	{
+		run("V1 [sanity] zeta3, S(-1,3,1)  expect 2*zeta3 + 5*S(-1,3,1) = 0", { {-1,3,1,false} }, false, true);
+		{
+			auto L = Labels{ "S(1,2,1)", "pi^2" };
+			reportLinearRelationSearch("V2 [sanity] S(1,2,1), pi^2  expect 18*S - pi^2 = 0",
+				[](int) { return std::vector<mpreal>{ centralBinomialSeries(1, 2, 1), mpfr::const_pi() * mpfr::const_pi() }; }, L, digits);
+		}
+	}
+	else
+	{
+		run("V1b [sanity] zeta5, S(-1,5,1), H2*S(-1,3,1)  expect 2*zeta5 + 4*S(-1,5,1) - 5*H2*S(-1,3,1) = 0", { {-1,5,1,false}, {-1,3,1,true} }, false, true);
+		{
+			auto L = Labels{ "S(1,2,1)", "pi^2" };
+			reportLinearRelationSearch("V2 [sanity] S(1,2,1), pi^2  expect 18*S - pi^2 = 0",
+				[](int) { return std::vector<mpreal>{ centralBinomialSeries(1, 2, 1), mpfr::const_pi() * mpfr::const_pi() }; }, L, digits);
+		}
+	}
+	// main bases
+	std::vector<Ser> base;
+	for (long s : { 1, 2, 3, -2, -3 }) base.push_back({ s, w, 1, false });
+	for (long s : { 1, -1, 4, -4 }) base.push_back({ s, w, 2, false });
+	std::vector<Ser> withK = base;
+	withK.push_back({ -1, w, 1, false });
+	if (w == 5) withK.push_back({ -1, 3, 1, true });
+	run("V3 [sanity] main basis WITH Koecher series: relation must appear", withK, true, true);
+	run("M main basis WITHOUT Koecher series", base, true, true);
+}

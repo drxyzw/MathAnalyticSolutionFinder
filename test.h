@@ -17,3 +17,4 @@ void test_pslq_zeta357_multiplicative(int pslqDigits, int maxPrime); // zeta(3)^
 void test_pslq_zeta_multiplicative(int pslqDigits, int maxPrime, const std::vector<int>& zetaArgs, bool includePi, bool includeEuler = false);
 void test_pslq_zeta_weight_homogeneous(int digits, int minWeight, int maxWeight, int maxZetaArg); // homogeneous weight-w monomials in pi^2, zeta(odd)
 void test_pslq_zeta3_additive_elementary(int digits, bool includeLog5); // zeta(3) vs weight-3 monomials in pi, log2, log3, (log5), Catalan G
+void test_pslq_zeta_central_binomial(int digits, int targetZeta); // zeta(3) or zeta(5) vs sum s^n/(n^w C(2n,n)^k) and weight-w constants

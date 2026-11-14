@@ -13,6 +13,7 @@
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(nproc)",
+      "Bash(date:*)",
       "Bash(ps:*)",
       "Bash(find:*)",
       "Bash(du:*)",

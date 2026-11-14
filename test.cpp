@@ -9,6 +9,8 @@
 #include <mutex>
 #include <chrono>
 #include <functional>
+#include <array>
+#include <sstream>
 #include "check_recurring_decimal.h"
 #include "pslq.h"
 #include "test.h"
@@ -730,4 +732,230 @@ void test_pslq_zeta3_zeta5_ratio(int p, int q)
 	const std::string name = "zeta(3)" + expo + "zeta(5)" + expq;
 	std::cout << name << " = " << x << std::endl;
 	reportPolynomialSearch(name.c_str(), x, maxDegree);
+}
+
+// Li_3(z) = sum z^k / k^3 for real |z| <= 1/2, at the current default precision.
+mpreal polylog3(const mpreal& z)
+{
+	const mpreal eps = mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() - 40);
+	mpreal sum = 0, zk = 1;
+	for (long k = 1;; ++k)
+	{
+		zk *= z;
+		const mpreal term = zk / mpreal(k * k * k);
+		sum += term;
+		if (mpfr::abs(term) < eps) break;
+	}
+	return sum;
+}
+
+// PSLQ on the vector computeVector(digits); prints the relation with labels and verifies it at 2*digits.
+struct LinearSearchOutcome { bool found = false; bool verified = false; };
+LinearSearchOutcome reportLinearRelationSearch(std::ostream& out, const std::string& name, const std::function<std::vector<mpreal>(int digits)>& computeVector,
+	const std::vector<std::string>& labels, int digits)
+{
+	LinearSearchOutcome outcome;
+	const auto t0 = std::chrono::steady_clock::now();
+	mpreal::set_default_prec(mpfr::digits2bits(digits));
+	const std::vector<mpreal> c = computeVector(digits);
+	const int n = (int)c.size();
+	out << "=== " << name << " (n = " << n << ", digits = " << digits << ")" << std::endl;
+	PslqResult r = pslq(c);
+	out << "status = " << toString(r.status) << ", iterations = " << r.iterations
+		<< ", normBound = " << r.normBound.toString("%.3Re") << std::endl;
+	if (r.status == PslqResult::Status::Found)
+	{
+		std::string s;
+		for (int i = 0; i < n; ++i)
+		{
+			if (r.relation[i] == 0) continue;
+			const std::string v = r.relation[i].toString("%.0Rf");
+			s += (v[0] == '-' ? " " : " +") + v + "*" + labels[i];
+		}
+		out << "relation:" << s << std::endl;
+		mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+		const std::vector<mpreal> c2 = computeVector(2 * digits);
+		mpreal v = 0;
+		for (int i = 0; i < n; ++i) v += r.relation[i] * c2[i];
+		const bool ok = mpfr::abs(v) < mpfr::pow(mpreal(10), -1.6 * digits);
+		out << "residual at " << 2 * digits << " digits = " << mpfr::abs(v).toString("%.3Re")
+			<< (ok ? "  VERIFIED" : "  FAILED verification") << std::endl;
+		outcome.found = true; outcome.verified = ok;
+		mpreal::set_default_prec(mpfr::digits2bits(digits));
+	}
+	out << "power estimate 10^(0.8*D/n) = 1e" << (int)(0.8 * digits / n) << std::endl;
+	out << "elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
+	return outcome;
+}
+
+void reportLinearRelationSearch(const std::string& name, const std::function<std::vector<mpreal>(int digits)>& computeVector,
+	const std::vector<std::string>& labels, int digits)
+{
+	reportLinearRelationSearch(std::cout, name, computeVector, labels, digits);
+}
+
+void test_pslq_zeta3_additive_elementary(int digits, bool includeLog5)
+{
+	std::cout.precision(30);
+	// letters
+	std::vector<std::string> let = { "pi", "log2", "log3" };
+	if (includeLog5) let.push_back("log5");
+	const int nl = (int)let.size();
+	auto letters = [nl](int) {
+		std::vector<mpreal> v = { mpfr::const_pi(), mpfr::log(mpreal(2)), mpfr::log(mpreal(3)) };
+		if (nl == 4) v.push_back(mpfr::log(mpreal(5)));
+		return v;
+	};
+	std::vector<std::string> baseLabels;
+	std::vector<std::function<mpreal(const std::vector<mpreal>&, const mpreal&)>> unused;
+	std::vector<std::array<int, 3>> mons;
+	for (int a = 0; a < nl; ++a)
+		for (int b = a; b < nl; ++b)
+			for (int c = b; c < nl; ++c)
+			{
+				mons.push_back({ a, b, c });
+				baseLabels.push_back(let[a] + "*" + let[b] + "*" + let[c]);
+			}
+	for (int a = 0; a < nl; ++a) baseLabels.push_back("G*" + let[a]);
+	auto basis = [=](int d) {
+		const std::vector<mpreal> L = letters(d);
+		std::vector<mpreal> v;
+		for (auto& m : mons) v.push_back(L[m[0]] * L[m[1]] * L[m[2]]);
+		const mpreal G = mpfr::const_catalan();
+		for (int a = 0; a < nl; ++a) v.push_back(G * L[a]);
+		return v;
+	};
+	auto withPrefix = [&](std::vector<std::string> pre, std::function<std::vector<mpreal>(int)> pf) {
+		std::vector<std::string> lab = pre;
+		lab.insert(lab.end(), baseLabels.begin(), baseLabels.end());
+		return std::make_pair(lab, [=](int d) {
+			std::vector<mpreal> v = pf(d);
+			const std::vector<mpreal> b = basis(d);
+			v.insert(v.end(), b.begin(), b.end());
+			return v;
+		});
+	};
+	auto z3 = [](int) { return mpfr::zeta(mpreal(3)); };
+
+	// V1
+	reportLinearRelationSearch("V1 [sanity] Li3(1/2), zeta3, pi^2 log2, log2^3  expect (24,-21,2,-4)",
+		[&](int d) {
+			const mpreal pi = mpfr::const_pi(), l2 = mpfr::log(mpreal(2));
+			return std::vector<mpreal>{ polylog3(mpreal(1) / 2), z3(d), pi * pi * l2, l2 * l2 * l2 };
+		},
+		{ "Li3(1/2)", "zeta(3)", "pi^2*log2", "log2^3" }, digits);
+	// V2
+	{
+		auto p = withPrefix({ "Li3(1/2)", "zeta(3)" }, [&](int d) { return std::vector<mpreal>{ polylog3(mpreal(1) / 2), z3(d) }; });
+		reportLinearRelationSearch("V2 [sanity] Li3(1/2), zeta3, full basis  expect same as V1", p.second, p.first, digits);
+	}
+	// V3
+	{
+		auto p = withPrefix({ "Li3(1/3)", "Li3(-1/3)", "zeta(3)" },
+			[&](int d) { return std::vector<mpreal>{ polylog3(mpreal(1) / 3), polylog3(mpreal(-1) / 3), z3(d) }; });
+		reportLinearRelationSearch("V3 [sanity] Li3(1/3), Li3(-1/3), zeta3, full basis  expect (-12, 6, 13) & pi^2 log3 -1, log3^3 +1", p.second, p.first, digits);
+	}
+	// M
+	{
+		auto p = withPrefix({ "zeta(3)" }, [&](int d) { return std::vector<mpreal>{ z3(d) }; });
+		reportLinearRelationSearch("M zeta3, full basis", p.second, p.first, digits);
+	}
+}
+
+// Homogeneous weight-w monomials pi^(2a) * prod zeta(k)^(b_k) (k odd, 3 <= k <= maxZetaArg), one PSLQ job per weight,
+// each paired with a check job that appends a known-dependent element.
+void test_pslq_zeta_weight_homogeneous(int digits, int minWeight, int maxWeight, int maxZetaArg)
+{
+	std::cout.precision(30);
+	struct Job { int w; bool check; };
+	struct Mono { int a; std::vector<int> b; }; // pi^(2a) * prod zeta(3+2i)^b[i]
+	const int nz = (maxZetaArg >= 3) ? (maxZetaArg - 3) / 2 + 1 : 0;
+	auto enumerate = [&](int w) {
+		std::vector<Mono> res;
+		std::vector<int> b(nz, 0);
+		std::function<void(int, int)> rec = [&](int i, int rem) {
+			if (i == nz) { if (rem % 2 == 0) res.push_back({ rem / 2, b }); return; }
+			const int k = 3 + 2 * i;
+			for (int e = 0; e * k <= rem; ++e) { b[i] = e; rec(i + 1, rem - e * k); }
+			b[i] = 0;
+		};
+		rec(0, w);
+		return res;
+	};
+	auto label = [&](const Mono& m) {
+		std::string s;
+		if (m.a) s += "pi^" + std::to_string(2 * m.a);
+		for (int i = 0; i < nz; ++i) if (m.b[i])
+			s += (s.empty() ? "" : "*") + std::string("z") + std::to_string(3 + 2 * i) + (m.b[i] > 1 ? "^" + std::to_string(m.b[i]) : "");
+		return s;
+	};
+	std::vector<Job> jobs;
+	for (int w = maxWeight; w >= minWeight; --w) { jobs.push_back({ w, false }); jobs.push_back({ w, true }); }
+	const int nW = maxWeight + 1;
+	std::vector<LinearSearchOutcome> mainOut(nW), checkOut(nW);
+	std::vector<int> sizes(nW, 0);
+	std::mutex outMutex;
+	std::atomic<size_t> next{ 0 };
+	const auto t0 = std::chrono::steady_clock::now();
+	std::vector<std::thread> threads;
+	for (int th = 0; th < 10; ++th)
+		threads.emplace_back([&]() {
+			for (size_t k; (k = next++) < jobs.size();)
+			{
+				const Job job = jobs[k];
+				const int w = job.w;
+				mpreal::set_default_prec(mpfr::digits2bits(digits)); // thread-local
+				const std::vector<Mono> monos = enumerate(w);
+				sizes[w] = (int)monos.size();
+				std::vector<std::string> labels;
+				for (auto& m : monos) labels.push_back(label(m));
+				const bool even = (w % 2 == 0);
+				std::string checkName;
+				if (job.check)
+				{
+					if (!even && monos.size() < 3) continue;
+					if (even) { labels.push_back("zeta(" + std::to_string(w) + ")"); checkName = "adds zeta(w); expect rational*pi^w"; }
+					else { labels.push_back("y=3m1-7m2+2m_last"); checkName = "adds y; expect (3,-7,..,2,-1)"; }
+				}
+				auto compute = [&](int) {
+					const mpreal pi = mpfr::const_pi();
+					std::vector<mpreal> z(nz);
+					for (int i = 0; i < nz; ++i) z[i] = mpfr::zeta(mpreal(3 + 2 * i));
+					std::vector<mpreal> v;
+					for (auto& m : monos)
+					{
+						mpreal t = mpfr::pow(pi, mpreal(2 * m.a));
+						for (int i = 0; i < nz; ++i) if (m.b[i]) t *= mpfr::pow(z[i], mpreal(m.b[i]));
+						v.push_back(t);
+					}
+					if (job.check)
+					{
+						if (even) v.push_back(mpfr::zeta(mpreal(w)));
+						else v.push_back(3 * v[0] - 7 * v[1] + 2 * v[monos.size() - 1]);
+					}
+					return v;
+				};
+				std::ostringstream os;
+				os.precision(30);
+				const std::string name = std::string(job.check ? "CHECK" : "MAIN") + " w=" + std::to_string(w) + " " + checkName;
+				const LinearSearchOutcome o = reportLinearRelationSearch(os, name, compute, labels, digits);
+				std::lock_guard<std::mutex> lk(outMutex);
+				std::cout << os.str() << std::flush;
+				(job.check ? checkOut : mainOut)[w] = o;
+			}
+		});
+	for (auto& t : threads) t.join();
+	std::cout << "=== SUMMARY (digits = " << digits << ", maxZetaArg = " << maxZetaArg << ")" << std::endl;
+	for (int w = minWeight; w <= maxWeight; ++w)
+	{
+		const bool canCheck = (w % 2 == 0) || sizes[w] >= 3;
+		const bool checkOk = canCheck && checkOut[w].found && checkOut[w].verified;
+		std::cout << "w=" << w << " n=" << sizes[w] << " power~1e" << (int)(0.8 * digits / std::max(1, sizes[w]))
+			<< " check=" << (canCheck ? (checkOk ? "PASS" : "FAIL") : "N/A") << " main=";
+		if (canCheck && !checkOk) std::cout << "INVALID";
+		else if (mainOut[w].found) std::cout << (mainOut[w].verified ? "RELATION FOUND (VERIFIED)" : "found but spurious");
+		else std::cout << "no relation";
+		std::cout << std::endl;
+	}
+	std::cout << "elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
 }

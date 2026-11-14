@@ -31,7 +31,13 @@ int main()
 
 	//test_pslq_zeta_multiplicative(2000, 100, { 3, 5, 7, 9, 11 }, true);
 
-	test_pslq_zeta_multiplicative(2000, 100, { 3, 5, 7, 9, 11 }, true, true);
+	//test_pslq_zeta_multiplicative(2000, 100, { 3, 5, 7, 9, 11 }, true, true);
+
+	//test_pslq_zeta3_additive_elementary(3000, false);
+
+	//test_pslq_zeta3_additive_elementary(3000, true);
+
+	test_pslq_zeta_weight_homogeneous(2000, 6, 24, 23);
 
 	//test_mpreal();
 

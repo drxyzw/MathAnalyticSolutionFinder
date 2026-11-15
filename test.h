@@ -24,3 +24,7 @@ void test_pslq_zeta3_elementary_functions_highdeg(int digits, int degree, std::v
 void test_pslq_zeta3_composite_functions_highdeg(int digits, int degree, std::vector<int> ks); // f(g(zeta3*pi^k)), algebraicity only, degree==`degree` only
 void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<int> ks, int minLevel, int maxLevel); // y = f1(f2(..fL(zeta3*pi^k))), L=minLevel..maxLevel, algebraicity, degree==`degree` only
 void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgebraic, bool doRelations); // y = f(g(zeta3*pi^k)): algebraic? and multiplicative/additive relations
+
+// y = f(zeta3 (a x)^(b w)) algebraic; log zeta3 = log g(alpha) - b w (log a + log x).
+void test_pslq_zeta3_transcendental_exponent_absorbed(int digits, int maxPrime, int maxPrimeLogLog); // f = identity, log, exp: alpha absorbed into the PSLQ basis (primes <= maxPrime; loglog p for p <= maxPrimeLogLog)
+void test_pslq_zeta3_transcendental_exponent_grid(int digits, int maxPrime, int variant = 0); // other f: alpha from a grid; variant 0: no constant column, 1: constant column, 2: both

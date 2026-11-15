@@ -53,7 +53,11 @@ int main()
 
 	//test_pslq_zeta3_composite_functions_highdeg(1500, 16, {0, -2, -3});
 
-	test_pslq_zeta3_multilevel_composite(1800, 12, {0, -1, -2, -3}, 3, 4);
+	//test_pslq_zeta3_multilevel_composite(1800, 12, {0, -1, -2, -3}, 3, 4);
+
+	test_pslq_zeta3_transcendental_exponent_absorbed(3000, 31, 13);
+
+	//test_pslq_zeta3_transcendental_exponent_grid(1500, 13);
 
 	//test_mpreal();
 

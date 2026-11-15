@@ -403,3 +403,4 @@ FodyWeavers.xsd
 # Result files too large even after zip (>10MB)
 results/results.tsv
 cf_search
+results/zeta3_multilevel_composite_L3to4_1800digits_deg12_k0m1m2m3.txt

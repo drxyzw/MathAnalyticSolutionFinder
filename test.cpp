@@ -771,7 +771,7 @@ mpreal polylog3(const mpreal& z)
 }
 
 // PSLQ on the vector computeVector(digits); prints the relation with labels and verifies it at 2*digits.
-struct LinearSearchOutcome { bool found = false; bool verified = false; std::string normBound; };
+struct LinearSearchOutcome { bool found = false; bool verified = false; std::string normBound; std::vector<std::string> coeffs; };
 LinearSearchOutcome reportLinearRelationSearch(std::ostream& out, const std::string& name, const std::function<std::vector<mpreal>(int digits)>& computeVector,
 	const std::vector<std::string>& labels, int digits)
 {
@@ -795,6 +795,7 @@ LinearSearchOutcome reportLinearRelationSearch(std::ostream& out, const std::str
 			s += (v[0] == '-' ? " " : " +") + v + "*" + labels[i];
 		}
 		out << "relation:" << s << std::endl;
+		for (int i = 0; i < n; ++i) outcome.coeffs.push_back(r.relation[i].toString("%.0Rf"));
 		mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
 		const std::vector<mpreal> c2 = computeVector(2 * digits);
 		mpreal v = 0;
@@ -2194,4 +2195,415 @@ void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<in
 	std::cout << "TARGET COUNT = " << nMain << " main + " << checkMinDeg.size() << " validation" << std::endl;
 	const auto sm = reportPolynomialSearchParallel(targets, digits, degree, true, 10);
 	reportHighDegSummary(targets, nMain, sm, checkMinDeg, digits, degree);
+}
+
+// y = f(zeta3 * (a x)^(b w)) algebraic (= alpha), a algebraic, b rational, x and w transcendental.  u = g(alpha) > 0,  g = f^-1.
+//   log zeta3 = log u - b w (log a + log x).
+// Forms (what is absorbed into the PSLQ basis, so that no alpha grid is needed):
+//   GEN (sin, cos, tan, sinh, ..., alpha inside a transcendental g; alpha from a grid):
+//        (L = log u - log zeta3, w*{log2,log3,log5,log7,log(1+sqrt2),log phi,1,log pi,log gamma,log log2,log log3} [, 1])         n = 12 [13]
+//   identity (u = alpha):  (log zeta3, log2,log3,log5,log7,log(1+sqrt2),log phi, w*{...11})                                       n = 18 [19]
+//   log (u = exp(alpha)):  (log zeta3, 1,sqrt2,sqrt3,sqrt5,sqrt6, w*{...11})                                                      n = 17
+//   exp (u = log(alpha)):  (log zeta3, log2,log3,log5,log7, loglog2,loglog3,loglog5,loglog7, w*{...11} [, 1])                    n = 20 [21]
+// When w = 1, the w*X columns that duplicate plain columns are dropped.
+// Env vars (smoke tests): ZETA3_TE_THREADS (default 10), ZETA3_TE_JOBS (evenly spaced sample of that many production jobs),
+//   ZETA3_TE_PMAX / ZETA3_TE_QMAX (rational grid, default 60 / 30), ZETA3_TE_QUAD (0/1, default 1), ZETA3_TE_COUNT_ONLY (1: print job counts only).
+// variant: 0 = without constant column, 1 = with constant column only, 2 = both.
+static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorbedMode, int maxPrime, int maxPrimeLogLog)
+{
+	std::cout.precision(30);
+	const auto tStart = std::chrono::steady_clock::now();
+	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
+	const int pMax = envInt("ZETA3_TE_PMAX", 60), qMax = envInt("ZETA3_TE_QMAX", 30), useQuad = envInt("ZETA3_TE_QUAD", 1);
+	const int nThreads = std::max(1, envInt("ZETA3_TE_THREADS", 10)), sampleJobs = envInt("ZETA3_TE_JOBS", 0), countOnly = envInt("ZETA3_TE_COUNT_ONLY", 0);
+	auto nanv = []() { mpreal r; r.setNan(); return r; };
+	const auto savedPrec = mpreal::get_default_prec();
+	mpreal::set_default_prec(mpfr::digits2bits(50));
+
+	// ---- functions f with the branches of g = f^-1 (u values; NaN when outside the domain) ----
+	typedef std::function<std::vector<mpreal>(const mpreal&)> InvFn;
+	struct TFn { std::string name; int form; std::vector<std::string> bl; InvFn inv; };
+	enum { GEN = 0, ID = 1, LOG = 2, EXP = 3 };
+	auto newton = [](const std::function<mpreal(const mpreal&)>& g, const std::function<mpreal(const mpreal&)>& dg, mpreal x)
+	{
+		const mpreal eps = mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() + 20);
+		for (int i = 0; i < 300; ++i)
+		{
+			const mpreal dx = g(x) / dg(x);
+			x -= dx;
+			if (mpfr::abs(dx) < eps) break;
+		}
+		return x;
+	};
+	auto single = [](const std::function<mpreal(const mpreal&)>& g) { return InvFn([g](const mpreal& a) { return std::vector<mpreal>{ g(a) }; }); };
+	const std::vector<TFn> fns = {
+		{ "identity", ID, { "u=alpha" }, single([](const mpreal& a) { return a; }) },
+		{ "log", LOG, { "exp(alpha)" }, single([](const mpreal& a) { return mpfr::exp(a); }) },
+		{ "exp", EXP, { "log(alpha)" }, single([](const mpreal& a) { return mpfr::log(a); }) },
+		{ "sin", GEN, { "u0", "u0+2pi", "pi-u0", "3pi-u0" }, [](const mpreal& a) {
+				const mpreal u0 = mpfr::asin(a), p = mpfr::const_pi();
+				return std::vector<mpreal>{ u0, u0 + 2 * p, p - u0, 3 * p - u0 }; } },
+		{ "cos", GEN, { "u0", "u0+2pi", "2pi-u0", "4pi-u0" }, [](const mpreal& a) {
+				const mpreal u0 = mpfr::acos(a), p = mpfr::const_pi();
+				return std::vector<mpreal>{ u0, u0 + 2 * p, 2 * p - u0, 4 * p - u0 }; } },
+		{ "tan", GEN, { "u0", "u0+pi", "u0+2pi" }, [](const mpreal& a) {
+				const mpreal u0 = mpfr::atan(a), p = mpfr::const_pi();
+				return std::vector<mpreal>{ u0, u0 + p, u0 + 2 * p }; } },
+		{ "sinh", GEN, { "asinh(alpha)" }, single([](const mpreal& a) { return mpfr::asinh(a); }) },
+		{ "cosh", GEN, { "acosh(alpha)" }, single([](const mpreal& a) { return mpfr::acosh(a); }) },
+		{ "tanh", GEN, { "atanh(alpha)" }, single([](const mpreal& a) { return mpfr::atanh(a); }) },
+		{ "arctan", GEN, { "tan(alpha)" }, single([nanv](const mpreal& a) { return (a > 0 && a < mpfr::const_pi() / 2) ? mpfr::tan(a) : nanv(); }) },
+		{ "arcsinh", GEN, { "sinh(alpha)" }, single([](const mpreal& a) { return mpfr::sinh(a); }) },
+		{ "arccosh", GEN, { "cosh(alpha)" }, single([](const mpreal& a) { return mpfr::cosh(a); }) },
+		{ "arcsin(1/t)", GEN, { "1/sin(alpha)" }, single([nanv](const mpreal& a) { return (a > 0 && a <= mpfr::const_pi() / 2) ? 1 / mpfr::sin(a) : nanv(); }) },
+		{ "arccos(1/t)", GEN, { "1/cos(alpha)" }, single([nanv](const mpreal& a) { return (a > 0 && a < mpfr::const_pi() / 2) ? 1 / mpfr::cos(a) : nanv(); }) },
+		{ "log(t-1)", GEN, { "1+exp(alpha)" }, single([](const mpreal& a) { return 1 + mpfr::exp(a); }) },
+		{ "t^t", GEN, { "u^u=alpha, u>1/e" }, single([nanv, newton](const mpreal& a) {
+				if (!(a >= mpfr::exp(-1 / mpfr::exp(mpreal(1))))) return nanv();
+				if (a == 1) return mpreal(1);
+				const mpreal la = mpfr::log(a);
+				return newton([&](const mpreal& c) { return c * mpfr::log(c) - la; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, a > 1 ? a + 1 : mpreal(1)); }) },
+		{ "Gamma", GEN, { "Gamma(u)=alpha, u>1.4616" }, single([nanv, newton](const mpreal& a) {
+				if (!(a >= mpfr::gamma(mpreal("1.46163214496836234126265954232572132846819620400644")))) return nanv();
+				const mpreal la = mpfr::log(a);
+				return newton([&](const mpreal& c) { return mpfr::lngamma(c) - la; }, [](const mpreal& c) { return mpfr::digamma(c); }, a + 2); }) },
+		{ "exp(1/t)", GEN, { "1/log(alpha)" }, single([](const mpreal& a) { return 1 / mpfr::log(a); }) },
+	};
+	auto findF = [&](const std::string& n) { for (size_t i = 0; i < fns.size(); ++i) if (fns[i].name == n) return (int)i; return -1; };
+
+	// ---- alpha grid (GEN functions only) ----
+	struct Alpha { std::string name; std::function<mpreal()> val; };
+	std::vector<Alpha> alphas;
+	for (int p = 1; !absorbedMode && p <= pMax; ++p)
+		for (int q = 1; q <= qMax; ++q)
+			if (std::gcd(p, q) == 1)
+			{
+				alphas.push_back({ std::to_string(p) + "/" + std::to_string(q), [p, q]() { return mpreal(p) / q; } });
+				alphas.push_back({ "-" + std::to_string(p) + "/" + std::to_string(q), [p, q]() { return -mpreal(p) / q; } });
+			}
+	if (useQuad && !absorbedMode)
+	{
+		for (int d : { 2, 3, 5 })
+			for (int u = -3; u <= 3; ++u)
+				for (int v = -3; v <= 3; ++v)
+					for (int c = 1; c <= 4; ++c)
+					{
+						if (v == 0 || std::gcd(std::gcd(std::abs(u), std::abs(v)), c) != 1) continue;
+						alphas.push_back({ "(" + std::to_string(u) + "+" + std::to_string(v) + "*sqrt" + std::to_string(d) + ")/" + std::to_string(c),
+							[=]() { return (mpreal(u) + v * mpfr::sqrt(mpreal(d))) / c; } });
+					}
+		for (int b : { 2, 3 })
+			for (int inv = 0; inv < 2; ++inv)
+				for (int sg = 0; sg < 2; ++sg)
+					alphas.push_back({ std::string(sg ? "-" : "") + (inv ? "1/" : "") + std::to_string(b) + "^(1/3)",
+						[=]() { mpreal r = mpfr::cbrt(mpreal(b)); if (inv) r = 1 / r; return sg ? -r : r; } });
+	}
+
+	// ---- w ----
+	struct WSpec { std::string name; std::function<mpreal()> val; };
+	const std::vector<WSpec> ws = {
+		{ "1", []() { return mpreal(1); } }, { "pi", []() { return mpfr::const_pi(); } }, { "e", []() { return mpfr::exp(mpreal(1)); } },
+		{ "gamma", []() { return mpfr::const_euler(); } }, { "log2", []() { return mpfr::log(mpreal(2)); } },
+		{ "log3", []() { return mpfr::log(mpreal(3)); } }, { "pi^2", []() { return mpfr::const_pi() * mpfr::const_pi(); } },
+		{ "sqrt2*pi", []() { return mpfr::sqrt(mpreal(2)) * mpfr::const_pi(); } },
+	};
+	auto findW = [&](const std::string& n) { for (size_t i = 0; i < ws.size(); ++i) if (ws[i].name == n) return (int)i; return -1; };
+
+	// ---- columns ----
+	std::vector<int> primes;
+	for (int q = 2; q <= std::max(maxPrime, maxPrimeLogLog); ++q)
+	{
+		bool pr = true;
+		for (int d = 2; d * d <= q; ++d) if (q % d == 0) pr = false;
+		if (pr) primes.push_back(q);
+	}
+	std::map<std::string, std::function<mpreal()>> base = {
+		{ "1", []() { return mpreal(1); } },
+		{ "log(1+sqrt2)", []() { return mpfr::log(1 + mpfr::sqrt(mpreal(2))); } },
+		{ "log(phi)", []() { return mpfr::log((1 + mpfr::sqrt(mpreal(5))) / 2); } },
+		{ "log(pi)", []() { return mpfr::log(mpfr::const_pi()); } }, { "log(gamma)", []() { return mpfr::log(mpfr::const_euler()); } },
+		{ "sqrt2", []() { return mpfr::sqrt(mpreal(2)); } }, { "sqrt3", []() { return mpfr::sqrt(mpreal(3)); } },
+		{ "sqrt5", []() { return mpfr::sqrt(mpreal(5)); } }, { "sqrt6", []() { return mpfr::sqrt(mpreal(6)); } },
+	};
+	for (int q : primes)
+	{
+		base["log" + std::to_string(q)] = [q]() { return mpfr::log(mpreal(q)); };
+		base["log(log" + std::to_string(q) + ")"] = [q]() { return mpfr::log(mpfr::log(mpreal(q))); };
+	}
+	typedef std::vector<std::pair<std::string, bool>> ColSpec; // (base name, multiplied by w)
+	auto colSpec = [&](int form, const std::string& wname, bool wc)
+	{
+		std::vector<std::string> plain, logP, llP, wf;
+		for (int q : primes) { if (q <= maxPrime) logP.push_back("log" + std::to_string(q)); if (q <= maxPrimeLogLog) llP.push_back("log(log" + std::to_string(q) + ")"); }
+		if (form == ID) { plain = logP; plain.push_back("log(1+sqrt2)"); plain.push_back("log(phi)"); }
+		if (form == LOG) plain = { "1", "sqrt2", "sqrt3", "sqrt5", "sqrt6" };
+		if (form == EXP) { plain = logP; plain.insert(plain.end(), llP.begin(), llP.end()); }
+		wf = logP;
+		for (const char* n : { "log(1+sqrt2)", "log(phi)", "1", "log(pi)", "log(gamma)", "log(log2)", "log(log3)" }) wf.push_back(n);
+		auto has = [&](const std::string& n) { return std::find(plain.begin(), plain.end(), n) != plain.end(); };
+		ColSpec cs;
+		for (const auto& p : plain) cs.push_back({ p, false });
+		for (const auto& n : wf)
+		{
+			// drop w*X when it numerically equals a plain column
+			if (wname == "1" && has(n)) continue;
+			if (n == "1" && wname == "log2" && has("log2")) continue;
+			if (n == "1" && wname == "log3" && has("log3")) continue;
+			cs.push_back({ n, true });
+		}
+		if (wc) cs.push_back({ "1", false });
+		return cs;
+	};
+
+	// ---- jobs ----
+	struct Job
+	{
+		int fi = 0, ai = -1, br = 0, wi = 0, wc = 0, ci = -1;
+		LinearSearchOutcome oc;
+		double secs = 0;
+		std::string kind, name;
+		bool checkPass = false;
+	};
+	auto probeBranches = [&](const TFn& fn, const mpreal& a)
+	{
+		std::vector<int> keep;
+		const std::vector<mpreal> us = fn.inv(a);
+		for (size_t b = 0; b < us.size(); ++b)
+		{
+			const mpreal& u = us[b];
+			if (!mpfr::isfinite(u) || !(u > mpreal("1e-8"))) continue;
+			bool dup = false;
+			for (int k : keep) if (mpfr::abs(us[k] - u) < mpreal("1e-30")) dup = true;
+			if (!dup) keep.push_back((int)b);
+		}
+		return keep;
+	};
+	// validation cases: c = g(alpha0) / (a0 x0)^(b0 w0); expected relation given by labels
+	struct ChkSpec
+	{
+		std::string f; Alpha al; int br; std::string w, desc; std::function<mpreal()> a0, x0; long bp, bq;
+		std::vector<std::pair<std::string, long>> exp;
+		int needPrime = 0;
+	};
+	const std::vector<ChkSpec> specs = {
+		{ "tan", { "1/2", []() { return mpreal(1) / 2; } }, 0, "e", "a0=3, x0=pi, b0=2/5",
+			[]() { return mpreal(3); }, []() { return mpfr::const_pi(); }, 2, 5, { { "L", 5 }, { "w*log3", -2 }, { "w*log(pi)", -2 } } },
+		{ "sin", { "1/3", []() { return mpreal(1) / 3; } }, 2, "gamma", "reflected branch pi-asin(1/3), a0=5/7, x0=log3, b0=1",
+			[]() { return mpreal(5) / 7; }, []() { return mpfr::log(mpreal(3)); }, 1, 1, { { "L", 1 }, { "w*log5", -1 }, { "w*log7", 1 }, { "w*log(log3)", -1 } } },
+		{ "exp", { "3", []() { return mpreal(3); } }, 0, "log2", "alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4",
+			[]() { return mpfr::sqrt(mpreal(2)); }, []() { return mpfr::const_euler(); }, -3, 4, { { "logz", 8 }, { "log(log3)", -8 }, { "w*log2", -3 }, { "w*log(gamma)", -6 } } },
+		{ "identity", { "1/sqrt2", []() { return 1 / mpfr::sqrt(mpreal(2)); } }, 0, "pi", "alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3",
+			[]() { return (1 + mpfr::sqrt(mpreal(5))) / 2; }, []() { return mpfr::exp(mpreal(1)); }, 1, 3, { { "logz", 6 }, { "log2", 3 }, { "w*log(phi)", 2 }, { "w*1", 2 } } },
+		{ "identity", { "2^(3/7)*3^(-1/5)", []() { return mpfr::pow(mpreal(2), mpreal(3) / 7) * mpfr::pow(mpreal(3), -mpreal(1) / 5); } }, 0, "e",
+			"alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4",
+			[]() { return 1 + mpfr::sqrt(mpreal(2)); }, []() { return mpfr::const_euler(); }, 3, 4,
+			{ { "logz", 140 }, { "log2", -60 }, { "log3", 28 }, { "w*log(1+sqrt2)", 105 }, { "w*log(gamma)", 105 } } },
+		{ "log", { "1/3+sqrt5/7", []() { return mpreal(1) / 3 + mpfr::sqrt(mpreal(5)) / 7; } }, 0, "log3",
+			"alpha0=1/3+sqrt5/7 (off grid), a0=2, x0=pi, b0=-2/3",
+			[]() { return mpreal(2); }, []() { return mpfr::const_pi(); }, -2, 3, { { "logz", 21 }, { "1", -7 }, { "sqrt5", -3 }, { "w*log2", -14 }, { "w*log(pi)", -14 } } },
+		{ "exp", { "5^(2/9)", []() { return mpfr::pow(mpreal(5), mpreal(2) / 9); } }, 0, "gamma",
+			"alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2",
+			[]() { return mpreal(3); }, []() { return mpfr::exp(mpreal(1)); }, 1, 2,
+			{ { "logz", 2 }, { "log2", -2 }, { "log3", 4 }, { "log(log5)", -2 }, { "w*log3", 1 }, { "w*1", 1 } } },
+		{ "identity", { "29^(1/3)/2", []() { return mpfr::cbrt(mpreal(29)) / 2; } }, 0, "pi",
+			"alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3",
+			[]() { return (1 + mpfr::sqrt(mpreal(5))) / 2; }, []() { return mpfr::exp(mpreal(1)); }, 2, 3,
+			{ { "logz", 3 }, { "log29", -1 }, { "log2", 3 }, { "w*log(phi)", 2 }, { "w*1", 2 } }, 29 },
+		{ "identity", { "3^(1/4)*13^(-1/2)", []() { return mpfr::pow(mpreal(3), mpreal(1) / 4) * mpfr::pow(mpreal(13), -mpreal(1) / 2); } }, 0, "e",
+			"alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2",
+			[]() { return mpreal(23); }, []() { return mpfr::const_euler(); }, -1, 2,
+			{ { "logz", 4 }, { "log3", -1 }, { "log13", 2 }, { "w*log23", -2 }, { "w*log(gamma)", -2 } }, 23 },
+	};
+
+	std::vector<Job> checks, prod;
+	for (size_t ci = 0; ci < specs.size(); ++ci)
+	{
+		const int fi = findF(specs[ci].f);
+		if ((fns[fi].form == GEN) == absorbedMode || specs[ci].needPrime > maxPrime) continue;
+		for (int wc = 0; wc < 2; ++wc)
+		{
+			if (wc && fns[fi].form == LOG) continue; // plain 1 is already in the basis
+			Job j; j.fi = fi; j.br = specs[ci].br; j.wi = findW(specs[ci].w); j.wc = wc; j.ci = (int)ci;
+			checks.push_back(j);
+		}
+	}
+	std::vector<long> jobsPerF(fns.size(), 0);
+	for (size_t fi = 0; fi < fns.size(); ++fi)
+	{
+		if ((fns[fi].form == GEN) == absorbedMode) continue;
+		std::vector<std::pair<int, int>> abList; // (alpha index, branch)
+		if (fns[fi].form == GEN)
+		{
+			for (size_t ai = 0; ai < alphas.size(); ++ai)
+				for (int b : probeBranches(fns[fi], alphas[ai].val()))
+					abList.push_back({ (int)ai, b });
+		}
+		else abList.push_back({ -1, 0 });
+		for (const auto& ab : abList)
+			for (size_t wi = 0; wi < ws.size(); ++wi)
+				for (int wc = 0; wc < 2; ++wc)
+				{
+					if (wc == 0 && variant == 1) continue;
+					if (wc == 1 && variant == 0) continue;
+					if (wc == 1 && (ws[wi].name == "1" || fns[fi].form == LOG)) continue;
+					Job j; j.fi = (int)fi; j.ai = ab.first; j.br = ab.second; j.wi = (int)wi; j.wc = wc;
+					prod.push_back(j);
+					++jobsPerF[fi];
+				}
+	}
+	const size_t totalProd = prod.size();
+	std::cout << "NOTE: y = f(zeta3 (a x)^(b w)) algebraic. log zeta3 = log u - b w (log a + log x), u = g(alpha) > 0. digits = " << digits
+		<< ", variant = " << variant << ", threads = " << nThreads << ", rational grid p<=" << pMax << " q<=" << qMax << ", quad/cuberoot grid = " << useQuad
+		<< ", alphas = " << alphas.size() << std::endl;
+	std::cout << "TOTAL production jobs = " << totalProd << " + " << checks.size() << " validation jobs" << std::endl;
+	for (size_t i = 0; i < fns.size(); ++i) std::cout << "  jobs for f=" << fns[i].name << ": " << jobsPerF[i] << std::endl;
+	mpreal::set_default_prec(savedPrec);
+	if (countOnly) return;
+	if (sampleJobs > 0 && (size_t)sampleJobs < prod.size())
+	{
+		std::vector<Job> sub;
+		for (size_t i = 0; i < (size_t)sampleJobs; ++i) sub.push_back(prod[i * prod.size() / sampleJobs]);
+		prod.swap(sub);
+	}
+
+	struct Built { std::string name; std::vector<std::string> labels; std::function<std::vector<mpreal>(int)> compute; };
+	auto build = [&](const Job& j)
+	{
+		Built b;
+		const TFn& fn = fns[j.fi];
+		const int form = fn.form;
+		const WSpec& w = ws[j.wi];
+		const bool isChk = j.ci >= 0;
+		const Alpha* al = isChk ? &specs[j.ci].al : (j.ai >= 0 ? &alphas[j.ai] : nullptr);
+		const ColSpec cs = colSpec(form, w.name, j.wc != 0);
+		b.labels.push_back(form == GEN ? "L" : "logz");
+		for (const auto& c : cs) b.labels.push_back((c.second ? "w*" : "") + c.first);
+		b.name = std::string(isChk ? "[CHECK] " : "") + "f=" + fn.name + (al ? " alpha=" + al->name + " branch=" + fn.bl[j.br] : std::string(" (alpha absorbed)"))
+			+ " w=" + w.name + (j.wc ? " [const]" : "") + " n=" + std::to_string(b.labels.size()) + (isChk ? " " + specs[j.ci].desc : std::string());
+		const InvFn inv = fn.inv;
+		const auto av = al ? al->val : std::function<mpreal()>();
+		const auto wv = w.val;
+		const int br = j.br;
+		std::function<mpreal()> zfn = []() { return mpfr::zeta(mpreal(3)); };
+		if (isChk)
+		{
+			const ChkSpec& sp = specs[j.ci];
+			const auto a0 = sp.a0, x0 = sp.x0;
+			const long bp = sp.bp, bq = sp.bq;
+			zfn = [=]() { return inv(av())[br] / mpfr::pow(a0() * x0(), mpreal(bp) / bq * wv()); };
+		}
+		const std::map<std::string, std::function<mpreal()>>* basep = &base;
+		b.compute = [=](int)
+		{
+			mpreal first = mpfr::log(zfn());
+			if (form == GEN) first = mpfr::log(inv(av())[br]) - first;
+			std::vector<mpreal> v = { first };
+			const mpreal wvv = wv();
+			for (const auto& c : cs)
+			{
+				const mpreal x = basep->at(c.first)();
+				v.push_back(c.second ? wvv * x : x);
+			}
+			return v;
+		};
+		return b;
+	};
+
+	// ---- run: validation first, then production ----
+	std::vector<Job*> all;
+	for (auto& j : checks) all.push_back(&j);
+	for (auto& j : prod) all.push_back(&j);
+	std::mutex mtx;
+	std::atomic<size_t> next(0);
+	auto worker = [&]()
+	{
+		for (;;)
+		{
+			const size_t i = next++;
+			if (i >= all.size()) return;
+			Job& j = *all[i];
+			const Built bt = build(j);
+			j.name = bt.name;
+			const auto t0 = std::chrono::steady_clock::now();
+			std::ostringstream os;
+			os.precision(30);
+			j.oc = reportLinearRelationSearch(os, bt.name, bt.compute, bt.labels, digits);
+			j.secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+			bool l0 = true;
+			if (j.oc.found)
+			{
+				l0 = j.oc.coeffs[0].find_first_not_of("-0") == std::string::npos;
+				j.kind = !j.oc.verified ? "unverified" : (l0 ? "degenerate" : "real");
+			}
+			else j.kind = "none";
+			std::string chkMsg;
+			if (j.ci >= 0)
+			{
+				bool ok = j.oc.found && j.oc.verified && !l0 && j.oc.coeffs.size() == bt.labels.size();
+				if (ok)
+				{
+					std::map<std::string, long> ex(specs[j.ci].exp.begin(), specs[j.ci].exp.end());
+					const long s = std::atol(j.oc.coeffs[0].c_str()) > 0 ? 1 : -1;
+					for (size_t k = 0; k < bt.labels.size(); ++k)
+					{
+						const auto it = ex.find(bt.labels[k]);
+						if (std::atol(j.oc.coeffs[k].c_str()) != s * (it == ex.end() ? 0 : it->second)) ok = false;
+					}
+				}
+				j.checkPass = ok;
+				chkMsg = std::string("  check: ") + (ok ? "DETECTED, VERIFIED, coefficients match expected" : "FAILED (not detected or coefficients differ)");
+			}
+			std::lock_guard<std::mutex> lk(mtx);
+			if (j.ci >= 0 || j.oc.found) std::cout << os.str();
+			std::cout << "JOB " << (i + 1) << "/" << all.size() << " " << bt.name << " | " << j.kind << " | normBound " << j.oc.normBound
+				<< " | " << j.secs << " s" << std::endl;
+			if (!chkMsg.empty()) std::cout << chkMsg << std::endl;
+		}
+	};
+	std::vector<std::thread> th;
+	for (int t = 0; t < nThreads; ++t) th.emplace_back(worker);
+	for (auto& t : th) t.join();
+
+	// ---- summary ----
+	std::cout << "\n===== SUMMARY (" << digits << " digits, variant " << variant << ") =====" << std::endl;
+	int nReal = 0, nDeg = 0, nUnv = 0;
+	double minAll = 1e300;
+	std::vector<double> minF(fns.size(), 1e300), secF(fns.size(), 0);
+	std::vector<int> cntF(fns.size(), 0), realF(fns.size(), 0), degF(fns.size(), 0);
+	for (const auto& j : prod)
+	{
+		++cntF[j.fi]; secF[j.fi] += j.secs;
+		if (j.kind == "real") { ++nReal; ++realF[j.fi]; std::cout << "REAL RELATION: " << j.name << std::endl; }
+		else if (j.kind == "degenerate") { ++nDeg; ++degF[j.fi]; std::cout << "DEGENERATE (coefficient of first column is 0): " << j.name << std::endl; }
+		else if (j.kind == "unverified") { ++nUnv; std::cout << "UNVERIFIED: " << j.name << std::endl; }
+		else
+		{
+			const double nb = std::strtod(j.oc.normBound.c_str(), nullptr);
+			minAll = std::min(minAll, nb); minF[j.fi] = std::min(minF[j.fi], nb);
+		}
+	}
+	std::cout << "jobs run = " << prod.size() << ", real relations = " << nReal << ", degenerate = " << nDeg << ", unverified = " << nUnv << std::endl;
+	std::cout << "min normBound (jobs without relation) overall = " << minAll << std::endl;
+	for (size_t i = 0; i < fns.size(); ++i)
+		std::cout << "  f=" << fns[i].name << ": jobs " << cntF[i] << ", real " << realF[i] << ", degenerate " << degF[i]
+		<< ", min normBound " << minF[i] << ", mean time " << (cntF[i] ? secF[i] / cntF[i] : 0.0) << " s" << std::endl;
+	std::cout << "--- validation ---" << std::endl;
+	int chkFail = 0;
+	for (const auto& j : checks)
+	{
+		if (!j.checkPass) ++chkFail;
+		std::cout << (j.checkPass ? "PASS " : "FAIL ") << j.name << std::endl;
+	}
+	std::cout << "validation: " << (chkFail == 0 ? "all PASS" : "some FAIL") << std::endl;
+	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
+}
+
+void test_pslq_zeta3_transcendental_exponent_absorbed(int digits, int maxPrime, int maxPrimeLogLog)
+{
+	zeta3TranscendentalExponentImpl(digits, 2, true, maxPrime, maxPrimeLogLog);
+}
+
+void test_pslq_zeta3_transcendental_exponent_grid(int digits, int maxPrime, int variant)
+{
+	zeta3TranscendentalExponentImpl(digits, variant, false, maxPrime, 3);
 }

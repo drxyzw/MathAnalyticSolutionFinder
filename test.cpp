@@ -1903,7 +1903,16 @@ void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<in
 		if (a > big || a < small) return 2;
 		return 0;
 	};
-	auto tOf = [](int k) { return mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)); };
+	// zeta(3) and pi are cached per precision (thread-local): recomputing mpfr::zeta for each of ~35k targets
+	// made the serial target-evaluation phase take hours.
+	auto tOf = [](int k)
+	{
+		thread_local mp_prec_t cachedPrec = 0;
+		thread_local mpreal z3, piV;
+		const mp_prec_t p = mpreal::get_default_prec();
+		if (cachedPrec != p) { z3 = mpfr::zeta(mpreal(3)); piV = mpfr::const_pi(); cachedPrec = p; }
+		return z3 * mpfr::pow(piV, mpreal(k));
+	};
 
 	// number of rule-valid continuations (outward) of length n after function `last`
 	std::vector<std::vector<double>> comp(maxLevel + 1, std::vector<double>(NF, 1.0));

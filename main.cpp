@@ -45,7 +45,9 @@ int main()
 
 	//test_pslq_zeta3_elementary_functions(1000, 12);
 
-	test_pslq_zeta3_elementary_functions_relations(2000);
+	//test_pslq_zeta3_elementary_functions_relations(2000);
+
+	test_pslq_zeta3_composite_functions(1000, 8, true, true);
 
 	//test_mpreal();
 

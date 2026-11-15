@@ -20,3 +20,4 @@ void test_pslq_zeta3_additive_elementary(int digits, bool includeLog5); // zeta(
 void test_pslq_zeta_central_binomial(int digits, int targetZeta); // zeta(3) or zeta(5) vs sum s^n/(n^w C(2n,n)^k) and weight-w constants
 void test_pslq_zeta3_elementary_functions_relations(int digits); // multiplicative/additive relations of f(zeta3*pi^k)
 void test_pslq_zeta3_elementary_functions(int digits, int maxDegree); // f(zeta(3))*pi^k algebraic? f in exp, log, trig, hyperbolic, ...
+void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgebraic, bool doRelations); // y = f(g(zeta3*pi^k)): algebraic? and multiplicative/additive relations

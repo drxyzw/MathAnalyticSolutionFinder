@@ -1320,3 +1320,266 @@ void test_pslq_zeta3_elementary_functions_relations(int digits)
 	}
 	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
 }
+
+// Compositions y = f(g(zeta3 * pi^k)), k in {-3..0}, f,g in 12 elementary functions (inverse pairs and f = g excluded).
+// (1) doAlgebraic: y algebraic of degree <= maxDegree?  (2) doRelations: multiplicative (A) / additive (B) PSLQ vectors, as in
+// test_pslq_zeta3_elementary_functions_relations.
+// Env ZCOMP_STRIDE=N (smoke test only): keep every N-th main target.
+void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgebraic, bool doRelations)
+{
+	std::cout.precision(30);
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		std::function<mpreal(const mpreal&)> inv;
+		bool small;
+	};
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, [](const mpreal& v) { return mpfr::log(v); }, false },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, [](const mpreal& v) { return mpfr::exp(v); }, false },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, [](const mpreal& v) { return mpfr::asin(v); }, true },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, [](const mpreal& v) { return mpfr::acos(v); }, true },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, [](const mpreal& v) { return mpfr::atan(v); }, true },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, [](const mpreal& v) { return mpfr::asinh(v); }, false },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, [](const mpreal& v) { return mpfr::acosh(v); }, false },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, [](const mpreal& v) { return mpfr::atanh(v); }, true },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, [](const mpreal& v) { return mpfr::tan(v); }, true },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, [](const mpreal& v) { return mpfr::sinh(v); }, false },
+		{ "arcsin", [](const mpreal& t) { return mpfr::asin(t); }, [](const mpreal& v) { return mpfr::sin(v); }, true },
+		{ "arccos", [](const mpreal& t) { return mpfr::acos(t); }, [](const mpreal& v) { return mpfr::cos(v); }, true },
+	};
+	auto isInversePair = [](const std::string& a, const std::string& b)
+	{
+		static const std::vector<std::pair<std::string, std::string>> inv = { { "exp", "log" }, { "sin", "arcsin" }, { "tan", "arctan" }, { "sinh", "arcsinh" }, { "cos", "arccos" } };
+		for (auto& p : inv) if ((p.first == a && p.second == b) || (p.first == b && p.second == a)) return true;
+		return false;
+	};
+	const std::vector<int> ks = { -3, -2, -1, 0 };
+	auto tOf = [](int k) { return mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)); };
+	struct Tgt { std::string name; std::function<mpreal(int)> y; };
+	std::vector<Tgt> main;
+	int nDomain = 0, nRange = 0;
+	for (const auto& f : fns)
+		for (const auto& g : fns)
+		{
+			if (f.name == g.name || isInversePair(f.name, g.name)) continue;
+			for (int k : ks)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(50));
+				const mpreal y50 = f.f(g.f(tOf(k)));
+				if (mpfr::isnan(y50) || mpfr::isinf(y50)) { ++nDomain; continue; }
+				const mpreal ay = mpfr::abs(y50);
+				if (ay < mpreal("1e-30") || ay > mpreal("1e30")) { ++nRange; continue; }
+				main.push_back({ f.name + "(" + g.name + "(zeta3*pi^" + std::to_string(k) + "))", [f, g, k, tOf](int d)
+					{
+						mpreal::set_default_prec(mpfr::digits2bits(d));
+						return f.f(g.f(tOf(k)));
+					} });
+			}
+		}
+	if (const char* s = std::getenv("ZCOMP_STRIDE"))
+	{
+		const size_t st = std::max(1, std::atoi(s));
+		std::vector<Tgt> kept;
+		for (size_t i = 0; i < main.size(); i += st) kept.push_back(main[i]);
+		main = kept;
+		std::cout << "SMOKE: ZCOMP_STRIDE=" << st << std::endl;
+	}
+	std::cout << "NOTE: targets y = f(g(zeta3*pi^k)), k in {-3..0}; dropped " << nDomain << " (domain error), " << nRange << " (|y|<1e-30 or >1e30). "
+		"FINAL TARGET COUNT = " << main.size() << std::endl;
+
+	const auto t0 = std::chrono::steady_clock::now();
+	if (doAlgebraic)
+	{
+		std::vector<PolySearchTarget> targets;
+		for (auto& m : main) targets.push_back({ m.name, m.y });
+		const size_t nMain = targets.size();
+		auto addChk = [&](const std::string& nm, std::function<mpreal()> v)
+		{
+			targets.push_back({ "[CHECK] " + nm, [v](int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); return v(); } });
+		};
+		addChk("cos(arcsin(1/3)) = sqrt8/3 (deg 2)", []() { return mpfr::cos(mpfr::asin(mpreal(1) / 3)); });
+		addChk("sin(arctan(2)) = 2/sqrt5 (deg 2)", []() { return mpfr::sin(mpfr::atan(mpreal(2))); });
+		addChk("cosh(arcsinh(sqrt3)) = 2 (deg 1)", []() { return mpfr::cosh(mpfr::asinh(mpfr::sqrt(mpreal(3)))); });
+		addChk("cos(arctan(3^(1/4))) = 1/sqrt(1+sqrt3) (deg 4)", []() { return mpfr::cos(mpfr::atan(mpfr::root(mpreal(3), 4))); });
+		addChk("tanh(log 5) = 12/13 (deg 1)", []() { return mpfr::tanh(mpfr::log(mpreal(5))); });
+		addChk("sin(arccos(2^(1/3)/2)) (deg 6)", []() { return mpfr::sin(mpfr::acos(mpfr::cbrt(mpreal(2)) / 2)); });
+		const std::vector<int> expectDeg = { 2, 2, 1, 4, 1, 6 };
+
+		const auto sm = reportPolynomialSearchParallel(targets, digits, maxDegree);
+
+		std::cout << "\n===== ALGEBRAIC SUMMARY (" << digits << " digits, degree <= " << maxDegree << ", " << nMain << " targets) =====" << std::endl;
+		int nFound = 0;
+		for (size_t t = 0; t < nMain; ++t)
+		{
+			int firstDeg = 0;
+			for (int d = 1; d <= maxDegree && !firstDeg; ++d)
+				if (sm.results[t][d].status == PslqResult::Status::Found) firstDeg = d;
+			if (firstDeg) { ++nFound; std::cout << targets[t].name << " | " << (sm.verified[t] > 0 ? "FOUND (verified)" : "SPURIOUS only") << ", first at degree " << firstDeg << std::endl; }
+		}
+		std::cout << "main targets with a relation: " << nFound << std::endl;
+		std::cout << "min normBound per degree over all main targets without relation:" << std::endl;
+		for (int d = 1; d <= maxDegree; ++d)
+		{
+			bool have = false; mpreal mn; std::string who;
+			for (size_t t = 0; t < nMain; ++t)
+			{
+				bool anyFound = false;
+				for (int e = 1; e <= maxDegree; ++e) if (sm.results[t][e].status == PslqResult::Status::Found) anyFound = true;
+				if (anyFound) continue;
+				const mpreal nb = sm.results[t][d].normBound;
+				if (!have || nb < mn) { mn = nb; who = targets[t].name; have = true; }
+			}
+			if (have) std::cout << "  degree " << d << ": " << mn.toString("%.3Re") << "  (" << who << ")" << std::endl;
+		}
+		int nFail = 0;
+		for (size_t c = 0; c < expectDeg.size(); ++c)
+		{
+			const size_t t = nMain + c;
+			int firstDeg = 0;
+			for (int d = 1; d <= maxDegree && !firstDeg; ++d)
+				if (sm.results[t][d].status == PslqResult::Status::Found) firstDeg = d;
+			if (expectDeg[c] > maxDegree) { std::cout << "SKIP (needs maxDegree >= " << expectDeg[c] << ") " << targets[t].name << std::endl; continue; }
+			const bool ok = firstDeg == expectDeg[c] && sm.verified[t] > 0;
+			if (!ok) ++nFail;
+			std::cout << (ok ? "PASS " : "FAIL ") << targets[t].name << " : first degree " << firstDeg << ", verified " << sm.verified[t] << std::endl;
+		}
+		std::cout << "algebraic validation: " << (nFail == 0 ? "all PASS" : "some FAIL") << std::endl;
+		std::cout << "elapsed (algebraic) " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
+	}
+
+	if (doRelations)
+	{
+		const auto t1 = std::chrono::steady_clock::now();
+		const std::vector<std::string> labelsA = { "log|y|", "1", "log(pi)", "log2", "log3", "log5", "log7", "log11", "log13", "log(gamma)",
+			"log(1+sqrt2)", "log(phi)", "log(2+sqrt3)" };
+		const std::vector<std::string> labelsB = { "y", "1", "pi", "pi^2", "pi^3", "log2", "log3", "e", "gamma", "G", "sqrt2", "sqrt3", "sqrt5", "zeta3" };
+		auto vecA = [](const mpreal& y)
+		{
+			return std::vector<mpreal>{ mpfr::log(mpfr::abs(y)), mpreal(1), mpfr::log(mpfr::const_pi()), mpfr::log(mpreal(2)), mpfr::log(mpreal(3)),
+				mpfr::log(mpreal(5)), mpfr::log(mpreal(7)), mpfr::log(mpreal(11)), mpfr::log(mpreal(13)), mpfr::log(mpfr::const_euler()),
+				mpfr::log(1 + mpfr::sqrt(mpreal(2))), mpfr::log((1 + mpfr::sqrt(mpreal(5))) / 2), mpfr::log(2 + mpfr::sqrt(mpreal(3))) };
+		};
+		auto vecB = [](const mpreal& y)
+		{
+			const mpreal pi = mpfr::const_pi();
+			return std::vector<mpreal>{ y, mpreal(1), pi, pi * pi, pi * pi * pi, mpfr::log(mpreal(2)), mpfr::log(mpreal(3)), mpfr::exp(mpreal(1)),
+				mpfr::const_euler(), mpfr::const_catalan(), mpfr::sqrt(mpreal(2)), mpfr::sqrt(mpreal(3)), mpfr::sqrt(mpreal(5)), mpfr::zeta(mpreal(3)) };
+		};
+		auto valA = [](bool small) { return mpfr::cbrt(mpreal(2)) * mpfr::sqrt(mpfr::const_pi()) * mpfr::exp(mpreal(1) / 5) / (small ? 4 : 1); };
+		auto valB = [](bool small) { return (2 * mpfr::const_pi() - 3 - mpfr::log(mpreal(2)) / 5 - mpfr::sqrt(mpreal(3)) / 7) / (small ? 4 : 1); };
+
+		struct Job
+		{
+			std::string name;
+			bool isCheck, isA;
+			std::function<std::vector<mpreal>(int)> compute;
+			const std::vector<std::string>* labels;
+			std::string text;
+			LinearSearchOutcome oc;
+		};
+		std::vector<Job> jobs;
+		for (auto& m : main)
+		{
+			auto yOf = m.y;
+			jobs.push_back({ "(A) " + m.name, false, true, [yOf, vecA](int d) { return vecA(yOf(d)); }, &labelsA });
+			jobs.push_back({ "(B) " + m.name, false, false, [yOf, vecB](int d) { return vecB(yOf(d)); }, &labelsB });
+		}
+		// single-function checks (same as the single-function test)
+		for (const auto& fn : fns)
+		{
+			const bool sm = fn.small;
+			auto chk = [fn, sm](int d, const std::function<mpreal(bool)>& val)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				return fn.f(fn.inv(val(sm)));
+			};
+			jobs.push_back({ "(A) [CHECK] " + fn.name + "(x0), f(x0) = 2^(1/3)pi^(1/2)e^(1/5)" + (sm ? "/4" : ""), true, true,
+				[chk, vecA, valA](int d) { return vecA(chk(d, valA)); }, &labelsA });
+			jobs.push_back({ "(B) [CHECK] " + fn.name + "(x0), f(x0) = 2pi-3-log2/5-sqrt3/7" + (sm ? " over 4" : ""), true, false,
+				[chk, vecB, valB](int d) { return vecB(chk(d, valB)); }, &labelsB });
+		}
+		// composite checks: y = f(g(x0)) with x0 = g^-1(f^-1(v))
+		for (const auto& f : fns)
+			for (const auto& g : fns)
+			{
+				const bool pickA = (f.name == "cosh" && g.name == "arcsinh") || (f.name == "sin" && g.name == "arctan") || (f.name == "exp" && g.name == "arcsinh");
+				if (!pickA) continue;
+				const bool sm = f.small;
+				auto chk = [f, g, sm](int d, const std::function<mpreal(bool)>& val)
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(d));
+					return f.f(g.f(g.inv(f.inv(val(sm)))));
+				};
+				jobs.push_back({ "(A) [CHECK] composite " + f.name + "(" + g.name + "(x0))", true, true, [chk, vecA, valA](int d) { return vecA(chk(d, valA)); }, &labelsA });
+				jobs.push_back({ "(B) [CHECK] composite " + f.name + "(" + g.name + "(x0))", true, false, [chk, vecB, valB](int d) { return vecB(chk(d, valB)); }, &labelsB });
+			}
+		// fixed known composites (B): sinh(log 2) = 3/4 ; log(sinh(log 2)) = log3 - 2 log2 ; log(cosh(log 3)) = log5 - log3 (A: y = log(5/3) not in basis; tested as B-like via explicit relation below)
+		jobs.push_back({ "(B) [CHECK] sinh(log 2) = 3/4", true, false, [vecB](int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); return vecB(mpfr::sinh(mpfr::log(mpreal(2)))); }, &labelsB });
+		jobs.push_back({ "(B) [CHECK] log(sinh(log 2)) = log3 - 2log2", true, false, [vecB](int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); return vecB(mpfr::log(mpfr::sinh(mpfr::log(mpreal(2))))); }, &labelsB });
+		jobs.push_back({ "(B') [CHECK] log(cosh(log 3)) = log5 - log3 (vector y, 1, log3, log5)", true, false, [](int d) {
+			mpreal::set_default_prec(mpfr::digits2bits(d));
+			return std::vector<mpreal>{ mpfr::log(mpfr::cosh(mpfr::log(mpreal(3)))), mpreal(1), mpfr::log(mpreal(3)), mpfr::log(mpreal(5)), mpfr::const_pi() }; },
+			&labelsB });
+		jobs.back().labels = nullptr;
+		static const std::vector<std::string> labelsBp = { "y", "1", "log3", "log5", "pi" };
+		jobs.back().labels = &labelsBp;
+
+		std::cout << "RELATIONS: " << jobs.size() << " jobs (" << main.size() << " main targets x 2 + checks); (A) n=13 multiplicative, (B) n=14 additive." << std::endl;
+		std::mutex mtx;
+		std::atomic<size_t> next(0);
+		auto worker = [&]()
+		{
+			for (;;)
+			{
+				const size_t i = next++;
+				if (i >= jobs.size()) return;
+				std::ostringstream os;
+				os.precision(30);
+				Job& j = jobs[i];
+				const auto tj = std::chrono::steady_clock::now();
+				j.oc = reportLinearRelationSearch(os, j.name, j.compute, *j.labels, digits);
+				os << "elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tj).count() << " s" << std::endl;
+				j.text = os.str();
+				std::lock_guard<std::mutex> lk(mtx);
+				std::cout << j.text << std::endl;
+			}
+		};
+		std::vector<std::thread> th;
+		for (int t = 0; t < 10; ++t) th.emplace_back(worker);
+		for (auto& t : th) t.join();
+
+		std::cout << "\n===== RELATIONS SUMMARY (" << digits << " digits) =====" << std::endl;
+		int nFail = 0, nFound = 0;
+		for (const auto& j : jobs)
+			if (j.isCheck)
+			{
+				const bool ok = j.oc.found && j.oc.verified;
+				if (!ok) ++nFail;
+				std::cout << (ok ? "PASS " : "FAIL ") << j.name << std::endl;
+			}
+		std::cout << "relations validation: " << (nFail == 0 ? "all PASS" : "some FAIL") << std::endl;
+		for (const auto& j : jobs)
+			if (!j.isCheck && j.oc.found)
+			{
+				++nFound;
+				std::cout << j.name << " | " << (j.oc.verified ? "FOUND (verified)" : "found but NOT verified") << std::endl;
+			}
+		std::cout << "main jobs with a relation: " << nFound << std::endl;
+		// min normBound over A and B separately (normBound is a string)
+		for (int isA = 1; isA >= 0; --isA)
+		{
+			bool have = false; mpreal mn; std::string who;
+			for (const auto& j : jobs)
+				if (!j.isCheck && !j.oc.found && (j.isA == (bool)isA) && !j.oc.normBound.empty())
+				{
+					mpreal nb(j.oc.normBound);
+					if (!have || nb < mn) { mn = nb; who = j.name; have = true; }
+				}
+			if (have) std::cout << "min normBound " << (isA ? "(A)" : "(B)") << ": " << mn.toString("%.3Re") << "  (" << who << ")" << std::endl;
+		}
+		std::cout << "elapsed (relations) " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t1).count() << " s" << std::endl;
+	}
+	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
+}

@@ -428,9 +428,12 @@ namespace
 			std::vector<int> verified;
 		};
 
-		PolySearchSummary reportPolynomialSearchParallel(const std::vector<PolySearchTarget>& targets, int pslqDigits, int maxDegree)
+		PolySearchSummary reportPolynomialSearchParallel(const std::vector<PolySearchTarget>& targets, int pslqDigits, int maxDegree,
+			bool onlyMaxDegree = false, unsigned maxThreads = 0)
 	{
 		mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
+		// onlyMaxDegree: run only degree == maxDegree (the vector (1,x,..,x^d) contains every lower-degree polynomial).
+		const int minDeg = onlyMaxDegree ? maxDegree : 1;
 		const size_t nt = targets.size();
 		std::vector<mpreal> xs(nt);
 		for (size_t t = 0; t < nt; ++t)
@@ -438,14 +441,14 @@ namespace
 
 		// jobs: (target, degree), biggest degree first for load balancing
 		std::vector<std::pair<size_t, int>> jobs;
-		for (int d = maxDegree; d >= 1; --d)
+		for (int d = maxDegree; d >= minDeg; --d)
 			for (size_t t = 0; t < nt; ++t)
 				jobs.push_back({ t, d });
 		std::vector<std::vector<PslqResult>> results(nt, std::vector<PslqResult>(maxDegree + 1));
 		std::vector<std::vector<double>> seconds(nt, std::vector<double>(maxDegree + 1));
 
 		std::atomic<size_t> next{ 0 }, done{ 0 };
-		const unsigned nThreads = std::max(1u, std::thread::hardware_concurrency());
+		const unsigned nThreads = maxThreads ? maxThreads : std::max(1u, std::thread::hardware_concurrency());
 		const auto t0 = std::chrono::steady_clock::now();
 		std::vector<std::thread> threads;
 		for (unsigned th = 0; th < nThreads; ++th)
@@ -476,7 +479,7 @@ namespace
 		{
 			std::cout << "=== " << targets[t].name << " (" << pslqDigits << " digits) ===" << std::endl;
 			int verified = 0;
-			for (int d = 1; d <= maxDegree; ++d)
+			for (int d = minDeg; d <= maxDegree; ++d)
 			{
 				const PslqResult& r = results[t][d];
 				std::cout << "degree " << d << ": " << toString(r.status) << ", iter " << r.iterations << ", "
@@ -494,7 +497,10 @@ namespace
 				const bool genuine = mpfr::abs(v) < mpfr::pow(mpreal(10), -1.5 * pslqDigits);
 				mpreal::set_default_prec(mpfr::digits2bits(pslqDigits));
 				verified += genuine;
-				std::cout << (genuine ? "  VERIFIED" : "  SPURIOUS") << "\n    " << polynomialToString(r.relation)
+				int trueDeg = 0;
+				for (size_t i = 0; i < r.relation.size(); ++i)
+					if (r.relation[i] != 0) trueDeg = static_cast<int>(i);
+				std::cout << (genuine ? "  VERIFIED" : "  SPURIOUS") << " (true degree " << trueDeg << ")\n    " << polynomialToString(r.relation)
 					<< "   (residual at " << 2 * pslqDigits << " digits: " << mpfr::abs(v).toString("%.3Re") << ")" << std::endl;
 			}
 			std::cout << verified << " verified relation(s) for " << targets[t].name << std::endl;
@@ -1582,4 +1588,252 @@ void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgeb
 		std::cout << "elapsed (relations) " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t1).count() << " s" << std::endl;
 	}
 	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() << " s" << std::endl;
+}
+
+
+namespace
+{
+	// Shared by the *_highdeg wrappers. Prints per-target status, summary, min normBound, and validation results.
+	struct HdCheck
+	{
+		size_t index;      // index into targets
+		int minTrueDeg;    // required true degree of the found relation (>= ; 0 = any)
+	};
+
+	void reportHighDegSummary(const std::vector<PolySearchTarget>& targets, size_t nMain, const PolySearchSummary& sm,
+		const std::vector<int>& checkMinDeg, int digits, int degree)
+	{
+		auto trueDegOf = [](const PslqResult& r)
+		{
+			int td = 0;
+			for (size_t i = 0; i < r.relation.size(); ++i) if (r.relation[i] != 0) td = static_cast<int>(i);
+			return td;
+		};
+		std::cout << "\n===== HIGHDEG SUMMARY (" << digits << " digits, only degree " << degree << " [covers all degrees <= " << degree << "], "
+			<< nMain << " main targets) =====" << std::endl;
+		int nFound = 0;
+		bool have = false; mpreal mn; std::string who;
+		for (size_t t = 0; t < nMain; ++t)
+		{
+			const PslqResult& r = sm.results[t][degree];
+			const bool found = r.status == PslqResult::Status::Found;
+			std::cout << targets[t].name << " | " << toString(r.status) << " | ";
+			if (found)
+			{
+				++nFound;
+				std::cout << (sm.verified[t] > 0 ? "FOUND (verified)" : "SPURIOUS") << ", true degree " << trueDegOf(r) << std::endl;
+			}
+			else
+			{
+				std::cout << "normBound " << r.normBound.toString("%.3Re") << std::endl;
+				if (!have || r.normBound < mn) { mn = r.normBound; who = targets[t].name; have = true; }
+			}
+		}
+		std::cout << "main targets with a relation: " << nFound << " / " << nMain << std::endl;
+		if (have) std::cout << "MIN normBound over targets without relation: " << mn.toString("%.3Re") << "  (" << who << ")" << std::endl;
+		int nFail = 0;
+		for (size_t c = 0; c < checkMinDeg.size(); ++c)
+		{
+			const size_t t = nMain + c;
+			const PslqResult& r = sm.results[t][degree];
+			const bool found = r.status == PslqResult::Status::Found;
+			const int td = found ? trueDegOf(r) : -1;
+			const bool ok = found && sm.verified[t] > 0 && td >= checkMinDeg[c];
+			if (!ok) ++nFail;
+			std::cout << (ok ? "PASS " : "FAIL ") << targets[t].name << " : status " << toString(r.status) << ", true degree " << td
+				<< " (required >= " << checkMinDeg[c] << "), verified " << sm.verified[t] << std::endl;
+		}
+		std::cout << "validation: " << (nFail == 0 ? "all PASS" : "some FAIL") << " (" << checkMinDeg.size() << " cases)" << std::endl;
+	}
+
+	void applyStrideEnv(std::vector<PolySearchTarget>& main)
+	{
+		if (const char* s = std::getenv("ZHD_STRIDE"))
+		{
+			const size_t st = std::max(1, std::atoi(s));
+			std::vector<PolySearchTarget> kept;
+			for (size_t i = 0; i < main.size(); i += st) kept.push_back(main[i]);
+			main = kept;
+			std::cout << "SMOKE: ZHD_STRIDE=" << st << std::endl;
+		}
+	}
+}
+
+// Single functions f(t), t = zeta3 * pi^k (k in ks; NOTE: opposite sign convention to test_pslq_zeta3_elementary_functions),
+// algebraic of degree <= `degree`?  Only degree == `degree` is run (the vector (1,..,x^d) contains all lower degrees).
+void test_pslq_zeta3_elementary_functions_highdeg(int digits, int degree, std::vector<int> ks)
+{
+	std::cout.precision(60);
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		std::function<mpreal(int)> checkC; // known x0 with f(x0) algebraic
+		int checkK;
+		std::string checkNote;
+	};
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "exp(x0)=1+2^(1/3): deg 3" },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, [](int) { return mpfr::exp(mpfr::sqrt(mpreal(2))); }, 0, "x0=exp(sqrt2): log=sqrt2" },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, [](int) { return mpfr::const_pi() / 5; }, 0, "c=pi/5: deg 4" },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, [](int) { return mpfr::const_pi() / 7; }, 0, "c=pi/7: deg 3" },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, [](int) { return mpfr::const_pi() / 5; }, 0, "c=pi/5: deg 4" },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, [](int) { return mpfr::log(1 + mpfr::cbrt(mpreal(2))); }, 0, "c=log(1+2^(1/3)): deg 3" },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, [](int) { return mpfr::tan(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=tan(sqrt2/3): sqrt2/3" },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, [](int) { return mpfr::sinh(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=sinh(sqrt2/3): sqrt2/3" },
+		{ "arccosh", [](const mpreal& t) { return mpfr::acosh(t); }, [](int) { return mpfr::cosh(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=cosh(sqrt2/3): sqrt2/3" },
+		{ "arcsin(1/t)", [](const mpreal& t) { return mpfr::asin(1 / t); }, [](int) { return 1 / mpfr::sin(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=1/sin(sqrt2/3): sqrt2/3" },
+		{ "arccos(1/t)", [](const mpreal& t) { return mpfr::acos(1 / t); }, [](int) { return 1 / mpfr::cos(mpfr::sqrt(mpreal(2)) / 3); }, 0, "x0=1/cos(sqrt2/3): sqrt2/3" },
+		{ "log(t-1)", [](const mpreal& t) { return mpfr::log(t - 1); }, [](int) { return 1 + mpfr::exp(mpfr::sqrt(mpreal(2))); }, 0, "x0=1+exp(sqrt2): sqrt2" },
+		{ "t^t", [](const mpreal& t) { return mpfr::pow(t, t); }, [](int) {
+				// solve c^c = 2 by Newton on g(c) = c log c - log 2
+				const mpreal l2 = mpfr::log(mpreal(2));
+				mpreal c = 1.5;
+				for (int i = 0; i < 200; ++i)
+					c -= (c * mpfr::log(c) - l2) / (mpfr::log(c) + 1);
+				return c; }, 0, "c^c=2: rational 2" },
+		{ "Gamma", [](const mpreal& t) { return mpfr::gamma(t); }, [](int) { return mpreal(4); }, 0, "c=4: Gamma=6 (weak check)" },
+		{ "exp(1/t)", [](const mpreal& t) { return mpfr::exp(1 / t); }, [](int) { return 1 / mpfr::log(mpreal(2)); }, 0, "c=1/log2: 2" },
+	};
+	std::vector<PolySearchTarget> main;
+	for (const auto& fn : fns)
+		for (int k : ks)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(50));
+			if (mpfr::isnan(fn.f(mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)))))
+			{
+				std::cout << "skip " << fn.name << "(zeta3*pi^" << k << "): outside the domain of the function" << std::endl;
+				continue;
+			}
+			main.push_back({ fn.name + "(zeta3*pi^" + std::to_string(k) + ")", [fn, k](int d)
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(d));
+					return fn.f(mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)));
+				} });
+		}
+	applyStrideEnv(main);
+	std::vector<PolySearchTarget> targets = main;
+	const size_t nMain = targets.size();
+	std::vector<int> checkMinDeg;
+	for (const auto& fn : fns)
+	{
+		targets.push_back({ "[CHECK] " + fn.name + "(c / pi^2), c = x0 pi^2  (" + fn.checkNote + ")", [fn](int d)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				const mpreal pi2 = mpfr::const_pi() * mpfr::const_pi();
+				const mpreal c = fn.checkC(d) * pi2;
+				return fn.f(c / pi2);
+			} });
+		checkMinDeg.push_back(1);
+	}
+	// high-degree checks: cos(2 pi/65) has degree phi(65)/2 = 24; log(exp(2^(1/3)+3^(1/8))) = 2^(1/3)+3^(1/8) has degree 24.
+	const int hd = 24;
+	if (degree >= hd)
+	{
+		targets.push_back({ "[CHECK] cos(c / pi^2), x0 = 2 pi/65 (algebraic degree 24)", [](int d)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				const mpreal pi2 = mpfr::const_pi() * mpfr::const_pi();
+				const mpreal c = (2 * mpfr::const_pi() / 65) * pi2;
+				return mpfr::cos(c / pi2);
+			} });
+		checkMinDeg.push_back(hd);
+		targets.push_back({ "[CHECK] log(c / pi^2), x0 = exp(2^(1/3)+3^(1/8)) (algebraic degree 24)", [](int d)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				const mpreal pi2 = mpfr::const_pi() * mpfr::const_pi();
+				const mpreal c = mpfr::exp(mpfr::cbrt(mpreal(2)) + mpfr::root(mpreal(3), 8)) * pi2;
+				return mpfr::log(c / pi2);
+			} });
+		checkMinDeg.push_back(hd);
+	}
+	std::cout << "NOTE: targets f(zeta3*pi^k), k in {";
+	for (int k : ks) std::cout << " " << k;
+	std::cout << " }. TARGET COUNT = " << nMain << " main + " << checkMinDeg.size() << " validation" << std::endl;
+	const auto sm = reportPolynomialSearchParallel(targets, digits, degree, true, 10);
+	reportHighDegSummary(targets, nMain, sm, checkMinDeg, digits, degree);
+}
+
+// Compositions y = f(g(zeta3 * pi^k)), k in ks, algebraicity only (degree == `degree` only).
+void test_pslq_zeta3_composite_functions_highdeg(int digits, int degree, std::vector<int> ks)
+{
+	std::cout.precision(30);
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		std::function<mpreal(const mpreal&)> inv;
+		bool small;
+	};
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, [](const mpreal& v) { return mpfr::log(v); }, false },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, [](const mpreal& v) { return mpfr::exp(v); }, false },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, [](const mpreal& v) { return mpfr::asin(v); }, true },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, [](const mpreal& v) { return mpfr::acos(v); }, true },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, [](const mpreal& v) { return mpfr::atan(v); }, true },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, [](const mpreal& v) { return mpfr::asinh(v); }, false },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, [](const mpreal& v) { return mpfr::acosh(v); }, false },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, [](const mpreal& v) { return mpfr::atanh(v); }, true },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, [](const mpreal& v) { return mpfr::tan(v); }, true },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, [](const mpreal& v) { return mpfr::sinh(v); }, false },
+		{ "arcsin", [](const mpreal& t) { return mpfr::asin(t); }, [](const mpreal& v) { return mpfr::sin(v); }, true },
+		{ "arccos", [](const mpreal& t) { return mpfr::acos(t); }, [](const mpreal& v) { return mpfr::cos(v); }, true },
+	};
+	auto isInversePair = [](const std::string& a, const std::string& b)
+	{
+		static const std::vector<std::pair<std::string, std::string>> inv = { { "exp", "log" }, { "sin", "arcsin" }, { "tan", "arctan" }, { "sinh", "arcsinh" }, { "cos", "arccos" } };
+		for (auto& p : inv) if ((p.first == a && p.second == b) || (p.first == b && p.second == a)) return true;
+		return false;
+	};
+	auto tOf = [](int k) { return mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)); };
+	std::vector<PolySearchTarget> main;
+	int nDomain = 0, nRange = 0;
+	for (const auto& f : fns)
+		for (const auto& g : fns)
+		{
+			if (f.name == g.name || isInversePair(f.name, g.name)) continue;
+			for (int k : ks)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(50));
+				const mpreal y50 = f.f(g.f(tOf(k)));
+				if (mpfr::isnan(y50) || mpfr::isinf(y50)) { ++nDomain; continue; }
+				const mpreal ay = mpfr::abs(y50);
+				if (ay < mpreal("1e-30") || ay > mpreal("1e30")) { ++nRange; continue; }
+				main.push_back({ f.name + "(" + g.name + "(zeta3*pi^" + std::to_string(k) + "))", [f, g, k, tOf](int d)
+					{
+						mpreal::set_default_prec(mpfr::digits2bits(d));
+						return f.f(g.f(tOf(k)));
+					} });
+			}
+		}
+	applyStrideEnv(main);
+	std::vector<PolySearchTarget> targets = main;
+	const size_t nMain = targets.size();
+	std::vector<int> checkMinDeg;
+	auto addChk = [&](const std::string& nm, std::function<mpreal()> v, int minDeg)
+	{
+		targets.push_back({ "[CHECK] " + nm, [v](int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); return v(); } });
+		checkMinDeg.push_back(minDeg);
+	};
+	addChk("cos(arcsin(1/3)) = sqrt8/3 (deg 2)", []() { return mpfr::cos(mpfr::asin(mpreal(1) / 3)); }, 2);
+	addChk("sin(arctan(2)) = 2/sqrt5 (deg 2)", []() { return mpfr::sin(mpfr::atan(mpreal(2))); }, 2);
+	addChk("cosh(arcsinh(sqrt3)) = 2 (deg 1)", []() { return mpfr::cosh(mpfr::asinh(mpfr::sqrt(mpreal(3)))); }, 1);
+	addChk("cos(arctan(3^(1/4))) = 1/sqrt(1+sqrt3) (deg 4)", []() { return mpfr::cos(mpfr::atan(mpfr::root(mpreal(3), 4))); }, 4);
+	addChk("tanh(log 5) = 12/13 (deg 1)", []() { return mpfr::tanh(mpfr::log(mpreal(5))); }, 1);
+	addChk("sin(arccos(2^(1/3)/2)) (deg 6)", []() { return mpfr::sin(mpfr::acos(mpfr::cbrt(mpreal(2)) / 2)); }, 6);
+	// high-degree: cosh(arccosh(a)) with a = 2^(1/4)+3^(1/4) (degree 16); cos(arctan(tan(2 pi/51))) = cos(2 pi/51) (degree phi(51)/2 = 16)
+	const int hd = 16;
+	if (degree >= hd)
+	{
+		addChk("cosh(arccosh(2^(1/4)+3^(1/4))) (deg 16)", []() { return mpfr::cosh(mpfr::acosh(mpfr::root(mpreal(2), 4) + mpfr::root(mpreal(3), 4))); }, hd);
+		addChk("cos(arctan(tan(2 pi/51))) = cos(2 pi/51) (deg 16)", []() { return mpfr::cos(mpfr::atan(mpfr::tan(2 * mpfr::const_pi() / 51))); }, hd);
+	}
+	std::cout << "NOTE: targets y = f(g(zeta3*pi^k)), k in {";
+	for (int k : ks) std::cout << " " << k;
+	std::cout << " }; dropped " << nDomain << " (domain error), " << nRange << " (|y|<1e-30 or >1e30). TARGET COUNT = " << nMain
+		<< " main + " << checkMinDeg.size() << " validation" << std::endl;
+	const auto sm = reportPolynomialSearchParallel(targets, digits, degree, true, 10);
+	reportHighDegSummary(targets, nMain, sm, checkMinDeg, digits, degree);
 }

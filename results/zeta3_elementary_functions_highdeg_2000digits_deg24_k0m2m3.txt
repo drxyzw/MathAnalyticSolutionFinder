@@ -1,0 +1,344 @@
+skip arccosh(zeta3*pi^-2): outside the domain of the function
+skip arccosh(zeta3*pi^-3): outside the domain of the function
+skip arcsin(1/t)(zeta3*pi^-2): outside the domain of the function
+skip arcsin(1/t)(zeta3*pi^-3): outside the domain of the function
+skip arccos(1/t)(zeta3*pi^-2): outside the domain of the function
+skip arccos(1/t)(zeta3*pi^-3): outside the domain of the function
+skip log(t-1)(zeta3*pi^-2): outside the domain of the function
+skip log(t-1)(zeta3*pi^-3): outside the domain of the function
+NOTE: targets f(zeta3*pi^k), k in { 0 -2 -3 }. TARGET COUNT = 43 main + 19 validation
+  [1 / 62] sin(zeta3*pi^-3), degree 24: PrecisionExhausted (187978 ms)
+  [2 / 62] log(zeta3*pi^-2), degree 24: PrecisionExhausted (193717 ms)
+  [3 / 62] exp(zeta3*pi^0), degree 24: PrecisionExhausted (195932 ms)
+  [4 / 62] exp(zeta3*pi^-2), degree 24: PrecisionExhausted (197370 ms)
+  [5 / 62] exp(zeta3*pi^-3), degree 24: PrecisionExhausted (198897 ms)
+  [6 / 62] cos(zeta3*pi^0), degree 24: PrecisionExhausted (199415 ms)
+  [7 / 62] log(zeta3*pi^-3), degree 24: PrecisionExhausted (204120 ms)
+  [8 / 62] log(zeta3*pi^0), degree 24: PrecisionExhausted (238676 ms)
+  [9 / 62] sin(zeta3*pi^-2), degree 24: PrecisionExhausted (240397 ms)
+  [10 / 62] sin(zeta3*pi^0), degree 24: PrecisionExhausted (241175 ms)
+  [11 / 62] tan(zeta3*pi^0), degree 24: PrecisionExhausted (117893 ms)
+  [12 / 62] cos(zeta3*pi^-2), degree 24: PrecisionExhausted (126119 ms)
+  [13 / 62] cos(zeta3*pi^-3), degree 24: PrecisionExhausted (121340 ms)
+  [14 / 62] sinh(zeta3*pi^0), degree 24: PrecisionExhausted (118354 ms)
+  [15 / 62] tan(zeta3*pi^-3), degree 24: PrecisionExhausted (126698 ms)
+  [16 / 62] cosh(zeta3*pi^-2), degree 24: PrecisionExhausted (88731 ms)
+  [17 / 62] tan(zeta3*pi^-2), degree 24: PrecisionExhausted (152897 ms)
+  [18 / 62] sinh(zeta3*pi^-2), degree 24: PrecisionExhausted (150644 ms)
+  [19 / 62] sinh(zeta3*pi^-3), degree 24: PrecisionExhausted (120920 ms)
+  [20 / 62] cosh(zeta3*pi^0), degree 24: PrecisionExhausted (128217 ms)
+  [21 / 62] cosh(zeta3*pi^-3), degree 24: PrecisionExhausted (79947 ms)
+  [22 / 62] tanh(zeta3*pi^-2), degree 24: PrecisionExhausted (80020 ms)
+  [23 / 62] tanh(zeta3*pi^0), degree 24: PrecisionExhausted (81308 ms)
+  [24 / 62] tanh(zeta3*pi^-3), degree 24: PrecisionExhausted (79447 ms)
+  [25 / 62] arctan(zeta3*pi^0), degree 24: PrecisionExhausted (80917 ms)
+  [26 / 62] arctan(zeta3*pi^-2), degree 24: PrecisionExhausted (79249 ms)
+  [27 / 62] arccosh(zeta3*pi^0), degree 24: PrecisionExhausted (79487 ms)
+  [28 / 62] arcsin(1/t)(zeta3*pi^0), degree 24: PrecisionExhausted (79864 ms)
+  [29 / 62] arccos(1/t)(zeta3*pi^0), degree 24: PrecisionExhausted (79686 ms)
+  [30 / 62] log(t-1)(zeta3*pi^0), degree 24: PrecisionExhausted (80108 ms)
+  [31 / 62] arctan(zeta3*pi^-3), degree 24: PrecisionExhausted (127746 ms)
+  [32 / 62] arcsinh(zeta3*pi^0), degree 24: PrecisionExhausted (130695 ms)
+  [33 / 62] arcsinh(zeta3*pi^-3), degree 24: PrecisionExhausted (118578 ms)
+  [34 / 62] arcsinh(zeta3*pi^-2), degree 24: PrecisionExhausted (128556 ms)
+  [35 / 62] [CHECK] exp(c / pi^2), c = x0 pi^2  (exp(x0)=1+2^(1/3): deg 3), degree 24: Found (33 ms)
+  [36 / 62] [CHECK] log(c / pi^2), c = x0 pi^2  (x0=exp(sqrt2): log=sqrt2), degree 24: Found (9 ms)
+  [37 / 62] t^t(zeta3*pi^-2), degree 24: PrecisionExhausted (79776 ms)
+  [38 / 62] [CHECK] cos(c / pi^2), c = x0 pi^2  (c=pi/7: deg 3), degree 24: Found (220 ms)
+  [39 / 62] [CHECK] sin(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4), degree 24: Found (1303 ms)
+  [40 / 62] [CHECK] tan(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4), degree 24: Found (380 ms)
+  [41 / 62] [CHECK] sinh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3), degree 24: Found (494 ms)
+  [42 / 62] [CHECK] cosh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3), degree 24: Found (477 ms)
+  [43 / 62] [CHECK] arctan(c / pi^2), c = x0 pi^2  (x0=tan(sqrt2/3): sqrt2/3), degree 24: Found (76 ms)
+  [44 / 62] [CHECK] arcsinh(c / pi^2), c = x0 pi^2  (x0=sinh(sqrt2/3): sqrt2/3), degree 24: Found (76 ms)
+  [45 / 62] [CHECK] arccosh(c / pi^2), c = x0 pi^2  (x0=cosh(sqrt2/3): sqrt2/3), degree 24: Found (76 ms)
+  [46 / 62] [CHECK] arcsin(1/t)(c / pi^2), c = x0 pi^2  (x0=1/sin(sqrt2/3): sqrt2/3), degree 24: Found (76 ms)
+  [47 / 62] [CHECK] tanh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3), degree 24: Found (338 ms)
+  [48 / 62] [CHECK] log(t-1)(c / pi^2), c = x0 pi^2  (x0=1+exp(sqrt2): sqrt2), degree 24: Found (9 ms)
+  [49 / 62] [CHECK] t^t(c / pi^2), c = x0 pi^2  (c^c=2: rational 2), degree 24: Found (8 ms)
+  [50 / 62] [CHECK] Gamma(c / pi^2), c = x0 pi^2  (c=4: Gamma=6 (weak check)), degree 24: Found (8 ms)
+  [51 / 62] [CHECK] exp(1/t)(c / pi^2), c = x0 pi^2  (c=1/log2: 2), degree 24: Found (8 ms)
+  [52 / 62] [CHECK] arccos(1/t)(c / pi^2), c = x0 pi^2  (x0=1/cos(sqrt2/3): sqrt2/3), degree 24: Found (77 ms)
+  [53 / 62] t^t(zeta3*pi^0), degree 24: PrecisionExhausted (86193 ms)
+  [54 / 62] [CHECK] log(c / pi^2), x0 = exp(2^(1/3)+3^(1/8)) (algebraic degree 24), degree 24: Found (5728 ms)
+  [55 / 62] [CHECK] cos(c / pi^2), x0 = 2 pi/65 (algebraic degree 24), degree 24: Found (13720 ms)
+  [56 / 62] t^t(zeta3*pi^-3), degree 24: PrecisionExhausted (76072 ms)
+  [57 / 62] exp(1/t)(zeta3*pi^-3), degree 24: PrecisionExhausted (63314 ms)
+  [58 / 62] Gamma(zeta3*pi^0), degree 24: PrecisionExhausted (76173 ms)
+  [59 / 62] Gamma(zeta3*pi^-3), degree 24: PrecisionExhausted (74636 ms)
+  [60 / 62] Gamma(zeta3*pi^-2), degree 24: PrecisionExhausted (78072 ms)
+  [61 / 62] exp(1/t)(zeta3*pi^0), degree 24: PrecisionExhausted (81768 ms)
+  [62 / 62] exp(1/t)(zeta3*pi^-2), degree 24: PrecisionExhausted (91324 ms)
+elapsed 576 s
+=== exp(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75738, 195932 ms, no polynomial with |coeffs|_2 < 1.030e+64
+0 verified relation(s) for exp(zeta3*pi^0)
+=== exp(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76446, 197370 ms, no polynomial with |coeffs|_2 < 1.105e+64
+0 verified relation(s) for exp(zeta3*pi^-2)
+=== exp(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75924, 198897 ms, no polynomial with |coeffs|_2 < 1.110e+64
+0 verified relation(s) for exp(zeta3*pi^-3)
+=== log(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75212, 238676 ms, no polynomial with |coeffs|_2 < 1.126e+64
+0 verified relation(s) for log(zeta3*pi^0)
+=== log(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75996, 193717 ms, no polynomial with |coeffs|_2 < 1.004e+64
+0 verified relation(s) for log(zeta3*pi^-2)
+=== log(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75947, 204120 ms, no polynomial with |coeffs|_2 < 1.063e+64
+0 verified relation(s) for log(zeta3*pi^-3)
+=== sin(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75802, 241175 ms, no polynomial with |coeffs|_2 < 1.152e+64
+0 verified relation(s) for sin(zeta3*pi^0)
+=== sin(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74941, 240397 ms, no polynomial with |coeffs|_2 < 1.027e+64
+0 verified relation(s) for sin(zeta3*pi^-2)
+=== sin(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74197, 187978 ms, no polynomial with |coeffs|_2 < 1.047e+64
+0 verified relation(s) for sin(zeta3*pi^-3)
+=== cos(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75522, 199415 ms, no polynomial with |coeffs|_2 < 1.058e+64
+0 verified relation(s) for cos(zeta3*pi^0)
+=== cos(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76282, 126119 ms, no polynomial with |coeffs|_2 < 1.045e+64
+0 verified relation(s) for cos(zeta3*pi^-2)
+=== cos(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75201, 121340 ms, no polynomial with |coeffs|_2 < 1.168e+64
+0 verified relation(s) for cos(zeta3*pi^-3)
+=== tan(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75857, 117893 ms, no polynomial with |coeffs|_2 < 1.027e+64
+0 verified relation(s) for tan(zeta3*pi^0)
+=== tan(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75275, 152897 ms, no polynomial with |coeffs|_2 < 1.053e+64
+0 verified relation(s) for tan(zeta3*pi^-2)
+=== tan(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74655, 126698 ms, no polynomial with |coeffs|_2 < 1.058e+64
+0 verified relation(s) for tan(zeta3*pi^-3)
+=== sinh(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76016, 118354 ms, no polynomial with |coeffs|_2 < 1.006e+64
+0 verified relation(s) for sinh(zeta3*pi^0)
+=== sinh(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74888, 150644 ms, no polynomial with |coeffs|_2 < 1.084e+64
+0 verified relation(s) for sinh(zeta3*pi^-2)
+=== sinh(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74786, 120920 ms, no polynomial with |coeffs|_2 < 1.004e+64
+0 verified relation(s) for sinh(zeta3*pi^-3)
+=== cosh(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75890, 128217 ms, no polynomial with |coeffs|_2 < 1.234e+64
+0 verified relation(s) for cosh(zeta3*pi^0)
+=== cosh(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75507, 88731 ms, no polynomial with |coeffs|_2 < 1.029e+64
+0 verified relation(s) for cosh(zeta3*pi^-2)
+=== cosh(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75304, 79947 ms, no polynomial with |coeffs|_2 < 1.016e+64
+0 verified relation(s) for cosh(zeta3*pi^-3)
+=== tanh(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76091, 81308 ms, no polynomial with |coeffs|_2 < 1.080e+64
+0 verified relation(s) for tanh(zeta3*pi^0)
+=== tanh(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75150, 80020 ms, no polynomial with |coeffs|_2 < 1.008e+64
+0 verified relation(s) for tanh(zeta3*pi^-2)
+=== tanh(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74490, 79447 ms, no polynomial with |coeffs|_2 < 1.036e+64
+0 verified relation(s) for tanh(zeta3*pi^-3)
+=== arctan(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76415, 80917 ms, no polynomial with |coeffs|_2 < 1.040e+64
+0 verified relation(s) for arctan(zeta3*pi^0)
+=== arctan(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74967, 79249 ms, no polynomial with |coeffs|_2 < 1.192e+64
+0 verified relation(s) for arctan(zeta3*pi^-2)
+=== arctan(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74324, 127746 ms, no polynomial with |coeffs|_2 < 1.023e+64
+0 verified relation(s) for arctan(zeta3*pi^-3)
+=== arcsinh(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76398, 130695 ms, no polynomial with |coeffs|_2 < 1.186e+64
+0 verified relation(s) for arcsinh(zeta3*pi^0)
+=== arcsinh(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75249, 128556 ms, no polynomial with |coeffs|_2 < 1.092e+64
+0 verified relation(s) for arcsinh(zeta3*pi^-2)
+=== arcsinh(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74633, 118578 ms, no polynomial with |coeffs|_2 < 1.049e+64
+0 verified relation(s) for arcsinh(zeta3*pi^-3)
+=== arccosh(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75851, 79487 ms, no polynomial with |coeffs|_2 < 1.019e+64
+0 verified relation(s) for arccosh(zeta3*pi^0)
+=== arcsin(1/t)(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76076, 79864 ms, no polynomial with |coeffs|_2 < 1.088e+64
+0 verified relation(s) for arcsin(1/t)(zeta3*pi^0)
+=== arccos(1/t)(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75476, 79686 ms, no polynomial with |coeffs|_2 < 1.056e+64
+0 verified relation(s) for arccos(1/t)(zeta3*pi^0)
+=== log(t-1)(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76207, 80108 ms, no polynomial with |coeffs|_2 < 1.131e+64
+0 verified relation(s) for log(t-1)(zeta3*pi^0)
+=== t^t(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76235, 86193 ms, no polynomial with |coeffs|_2 < 1.019e+64
+0 verified relation(s) for t^t(zeta3*pi^0)
+=== t^t(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75870, 79776 ms, no polynomial with |coeffs|_2 < 1.058e+64
+0 verified relation(s) for t^t(zeta3*pi^-2)
+=== t^t(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75887, 76072 ms, no polynomial with |coeffs|_2 < 1.069e+64
+0 verified relation(s) for t^t(zeta3*pi^-3)
+=== Gamma(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76278, 76173 ms, no polynomial with |coeffs|_2 < 1.008e+64
+0 verified relation(s) for Gamma(zeta3*pi^0)
+=== Gamma(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 75710, 78072 ms, no polynomial with |coeffs|_2 < 1.066e+64
+0 verified relation(s) for Gamma(zeta3*pi^-2)
+=== Gamma(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 74645, 74636 ms, no polynomial with |coeffs|_2 < 1.109e+64
+0 verified relation(s) for Gamma(zeta3*pi^-3)
+=== exp(1/t)(zeta3*pi^0) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 76399, 81768 ms, no polynomial with |coeffs|_2 < 1.117e+64
+0 verified relation(s) for exp(1/t)(zeta3*pi^0)
+=== exp(1/t)(zeta3*pi^-2) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 72212, 91324 ms, no polynomial with |coeffs|_2 < 1.001e+64
+0 verified relation(s) for exp(1/t)(zeta3*pi^-2)
+=== exp(1/t)(zeta3*pi^-3) (2000 digits) ===
+degree 24: PrecisionExhausted, iter 63176, 63314 ms, no polynomial with |coeffs|_2 < 1.041e+64
+0 verified relation(s) for exp(1/t)(zeta3*pi^-3)
+=== [CHECK] exp(c / pi^2), c = x0 pi^2  (exp(x0)=1+2^(1/3): deg 3) (2000 digits) ===
+degree 24: Found, iter 29, 33 ms  VERIFIED (true degree 21)
+    x^21 - 2x^20 - 3x^17 = 0   (residual at 4000 digits: 6.856e-3994)
+1 verified relation(s) for [CHECK] exp(c / pi^2), c = x0 pi^2  (exp(x0)=1+2^(1/3): deg 3)
+=== [CHECK] log(c / pi^2), c = x0 pi^2  (x0=exp(sqrt2): log=sqrt2) (2000 digits) ===
+degree 24: Found, iter 2, 9 ms  VERIFIED (true degree 24)
+    -x^24 + 2x^22 = 0   (residual at 4000 digits: 0.000e+00)
+1 verified relation(s) for [CHECK] log(c / pi^2), c = x0 pi^2  (x0=exp(sqrt2): log=sqrt2)
+=== [CHECK] sin(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4) (2000 digits) ===
+degree 24: Found, iter 823, 1303 ms  VERIFIED (true degree 23)
+    -64x^23 + 48x^22 + 48x^21 - 28x^20 - 156x^19 - 25x^18 - 62x^17 - 54x^16 + 45x^15 + 64x^14 - 9x^13 + 32x^12 + 45x^11 - 77x^10 + 98x^9 + 2x^8 + 22x^7 + 18x^6 - 66x^5 + 25x^4 + 30x^3 - 10x^2 - 5x = 0   (residual at 4000 digits: 3.852e-4000)
+1 verified relation(s) for [CHECK] sin(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4)
+=== [CHECK] cos(c / pi^2), c = x0 pi^2  (c=pi/7: deg 3) (2000 digits) ===
+degree 24: Found, iter 255, 220 ms  VERIFIED (true degree 24)
+    8x^24 - 4x^23 - 4x^22 - 7x^21 - 4x^20 - 17x^18 - x^17 - 5x^16 + 17x^15 + 2x^14 + x^13 + 12x^12 + 3x^11 - 7x^9 - 3x^8 + x^7 = 0   (residual at 4000 digits: 1.184e-4000)
+1 verified relation(s) for [CHECK] cos(c / pi^2), c = x0 pi^2  (c=pi/7: deg 3)
+=== [CHECK] tan(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4) (2000 digits) ===
+degree 24: Found, iter 416, 380 ms  VERIFIED (true degree 21)
+    x^21 + x^20 - 9x^19 - 10x^18 - 7x^17 + 5x^16 + 25x^15 + x^14 - 8x^13 - 9x^12 - 19x^11 - 4x^10 - x^9 - 5x^8 + 15x^7 + 5x^6 - 5x^5 = 0   (residual at 4000 digits: 2.654e-4000)
+1 verified relation(s) for [CHECK] tan(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4)
+=== [CHECK] sinh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) (2000 digits) ===
+degree 24: Found, iter 327, 494 ms  VERIFIED (true degree 20)
+    -6x^20 - x^17 + 5x^16 = 0   (residual at 4000 digits: 1.417e-4000)
+1 verified relation(s) for [CHECK] sinh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3)
+=== [CHECK] cosh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) (2000 digits) ===
+degree 24: Found, iter 518, 477 ms  VERIFIED (true degree 23)
+    -12x^23 + 12x^22 + 2x^20 + 2x^19 + 26x^18 - 16x^17 - 10x^16 - 2x^15 + 3x^14 - 2x^13 + 5x^12 - 7x^11 - x^10 - 8x^9 - 2x^8 + 4x^7 - x^6 = 0   (residual at 4000 digits: 6.003e-3997)
+1 verified relation(s) for [CHECK] cosh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3)
+=== [CHECK] tanh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) (2000 digits) ===
+degree 24: Found, iter 241, 338 ms  VERIFIED (true degree 23)
+    2x^23 - 4x^22 + 13x^21 + 6x^20 - 2x^19 + 8x^17 + 5x^16 - 2x^15 - x^14 - 11x^13 + 11x^12 + 4x^11 - 5x^10 = 0   (residual at 4000 digits: 1.240e-4001)
+1 verified relation(s) for [CHECK] tanh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3)
+=== [CHECK] arctan(c / pi^2), c = x0 pi^2  (x0=tan(sqrt2/3): sqrt2/3) (2000 digits) ===
+degree 24: Found, iter 93, 76 ms  VERIFIED (true degree 18)
+    9x^18 - 2x^16 = 0   (residual at 4000 digits: 1.949e-4005)
+1 verified relation(s) for [CHECK] arctan(c / pi^2), c = x0 pi^2  (x0=tan(sqrt2/3): sqrt2/3)
+=== [CHECK] arcsinh(c / pi^2), c = x0 pi^2  (x0=sinh(sqrt2/3): sqrt2/3) (2000 digits) ===
+degree 24: Found, iter 93, 76 ms  VERIFIED (true degree 18)
+    9x^18 - 2x^16 = 0   (residual at 4000 digits: 1.949e-4005)
+1 verified relation(s) for [CHECK] arcsinh(c / pi^2), c = x0 pi^2  (x0=sinh(sqrt2/3): sqrt2/3)
+=== [CHECK] arccosh(c / pi^2), c = x0 pi^2  (x0=cosh(sqrt2/3): sqrt2/3) (2000 digits) ===
+degree 24: Found, iter 93, 76 ms  VERIFIED (true degree 18)
+    9x^18 - 2x^16 = 0   (residual at 4000 digits: 9.744e-4005)
+1 verified relation(s) for [CHECK] arccosh(c / pi^2), c = x0 pi^2  (x0=cosh(sqrt2/3): sqrt2/3)
+=== [CHECK] arcsin(1/t)(c / pi^2), c = x0 pi^2  (x0=1/sin(sqrt2/3): sqrt2/3) (2000 digits) ===
+degree 24: Found, iter 93, 76 ms  VERIFIED (true degree 18)
+    9x^18 - 2x^16 = 0   (residual at 4000 digits: 1.949e-4005)
+1 verified relation(s) for [CHECK] arcsin(1/t)(c / pi^2), c = x0 pi^2  (x0=1/sin(sqrt2/3): sqrt2/3)
+=== [CHECK] arccos(1/t)(c / pi^2), c = x0 pi^2  (x0=1/cos(sqrt2/3): sqrt2/3) (2000 digits) ===
+degree 24: Found, iter 93, 77 ms  VERIFIED (true degree 18)
+    9x^18 - 2x^16 = 0   (residual at 4000 digits: 5.847e-4005)
+1 verified relation(s) for [CHECK] arccos(1/t)(c / pi^2), c = x0 pi^2  (x0=1/cos(sqrt2/3): sqrt2/3)
+=== [CHECK] log(t-1)(c / pi^2), c = x0 pi^2  (x0=1+exp(sqrt2): sqrt2) (2000 digits) ===
+degree 24: Found, iter 2, 9 ms  VERIFIED (true degree 24)
+    -x^24 + 2x^22 = 0   (residual at 4000 digits: 0.000e+00)
+1 verified relation(s) for [CHECK] log(t-1)(c / pi^2), c = x0 pi^2  (x0=1+exp(sqrt2): sqrt2)
+=== [CHECK] t^t(c / pi^2), c = x0 pi^2  (c^c=2: rational 2) (2000 digits) ===
+degree 24: Found, iter 1, 8 ms  VERIFIED (true degree 24)
+    -x^24 + 2x^23 = 0   (residual at 4000 digits: 0.000e+00)
+1 verified relation(s) for [CHECK] t^t(c / pi^2), c = x0 pi^2  (c^c=2: rational 2)
+=== [CHECK] Gamma(c / pi^2), c = x0 pi^2  (c=4: Gamma=6 (weak check)) (2000 digits) ===
+degree 24: Found, iter 1, 8 ms  VERIFIED (true degree 24)
+    x^24 - 6x^23 = 0   (residual at 4000 digits: 0.000e+00)
+1 verified relation(s) for [CHECK] Gamma(c / pi^2), c = x0 pi^2  (c=4: Gamma=6 (weak check))
+=== [CHECK] exp(1/t)(c / pi^2), c = x0 pi^2  (c=1/log2: 2) (2000 digits) ===
+degree 24: Found, iter 1, 8 ms  VERIFIED (true degree 24)
+    -x^24 + 2x^23 = 0   (residual at 4000 digits: 0.000e+00)
+1 verified relation(s) for [CHECK] exp(1/t)(c / pi^2), c = x0 pi^2  (c=1/log2: 2)
+=== [CHECK] cos(c / pi^2), x0 = 2 pi/65 (algebraic degree 24) (2000 digits) ===
+degree 24: Found, iter 10009, 13720 ms  VERIFIED (true degree 24)
+    -16777216x^24 + 8388608x^23 + 100663296x^22 - 48234496x^21 - 264241152x^20 + 120061952x^19 + 398721024x^18 - 169345024x^17 - 382205952x^16 + 148766720x^15 + 242843648x^14 - 84230144x^13 - 103563264x^12 + 30722048x^11 + 29355008x^10 - 6990336x^9 - 5346816x^8 + 917504x^7 + 584064x^6 - 57664x^5 - 33360x^4 + 808x^3 + 720x^2 + 24x - 1 = 0   (residual at 4000 digits: 4.675e-3993)
+1 verified relation(s) for [CHECK] cos(c / pi^2), x0 = 2 pi/65 (algebraic degree 24)
+=== [CHECK] log(c / pi^2), x0 = exp(2^(1/3)+3^(1/8)) (algebraic degree 24) (2000 digits) ===
+degree 24: Found, iter 5662, 5728 ms  VERIFIED (true degree 24)
+    x^24 - 16x^21 + 112x^18 - 9x^16 - 448x^15 - 2016x^13 + 1120x^12 - 28224x^10 - 1792x^9 + 27x^8 - 73152x^7 + 1792x^6 - 3024x^5 - 38304x^4 - 1024x^3 + 3024x^2 - 2304x + 229 = 0   (residual at 4000 digits: 2.392e-3991)
+1 verified relation(s) for [CHECK] log(c / pi^2), x0 = exp(2^(1/3)+3^(1/8)) (algebraic degree 24)
+
+===== HIGHDEG SUMMARY (2000 digits, only degree 24 [covers all degrees <= 24], 43 main targets) =====
+exp(zeta3*pi^0) | PrecisionExhausted | normBound 1.030e+64
+exp(zeta3*pi^-2) | PrecisionExhausted | normBound 1.105e+64
+exp(zeta3*pi^-3) | PrecisionExhausted | normBound 1.110e+64
+log(zeta3*pi^0) | PrecisionExhausted | normBound 1.126e+64
+log(zeta3*pi^-2) | PrecisionExhausted | normBound 1.004e+64
+log(zeta3*pi^-3) | PrecisionExhausted | normBound 1.063e+64
+sin(zeta3*pi^0) | PrecisionExhausted | normBound 1.152e+64
+sin(zeta3*pi^-2) | PrecisionExhausted | normBound 1.027e+64
+sin(zeta3*pi^-3) | PrecisionExhausted | normBound 1.047e+64
+cos(zeta3*pi^0) | PrecisionExhausted | normBound 1.058e+64
+cos(zeta3*pi^-2) | PrecisionExhausted | normBound 1.045e+64
+cos(zeta3*pi^-3) | PrecisionExhausted | normBound 1.168e+64
+tan(zeta3*pi^0) | PrecisionExhausted | normBound 1.027e+64
+tan(zeta3*pi^-2) | PrecisionExhausted | normBound 1.053e+64
+tan(zeta3*pi^-3) | PrecisionExhausted | normBound 1.058e+64
+sinh(zeta3*pi^0) | PrecisionExhausted | normBound 1.006e+64
+sinh(zeta3*pi^-2) | PrecisionExhausted | normBound 1.084e+64
+sinh(zeta3*pi^-3) | PrecisionExhausted | normBound 1.004e+64
+cosh(zeta3*pi^0) | PrecisionExhausted | normBound 1.234e+64
+cosh(zeta3*pi^-2) | PrecisionExhausted | normBound 1.029e+64
+cosh(zeta3*pi^-3) | PrecisionExhausted | normBound 1.016e+64
+tanh(zeta3*pi^0) | PrecisionExhausted | normBound 1.080e+64
+tanh(zeta3*pi^-2) | PrecisionExhausted | normBound 1.008e+64
+tanh(zeta3*pi^-3) | PrecisionExhausted | normBound 1.036e+64
+arctan(zeta3*pi^0) | PrecisionExhausted | normBound 1.040e+64
+arctan(zeta3*pi^-2) | PrecisionExhausted | normBound 1.192e+64
+arctan(zeta3*pi^-3) | PrecisionExhausted | normBound 1.023e+64
+arcsinh(zeta3*pi^0) | PrecisionExhausted | normBound 1.186e+64
+arcsinh(zeta3*pi^-2) | PrecisionExhausted | normBound 1.092e+64
+arcsinh(zeta3*pi^-3) | PrecisionExhausted | normBound 1.049e+64
+arccosh(zeta3*pi^0) | PrecisionExhausted | normBound 1.019e+64
+arcsin(1/t)(zeta3*pi^0) | PrecisionExhausted | normBound 1.088e+64
+arccos(1/t)(zeta3*pi^0) | PrecisionExhausted | normBound 1.056e+64
+log(t-1)(zeta3*pi^0) | PrecisionExhausted | normBound 1.131e+64
+t^t(zeta3*pi^0) | PrecisionExhausted | normBound 1.019e+64
+t^t(zeta3*pi^-2) | PrecisionExhausted | normBound 1.058e+64
+t^t(zeta3*pi^-3) | PrecisionExhausted | normBound 1.069e+64
+Gamma(zeta3*pi^0) | PrecisionExhausted | normBound 1.008e+64
+Gamma(zeta3*pi^-2) | PrecisionExhausted | normBound 1.066e+64
+Gamma(zeta3*pi^-3) | PrecisionExhausted | normBound 1.109e+64
+exp(1/t)(zeta3*pi^0) | PrecisionExhausted | normBound 1.117e+64
+exp(1/t)(zeta3*pi^-2) | PrecisionExhausted | normBound 1.001e+64
+exp(1/t)(zeta3*pi^-3) | PrecisionExhausted | normBound 1.041e+64
+main targets with a relation: 0 / 43
+MIN normBound over targets without relation: 1.001e+64  (exp(1/t)(zeta3*pi^-2))
+PASS [CHECK] exp(c / pi^2), c = x0 pi^2  (exp(x0)=1+2^(1/3): deg 3) : status Found, true degree 21 (required >= 1), verified 1
+PASS [CHECK] log(c / pi^2), c = x0 pi^2  (x0=exp(sqrt2): log=sqrt2) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] sin(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4) : status Found, true degree 23 (required >= 1), verified 1
+PASS [CHECK] cos(c / pi^2), c = x0 pi^2  (c=pi/7: deg 3) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] tan(c / pi^2), c = x0 pi^2  (c=pi/5: deg 4) : status Found, true degree 21 (required >= 1), verified 1
+PASS [CHECK] sinh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) : status Found, true degree 20 (required >= 1), verified 1
+PASS [CHECK] cosh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) : status Found, true degree 23 (required >= 1), verified 1
+PASS [CHECK] tanh(c / pi^2), c = x0 pi^2  (c=log(1+2^(1/3)): deg 3) : status Found, true degree 23 (required >= 1), verified 1
+PASS [CHECK] arctan(c / pi^2), c = x0 pi^2  (x0=tan(sqrt2/3): sqrt2/3) : status Found, true degree 18 (required >= 1), verified 1
+PASS [CHECK] arcsinh(c / pi^2), c = x0 pi^2  (x0=sinh(sqrt2/3): sqrt2/3) : status Found, true degree 18 (required >= 1), verified 1
+PASS [CHECK] arccosh(c / pi^2), c = x0 pi^2  (x0=cosh(sqrt2/3): sqrt2/3) : status Found, true degree 18 (required >= 1), verified 1
+PASS [CHECK] arcsin(1/t)(c / pi^2), c = x0 pi^2  (x0=1/sin(sqrt2/3): sqrt2/3) : status Found, true degree 18 (required >= 1), verified 1
+PASS [CHECK] arccos(1/t)(c / pi^2), c = x0 pi^2  (x0=1/cos(sqrt2/3): sqrt2/3) : status Found, true degree 18 (required >= 1), verified 1
+PASS [CHECK] log(t-1)(c / pi^2), c = x0 pi^2  (x0=1+exp(sqrt2): sqrt2) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] t^t(c / pi^2), c = x0 pi^2  (c^c=2: rational 2) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] Gamma(c / pi^2), c = x0 pi^2  (c=4: Gamma=6 (weak check)) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] exp(1/t)(c / pi^2), c = x0 pi^2  (c=1/log2: 2) : status Found, true degree 24 (required >= 1), verified 1
+PASS [CHECK] cos(c / pi^2), x0 = 2 pi/65 (algebraic degree 24) : status Found, true degree 24 (required >= 24), verified 1
+PASS [CHECK] log(c / pi^2), x0 = exp(2^(1/3)+3^(1/8)) (algebraic degree 24) : status Found, true degree 24 (required >= 24), verified 1
+validation: all PASS (19 cases)

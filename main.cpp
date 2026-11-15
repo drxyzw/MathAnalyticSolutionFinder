@@ -47,7 +47,11 @@ int main()
 
 	//test_pslq_zeta3_elementary_functions_relations(2000);
 
-	test_pslq_zeta3_composite_functions(1000, 8, true, true);
+	//test_pslq_zeta3_composite_functions(1000, 8, true, true);
+
+	//test_pslq_zeta3_elementary_functions_highdeg(2000, 24, {0, -2, -3});
+
+	test_pslq_zeta3_composite_functions_highdeg(1500, 16, {0, -2, -3});
 
 	//test_mpreal();
 

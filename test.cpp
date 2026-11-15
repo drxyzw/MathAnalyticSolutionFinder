@@ -10,6 +10,10 @@
 #include <chrono>
 #include <functional>
 #include <array>
+#include <map>
+#include <memory>
+#include <set>
+#include <cstdio>
 #include <sstream>
 #include "check_recurring_decimal.h"
 #include "pslq.h"
@@ -465,7 +469,9 @@ namespace
 						const size_t c = ++done;
 						std::unique_lock lock(mutex);
 						std::cout << "  [" << c << " / " << jobs.size() << "] " << targets[t].name << ", degree " << d << ": "
-							<< toString(results[t][d].status) << " (" << static_cast<long>(seconds[t][d] * 1000) << " ms)" << std::endl;
+							<< toString(results[t][d].status) << " (" << static_cast<long>(seconds[t][d] * 1000) << " ms, normBound "
+								<< results[t][d].normBound.toString("%.2Re") << ", elapsed "
+								<< static_cast<long>(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count()) << " s)" << std::endl;
 					}
 				});
 		}
@@ -1834,6 +1840,349 @@ void test_pslq_zeta3_composite_functions_highdeg(int digits, int degree, std::ve
 	for (int k : ks) std::cout << " " << k;
 	std::cout << " }; dropped " << nDomain << " (domain error), " << nRange << " (|y|<1e-30 or >1e30). TARGET COUNT = " << nMain
 		<< " main + " << checkMinDeg.size() << " validation" << std::endl;
+	const auto sm = reportPolynomialSearchParallel(targets, digits, degree, true, 10);
+	reportHighDegSummary(targets, nMain, sm, checkMinDeg, digits, degree);
+}
+
+
+// Multi-level compositions y = f1(f2(...(fL(t)))), t = zeta3 * pi^k, L = minLevel..maxLevel; algebraicity only (degree == `degree` only).
+// Pruning: adjacent equal or mutually inverse functions are dropped; domain/range errors, numerical duplicates (also against levels < minLevel)
+// and targets that lose precision are dropped. Env ZHD_STRIDE (smoke test only) subsamples the final targets.
+void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<int> ks, int minLevel, int maxLevel)
+{
+	std::cout.precision(30);
+	enum Dom { None, Pos, Unit, Tan };
+	struct Fn
+	{
+		std::string name;
+		std::function<mpreal(const mpreal&)> f;
+		Dom dom;
+	};
+	const std::vector<Fn> fns = {
+		{ "exp", [](const mpreal& t) { return mpfr::exp(t); }, None },
+		{ "log", [](const mpreal& t) { return mpfr::log(t); }, Pos },
+		{ "sin", [](const mpreal& t) { return mpfr::sin(t); }, None },
+		{ "cos", [](const mpreal& t) { return mpfr::cos(t); }, None },
+		{ "tan", [](const mpreal& t) { return mpfr::tan(t); }, Tan },
+		{ "sinh", [](const mpreal& t) { return mpfr::sinh(t); }, None },
+		{ "cosh", [](const mpreal& t) { return mpfr::cosh(t); }, None },
+		{ "tanh", [](const mpreal& t) { return mpfr::tanh(t); }, None },
+		{ "arctan", [](const mpreal& t) { return mpfr::atan(t); }, None },
+		{ "arcsinh", [](const mpreal& t) { return mpfr::asinh(t); }, None },
+		{ "arcsin", [](const mpreal& t) { return mpfr::asin(t); }, Unit },
+		{ "arccos", [](const mpreal& t) { return mpfr::acos(t); }, Unit },
+	};
+	const int NF = static_cast<int>(fns.size());
+	auto idx = [&](const std::string& n) { for (int i = 0; i < NF; ++i) if (fns[i].name == n) return i; return -1; };
+	std::vector<std::vector<char>> forbidden(NF, std::vector<char>(NF, 0)); // forbidden[a][b]: a adjacent to b is dropped
+	for (int i = 0; i < NF; ++i) forbidden[i][i] = 1;
+	const char* invs[][2] = { { "exp", "log" }, { "sin", "arcsin" }, { "cos", "arccos" }, { "tan", "arctan" }, { "sinh", "arcsinh" } };
+	for (auto& p : invs) { forbidden[idx(p[0])][idx(p[1])] = 1; forbidden[idx(p[1])][idx(p[0])] = 1; }
+	// algebraic pairs {outer, inner}: outer(inner(x)) is an algebraic function A(x), so A(h) is algebraic iff h is.
+	// Outermost-pair case is exactly covered by the shorter composite; for inner pairs the reduction is NOT valid
+	// (f1(A(t)) is a new target), so by default only the outermost pair is pruned. ZML_ALGPAIR_ALL=1 prunes every adjacent pair.
+	const char* algs[][2] = { { "cos", "arcsin" }, { "tan", "arcsin" }, { "sin", "arccos" }, { "tan", "arccos" }, { "sin", "arctan" }, { "cos", "arctan" },
+		{ "cosh", "arcsinh" }, { "tanh", "arcsinh" }, { "exp", "arcsinh" }, { "sinh", "log" }, { "cosh", "log" }, { "tanh", "log" } };
+	std::vector<std::vector<char>> algOI(NF, std::vector<char>(NF, 0)); // algOI[outer][inner]
+	for (auto& p : algs) algOI[idx(p[0])][idx(p[1])] = 1;
+	const bool algAll = std::getenv("ZML_ALGPAIR_ALL") && std::atoi(std::getenv("ZML_ALGPAIR_ALL")) != 0;
+	if (algAll)
+		for (int o = 0; o < NF; ++o) for (int in = 0; in < NF; ++in) if (algOI[o][in]) forbidden[in][o] = 1;
+
+	// apply(i, x): reason 0 = ok, 1 = domain/nan/inf, 2 = range (|y|>1e30 or <1e-30)
+	const mpreal big("1e30"), small("1e-30"), poleEps("1e-10");
+	auto apply = [&](int i, const mpreal& x, mpreal& out) -> int
+	{
+		const Fn& fn = fns[i];
+		if (fn.dom == Pos && !(x > 0)) return 1;
+		if (fn.dom == Unit && mpfr::abs(x) > 1) return 1;
+		if (fn.dom == Tan && mpfr::abs(mpfr::cos(x)) < poleEps) return 1;
+		out = fn.f(x);
+		if (mpfr::isnan(out) || mpfr::isinf(out)) return 1;
+		const mpreal a = mpfr::abs(out);
+		if (a > big || a < small) return 2;
+		return 0;
+	};
+	auto tOf = [](int k) { return mpfr::zeta(mpreal(3)) * mpfr::pow(mpfr::const_pi(), mpreal(k)); };
+
+	// number of rule-valid continuations (outward) of length n after function `last`
+	std::vector<std::vector<double>> comp(maxLevel + 1, std::vector<double>(NF, 1.0));
+	for (int n = 1; n <= maxLevel; ++n)
+		for (int a = 0; a < NF; ++a)
+		{
+			double s = 0;
+			for (int b = 0; b < NF; ++b) if (!forbidden[a][b]) s += comp[n - 1][b];
+			comp[n][a] = s;
+		}
+
+	struct Entry
+	{
+		mpreal v;
+		int level, k;
+		std::vector<int> app; // application order: app[0] innermost
+		int fate = 0;         // 0 keep; 3 dup of lower level; 4 dup within run; 5 precision loss; 6 algebraic outermost pair
+		bool ref = false;     // reference entry (not a target)
+	};
+	std::vector<Entry> all;
+	const int nk = static_cast<int>(ks.size());
+	std::vector<double> algTop(maxLevel + 1, 0), dropDomain(maxLevel + 1, 0), dropRange(maxLevel + 1, 0), valid(maxLevel + 1, 0), total(maxLevel + 1, 0);
+	mpreal::set_default_prec(256);
+	for (int L = 1; L <= maxLevel; ++L)
+	{
+		double tot = nk;
+		for (int i = 0; i < L; ++i) tot *= NF;
+		total[L] = tot;
+		double v = 0;
+		for (int a = 0; a < NF; ++a) v += comp[L - 1][a];
+		valid[L] = v * nk;
+	}
+	for (int ki = 0; ki < nk; ++ki)
+	{
+		const mpreal t = tOf(ks[ki]);
+		std::vector<int> app;
+		std::function<void(const mpreal&)> dfs = [&](const mpreal& x)
+		{
+			const int depth = static_cast<int>(app.size());
+			if (depth >= maxLevel) return;
+			for (int i = 0; i < NF; ++i)
+			{
+				if (depth > 0 && forbidden[app.back()][i]) continue;
+				mpreal y;
+				const int r = apply(i, x, y);
+				if (r)
+				{
+					for (int l = depth + 1; l <= maxLevel; ++l)
+						(r == 1 ? dropDomain : dropRange)[l] += comp[l - depth - 1][i];
+					continue;
+				}
+				app.push_back(i);
+				all.push_back({ y, depth + 1, ks[ki], app, 0, false });
+				if (!algAll && depth >= 1 && depth + 1 >= minLevel && algOI[i][app[app.size() - 2]]) { all.back().fate = 6; ++algTop[depth + 1]; }
+				dfs(y);
+				app.pop_back();
+			}
+		};
+		dfs(t);
+	}
+	std::cout << "enumerated " << all.size() << " raw composites" << std::endl;
+	// generation order: level, then outer-first lexicographic sequence, then k
+	std::vector<size_t> ord(all.size());
+	std::iota(ord.begin(), ord.end(), 0);
+	auto outerFirst = [&](const Entry& e) { std::vector<int> s(e.app.rbegin(), e.app.rend()); return s; };
+	std::stable_sort(ord.begin(), ord.end(), [&](size_t a, size_t b)
+		{
+			if (all[a].level != all[b].level) return all[a].level < all[b].level;
+			const auto sa = outerFirst(all[a]), sb = outerFirst(all[b]);
+			if (sa != sb) return sa < sb;
+			return all[a].k < all[b].k;
+		});
+	std::vector<size_t> rank(all.size());
+	for (size_t r = 0; r < ord.size(); ++r) rank[ord[r]] = r;
+
+	// numerical dedup, per k (same t): key = max(|v|, 1/|v|) so that y, -y, 1/y, -1/y coincide.
+	// Reference entries: t itself (level 0) and every composite of level < minLevel (already tested).
+	const mpreal tol("1e-40");
+	std::vector<double> dupLower(maxLevel + 1, 0), dupRun(maxLevel + 1, 0), precLoss(maxLevel + 1, 0);
+	std::vector<double> dupLowerInv(maxLevel + 1, 0), dupRunInv(maxLevel + 1, 0);
+	for (int k : ks)
+	{
+		all.push_back({ tOf(k), 0, k, {}, 0, true });
+		all.back().ref = true;
+		rank.push_back(0);
+	}
+	auto keyOf = [&](const Entry& e) { const mpreal a = mpfr::abs(e.v); return a < 1 ? 1 / a : a; };
+	for (int k : ks)
+	{
+		std::vector<size_t> ids;
+		for (size_t i = 0; i < all.size(); ++i) if (all[i].k == k && all[i].fate != 6) ids.push_back(i);
+		std::vector<mpreal> key(all.size());
+		for (size_t i : ids) key[i] = keyOf(all[i]);
+		std::sort(ids.begin(), ids.end(), [&](size_t a, size_t b) { return key[a] < key[b]; });
+		for (size_t s = 0; s < ids.size();)
+		{
+			size_t e = s + 1;
+			while (e < ids.size() && key[ids[e]] - key[ids[e - 1]] <= tol * key[ids[e]]) ++e;
+			if (e - s > 1)
+			{
+				bool hasRef = false;
+				size_t best = ids[s];
+				bool bestSet = false;
+				for (size_t j = s; j < e; ++j)
+				{
+					const Entry& en = all[ids[j]];
+					if (en.ref || en.level < minLevel) hasRef = true;
+					else if (!bestSet || rank[ids[j]] < rank[best]) { best = ids[j]; bestSet = true; }
+				}
+				for (size_t j = s; j < e; ++j)
+				{
+					Entry& en = all[ids[j]];
+					if (en.ref || en.level < minLevel) continue;
+					if (!hasRef && ids[j] == best) continue;
+					// direct (+-y) match or via 1/y? compare |v| with some reference/best entry
+					bool direct = false;
+					for (size_t q = s; q < e; ++q)
+					{
+						if (q == j) continue;
+						const Entry& o = all[ids[q]];
+						const bool oRef = o.ref || o.level < minLevel;
+						if (hasRef ? !oRef : ids[q] != best) continue;
+						if (mpfr::abs(mpfr::abs(o.v) - mpfr::abs(en.v)) <= tol * mpfr::abs(en.v)) { direct = true; break; }
+					}
+					if (hasRef) { en.fate = 3; ++(direct ? dupLower : dupLowerInv)[en.level]; }
+					else { en.fate = 4; ++(direct ? dupRun : dupRunInv)[en.level]; }
+				}
+			}
+			s = e;
+		}
+	}
+	std::cout << "dedup done" << std::endl;
+	// precision check on survivors: recompute at 2 precisions, need >= `digits` agreeing digits
+	const mpfr_prec_t bitsD = mpfr::digits2bits(digits);
+	std::map<std::pair<int, mpfr_prec_t>, mpreal> tCache;
+	for (int k : ks)
+		for (mpfr_prec_t bits : { bitsD + 50, bitsD + 150 })
+		{
+			mpreal::set_default_prec(bits);
+			tCache[{ k, bits }] = tOf(k);
+		}
+	auto evalSeq = [&](const std::vector<int>& app, int k, mpfr_prec_t bits, mpreal& out) -> bool
+	{
+		mpreal::set_default_prec(bits);
+		mpreal x = tCache.at({ k, bits });
+		for (int i : app)
+		{
+			mpreal y;
+			if (apply(i, x, y)) return false;
+			x = y;
+		}
+		out = x;
+		return true;
+	};
+	{
+		std::vector<size_t> todo;
+		for (size_t i = 0; i < all.size(); ++i)
+			if (!all[i].ref && all[i].level >= minLevel && !all[i].fate) todo.push_back(i);
+		std::atomic<size_t> nxt{ 0 };
+		std::vector<std::thread> pool;
+		for (int th = 0; th < 10; ++th)
+			pool.emplace_back([&]()
+				{
+					for (size_t q; (q = nxt++) < todo.size();)
+					{
+						Entry& en = all[todo[q]];
+						mpreal a, b;
+						bool ok = evalSeq(en.app, en.k, bitsD + 50, a) && evalSeq(en.app, en.k, bitsD + 150, b);
+						if (ok)
+						{
+							mpreal::set_default_prec(bitsD + 150);
+							ok = mpfr::abs(a - b) < mpfr::abs(b) * mpfr::pow(mpreal(10), -digits);
+						}
+						if (!ok) en.fate = 5;
+					}
+				});
+		for (auto& th : pool) th.join();
+		for (size_t i : todo) if (all[i].fate == 5) ++precLoss[all[i].level];
+	}
+	auto seqName = [&](const Entry& e)
+	{
+		std::string s;
+		for (size_t i = e.app.size(); i-- > 0;) s += fns[e.app[i]].name + "(";
+		s += "zeta3*pi^" + std::to_string(e.k);
+		s += std::string(e.app.size(), ')');
+		return s;
+	};
+	std::cout << "NOTE: multilevel targets, k in {";
+	for (int k : ks) std::cout << " " << k;
+	std::cout << " }, levels " << minLevel << ".." << maxLevel << ", " << digits << " digits, degree " << degree << std::endl;
+	std::vector<PolySearchTarget> main;
+	for (size_t r = 0; r < ord.size(); ++r)
+	{
+		const Entry& en = all[ord[r]];
+		if (en.ref || en.level < minLevel || en.fate) continue;
+		auto cache = std::make_shared<std::map<mpfr_prec_t, mpreal>>(); // t at given bits (xAtPrec is called from one thread only)
+		const std::vector<int> app = en.app;
+		const int k = en.k;
+		main.push_back({ seqName(en), [=](int d)
+			{
+				const mpfr_prec_t bits = mpfr::digits2bits(d) + 50;
+				mpreal::set_default_prec(bits);
+				auto it = cache->find(bits);
+				if (it == cache->end()) it = cache->emplace(bits, tOf(k)).first;
+				mpreal x = it->second;
+				for (int i : app)
+				{
+					x = fns[i].f(x);
+				}
+				mpreal::set_default_prec(mpfr::digits2bits(d));
+				mpreal r(0, mpfr::digits2bits(d));
+				r = x;
+				return r;
+			} });
+	}
+	// funcs captured by reference above would dangle; fns is local to this function, which outlives reportPolynomialSearchParallel. OK.
+	for (int L = minLevel; L <= maxLevel; ++L)
+	{
+		double kept = 0;
+		for (const auto& en : all) if (!en.ref && en.level == L && !en.fate) ++kept;
+		std::cout << "LEVEL " << L << ": all sequences " << total[L] << ", rule-pruned (equal/inverse neighbours) " << total[L] - valid[L]
+			<< ", algebraic outermost pair " << algTop[L] << ", domain errors " << dropDomain[L] << ", range (|y|>1e30 or <1e-30) " << dropRange[L]
+			<< ", dup of lower-level composite/t (+-y) " << dupLower[L] << " (via 1/y) " << dupLowerInv[L]
+			<< ", dup within run (+-y) " << dupRun[L] << " (via 1/y) " << dupRunInv[L]
+			<< ", precision loss " << precLoss[L] << ", FINAL " << kept << std::endl;
+	}
+	std::cout << "TOTAL TARGETS BEFORE RANGE/SKIP: " << main.size() << std::endl;
+	if (const char* r = std::getenv("ZML_RANGE")) // a:b -> main targets with index in [a, b)
+	{
+		size_t lo = 0, hi = main.size();
+		if (std::sscanf(r, "%zu:%zu", &lo, &hi) == 2)
+		{
+			hi = std::min(hi, main.size());
+			lo = std::min(lo, hi);
+			main = std::vector<PolySearchTarget>(main.begin() + lo, main.begin() + hi);
+			std::cout << "RESUME: ZML_RANGE=" << lo << ":" << hi << std::endl;
+		}
+	}
+	if (const char* f = std::getenv("ZML_SKIP_DONE")) // previous output: skip targets whose job line shows a non-Found status at this degree
+	{
+		std::ifstream in(f);
+		std::set<std::string> done;
+		std::string line;
+		const std::string tag = ", degree " + std::to_string(degree) + ": ";
+		while (std::getline(in, line))
+		{
+			const size_t b = line.find("] ");
+			const size_t e = line.rfind(tag);
+			if (line.find("  [") != 0 || b == std::string::npos || e == std::string::npos || e < b) continue;
+			const std::string st = line.substr(e + tag.size());
+			if (st.rfind("Found", 0) == 0 || st.rfind("Precision", 0) == 0) continue; // re-run (need verification / unreliable)
+			done.insert(line.substr(b + 2, e - b - 2));
+		}
+		std::vector<PolySearchTarget> rest;
+		for (auto& t : main) if (!done.count(t.name)) rest.push_back(t);
+		std::cout << "RESUME: ZML_SKIP_DONE=" << f << ": skipped " << main.size() - rest.size() << " done targets, " << rest.size() << " remain" << std::endl;
+		main = rest;
+	}
+	applyStrideEnv(main);
+	std::vector<PolySearchTarget> targets = main;
+	const size_t nMain = targets.size();
+	std::vector<int> checkMinDeg;
+	auto addChk = [&](const std::string& nm, std::function<mpreal()> v, int minDeg)
+	{
+		targets.push_back({ "[CHECK] " + nm, [v](int d) { mpreal::set_default_prec(mpfr::digits2bits(d)); return v(); } });
+		checkMinDeg.push_back(minDeg);
+	};
+	addChk("cos(arctan(sinh(arcsinh(2)))) = 1/sqrt5 (deg 2)", []() { return mpfr::cos(mpfr::atan(mpfr::sinh(mpfr::asinh(mpreal(2))))); }, 2);
+	addChk("tanh(log(cosh(arccosh(3)))) = 4/5 (deg 1)", []() { return mpfr::tanh(mpfr::log(mpfr::cosh(mpfr::acosh(mpreal(3))))); }, 1);
+	addChk("cosh(arcsinh(sin(arcsin(2^(-1/3))))) = sqrt(1+2^(-2/3)) (deg 6)", []() { return mpfr::cosh(mpfr::asinh(mpfr::sin(mpfr::asin(mpfr::cbrt(mpreal(1) / 2))))); }, 6);
+	addChk("sin(arctan(sinh(arcsinh(3^(1/8))))) = c/sqrt(1+c^2), c=3^(1/8) (deg 8)", []() { return mpfr::sin(mpfr::atan(mpfr::sinh(mpfr::asinh(mpfr::root(mpreal(3), 8))))); }, 8);
+	{
+		const int D = degree;
+		addChk("tanh(log(cosh(arccosh(2^(1/D)+1)))) = (a^2-1)/(a^2+1), D=" + std::to_string(D) + " (deg D)",
+			[D]() { return mpfr::tanh(mpfr::log(mpfr::cosh(mpfr::acosh(mpfr::root(mpreal(2), D) + 1)))); }, D);
+		addChk("tan(arctan(cos(arccos(2^(-1/D))))) = 2^(-1/D), D=" + std::to_string(D) + " (deg D)",
+			[D]() { return mpfr::tan(mpfr::atan(mpfr::cos(mpfr::acos(mpreal(1) / mpfr::root(mpreal(2), D))))); }, D);
+	}
+	std::cout << "TARGET COUNT = " << nMain << " main + " << checkMinDeg.size() << " validation" << std::endl;
 	const auto sm = reportPolynomialSearchParallel(targets, digits, degree, true, 10);
 	reportHighDegSummary(targets, nMain, sm, checkMinDeg, digits, degree);
 }

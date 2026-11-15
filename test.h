@@ -22,4 +22,5 @@ void test_pslq_zeta3_elementary_functions_relations(int digits); // multiplicati
 void test_pslq_zeta3_elementary_functions(int digits, int maxDegree); // f(zeta(3))*pi^k algebraic? f in exp, log, trig, hyperbolic, ...
 void test_pslq_zeta3_elementary_functions_highdeg(int digits, int degree, std::vector<int> ks); // f(zeta3*pi^k), only degree==`degree` is run
 void test_pslq_zeta3_composite_functions_highdeg(int digits, int degree, std::vector<int> ks); // f(g(zeta3*pi^k)), algebraicity only, degree==`degree` only
+void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<int> ks, int minLevel, int maxLevel); // y = f1(f2(..fL(zeta3*pi^k))), L=minLevel..maxLevel, algebraicity, degree==`degree` only
 void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgebraic, bool doRelations); // y = f(g(zeta3*pi^k)): algebraic? and multiplicative/additive relations

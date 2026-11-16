@@ -1,0 +1,331 @@
+NOTE: y = f(zeta3 (a x)^(b w)) algebraic. log zeta3 = log u - b w (log a + log x), u = g(alpha) > 0. digits = 3000, variant = 2, threads = 10, rational grid p<=60 q<=30, quad/cuberoot grid = 1, alphas = 0
+TOTAL production jobs = 103 + 19 validation jobs
+  jobs for f=identity: 41
+  jobs for f=log: 21
+  jobs for f=exp: 41
+  jobs for f=sin: 0
+  jobs for f=cos: 0
+  jobs for f=tan: 0
+  jobs for f=sinh: 0
+  jobs for f=cosh: 0
+  jobs for f=tanh: 0
+  jobs for f=arctan: 0
+  jobs for f=arcsinh: 0
+  jobs for f=arccosh: 0
+  jobs for f=arcsin(1/t): 0
+  jobs for f=arccos(1/t): 0
+  jobs for f=log(t-1): 0
+  jobs for f=t^t: 0
+  jobs for f=Gamma: 0
+  jobs for f=exp(1/t): 0
+EXT MODE: x set = e, pi, gamma, G, log p (p<=31, as loglog p); w set size = 21, loglog plain p<=31
+OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_absorbed_ext_3000digits_p31.txt
+  n = 29: 2 jobs, PSLQ power ~ 10^82 (coefficient norm)
+  n = 33: 1 jobs, PSLQ power ~ 10^72 (coefficient norm)
+  n = 34: 20 jobs, PSLQ power ~ 10^70 (coefficient norm)
+  n = 41: 11 jobs, PSLQ power ~ 10^58 (coefficient norm)
+  n = 42: 20 jobs, PSLQ power ~ 10^57 (coefficient norm)
+  n = 43: 9 jobs, PSLQ power ~ 10^55 (coefficient norm)
+  n = 50: 11 jobs, PSLQ power ~ 10^48 (coefficient norm)
+  n = 51: 20 jobs, PSLQ power ~ 10^47 (coefficient norm)
+  n = 52: 9 jobs, PSLQ power ~ 10^46 (coefficient norm)
+  total production jobs 103, n range 29..52
+=== [CHECK] f=log alpha=1/3+sqrt5/7 branch=exp(alpha) w=log3 n=34 alpha0=1/3+sqrt5/7 (off grid), a0=2, x0=pi, b0=-2/3 (n = 34, digits = 3000)
+status = Found, iterations = 3658, normBound = 8.294e+00
+relation: +21*logz -7*1 -3*sqrt5 -14*w*log2 -14*w*log(pi)
+residual at 6000 digits = 2.373e-5999  VERIFIED
+power estimate 10^(0.8*D/n) = 1e70
+elapsed 16.9917913459999994074678397737 s
+JOB 7/122 [CHECK] f=log alpha=1/3+sqrt5/7 branch=exp(alpha) w=log3 n=34 alpha0=1/3+sqrt5/7 (off grid), a0=2, x0=pi, b0=-2/3 | real | normBound 8.29e+00 | 16.9918781800000004977846401744 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi n=42 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3 (n = 42, digits = 3000)
+status = Found, iterations = 4264, normBound = 2.918e+00
+relation: +6*logz +3*log2 +2*w*log(phi) +2*w*1
+residual at 6000 digits = 5.932e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e57
+elapsed 22.5202373260000001664593582973 s
+JOB 3/122 [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi n=42 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3 | real | normBound 2.92e+00 | 22.5204613219999991713393683312 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi n=42 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3 (n = 42, digits = 3000)
+status = Found, iterations = 3779, normBound = 2.007e+00
+relation: +3*logz +3*log2 -1*log29 +2*w*log(phi) +2*w*1
+residual at 6000 digits = 5.932e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e57
+elapsed 24.0634853440000000546206138097 s
+JOB 10/122 [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi n=42 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3 | real | normBound 2.01e+00 | 24.0636670819999984871628839755 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi [const] n=43 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3 (n = 43, digits = 3000)
+status = Found, iterations = 4885, normBound = 2.991e+00
+relation: +6*logz +3*log2 +2*w*log(phi) +2*w*1
+residual at 6000 digits = 5.932e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e55
+elapsed 24.864512254000000979203832685 s
+JOB 4/122 [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi [const] n=43 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3 | real | normBound 2.99e+00 | 24.8647275530000015919540601317 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi [const] n=43 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3 (n = 43, digits = 3000)
+status = Found, iterations = 4149, normBound = 1.903e+00
+relation: +3*logz +3*log2 -1*log29 +2*w*log(phi) +2*w*1
+residual at 6000 digits = 5.932e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e55
+elapsed 20.027994045999999883633790887 s
+JOB 11/122 [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi [const] n=43 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3 | real | normBound 1.90e+00 | 20.0281641780000008168372005457 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e n=42 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4 (n = 42, digits = 3000)
+status = Found, iterations = 8865, normBound = 5.162e+01
+relation: -140*logz +60*log2 -28*log3 -105*w*log(1+sqrt2) -105*w*log(gamma)
+residual at 6000 digits = 3.797e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e57
+elapsed 49.1393742260000010446674423292 s
+JOB 5/122 [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e n=42 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4 | real | normBound 5.16e+01 | 49.1395705990000024598884920124 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma n=51 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2 (n = 51, digits = 3000)
+status = Found, iterations = 6374, normBound = 1.950e+00
+relation: -2*logz +2*log2 -4*log3 +2*log(log5) -1*w*log3 -1*w*1
+residual at 6000 digits = 5.191e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e47
+elapsed 50.160025672000003282846591901 s
+JOB 8/122 [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma n=51 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2 | real | normBound 1.95e+00 | 50.1602761489999977584375301376 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 n=41 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2 (n = 41, digits = 3000)
+status = Found, iterations = 4729, normBound = 4.296e+00
+relation: -10*logz -10*log3 +4*log7 -5*w*log5 -5*w*log(G)
+residual at 6000 digits = 2.966e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e58
+elapsed 27.9894316610000011280590115348 s
+JOB 12/122 [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 n=41 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2 | real | normBound 4.30e+00 | 27.9894531109999995521775417728 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 n=50 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4 (n = 50, digits = 3000)
+status = Found, iterations = 7511, normBound = 3.520e+00
+relation: +8*logz -8*log(log3) -3*w*log2 -6*w*log(gamma)
+residual at 6000 digits = 2.966e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e48
+elapsed 51.5035606619999981603541527875 s
+JOB 1/122 [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 n=50 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4 | real | normBound 3.52e+00 | 51.5038100470000017594429664314 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 [const] n=51 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4 (n = 51, digits = 3000)
+status = Found, iterations = 8102, normBound = 3.738e+00
+relation: -8*logz +8*log(log3) +3*w*log2 +6*w*log(gamma)
+residual at 6000 digits = 2.966e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e47
+elapsed 57.9578401610000000232503225561 s
+JOB 2/122 [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 [const] n=51 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4 | real | normBound 3.74e+00 | 57.9581311580000004823887138627 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 [const] n=42 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2 (n = 42, digits = 3000)
+status = Found, iterations = 4800, normBound = 3.817e+00
+relation: +10*logz +10*log3 -4*log7 +5*w*log5 +5*w*log(G)
+residual at 6000 digits = 2.966e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e57
+elapsed 35.7879506620000000793879735284 s
+JOB 13/122 [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 [const] n=42 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2 | real | normBound 3.82e+00 | 35.7882046550000012530290405266 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=log alpha=3/7+sqrt5/2 branch=exp(alpha) w=sqrt3*pi n=34 [ext] x=pi, w=sqrt3*pi, f=log: alpha0=3/7+sqrt5/2 (off grid), a0=phi, b0=1/2 (n = 34, digits = 3000)
+status = Found, iterations = 3218, normBound = 6.234e+00
+relation: -14*logz +6*1 +7*sqrt5 -7*w*log(phi) -7*w*log(pi)
+residual at 6000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e70
+elapsed 10.1793285269999991271561157191 s
+JOB 17/122 [CHECK] f=log alpha=3/7+sqrt5/2 branch=exp(alpha) w=sqrt3*pi n=34 [ext] x=pi, w=sqrt3*pi, f=log: alpha0=3/7+sqrt5/2 (off grid), a0=phi, b0=1/2 | real | normBound 6.23e+00 | 10.1794155100000001112903191824 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=log alpha=2/5+sqrt6/3 branch=exp(alpha) w=pi^3 n=34 [ext] x=log31, w=pi^3: alpha0=2/5+sqrt6/3 (off grid), a0=13, b0=1/3 (n = 34, digits = 3000)
+status = Found, iterations = 3239, normBound = 5.648e+00
+relation: -15*logz +6*1 +5*sqrt6 -5*w*log13 -5*w*log(log31)
+residual at 6000 digits = 7.593e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e70
+elapsed 11.9828003739999999766041582916 s
+JOB 16/122 [CHECK] f=log alpha=2/5+sqrt6/3 branch=exp(alpha) w=pi^3 n=34 [ext] x=log31, w=pi^3: alpha0=2/5+sqrt6/3 (off grid), a0=13, b0=1/3 | real | normBound 5.65e+00 | 11.9829255410000001802472979762 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma [const] n=52 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2 (n = 52, digits = 3000)
+status = Found, iterations = 7788, normBound = 2.521e+00
+relation: -2*logz +2*log2 -4*log3 +2*log(log5) -1*w*log3 -1*w*1
+residual at 6000 digits = 5.191e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e46
+elapsed 69.6453312310000001161824911833 s
+JOB 9/122 [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma [const] n=52 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2 | real | normBound 2.52e+00 | 69.6456843699999978980486048386 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e n=42 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2 (n = 42, digits = 3000)
+status = Found, iterations = 3755, normBound = 1.814e+00
+relation: +4*logz -1*log3 +2*log13 -2*w*log23 -2*w*log(gamma)
+residual at 6000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e57
+elapsed 21.0311032010000005243455234449 s
+JOB 18/122 [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e n=42 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2 | real | normBound 1.81e+00 | 21.0313265969999996229944372317 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e [const] n=43 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4 (n = 43, digits = 3000)
+status = Found, iterations = 9812, normBound = 6.478e+01
+relation: -140*logz +60*log2 -28*log3 -105*w*log(1+sqrt2) -105*w*log(gamma)
+residual at 6000 digits = 3.797e-5998  VERIFIED
+power estimate 10^(0.8*D/n) = 1e55
+elapsed 72.2515829209999935756059130654 s
+JOB 6/122 [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e [const] n=43 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4 | real | normBound 6.48e+01 | 72.251811113000002251283149235 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e [const] n=43 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2 (n = 43, digits = 3000)
+status = Found, iterations = 4285, normBound = 2.256e+00
+relation: -4*logz +1*log3 -2*log13 +2*w*log23 +2*w*log(gamma)
+residual at 6000 digits = 0.000e+00  VERIFIED
+power estimate 10^(0.8*D/n) = 1e55
+elapsed 24.9880433830000008299521141453 s
+JOB 19/122 [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e [const] n=43 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2 | real | normBound 2.26e+00 | 24.9883855399999994517656887183 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G n=51 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3 (n = 51, digits = 3000)
+status = Found, iterations = 7378, normBound = 2.514e+00
+relation: +3*logz +6*log2 -3*log3 -3*log(log11) -1*w*log7 -1*w*log(log23)
+residual at 6000 digits = 7.415e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e47
+elapsed 79.1294311230000033674514270388 s
+JOB 14/122 [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G n=51 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3 | real | normBound 2.51e+00 | 79.1294512749999938705514068715 s
+  check: DETECTED, VERIFIED, coefficients match expected
+=== [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G [const] n=52 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3 (n = 52, digits = 3000)
+status = Found, iterations = 8199, normBound = 3.325e+00
+relation: +3*logz +6*log2 -3*log3 -3*log(log11) -1*w*log7 -1*w*log(log23)
+residual at 6000 digits = 7.415e-6000  VERIFIED
+power estimate 10^(0.8*D/n) = 1e46
+elapsed 80.1504885410000014189790817909 s
+JOB 15/122 [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G [const] n=52 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3 | real | normBound 3.33e+00 | 80.1505079589999951394929667003 s
+  check: DETECTED, VERIFIED, coefficients match expected
+JOB 20/122 f=identity (alpha absorbed) w=1 n=29 | none | normBound 6.01e+82 | 387.549752637999972648685798049 s
+JOB 29/122 f=identity (alpha absorbed) w=log2 n=41 | none | normBound 3.55e+58 | 1019.72970765299999129638308659 s
+JOB 24/122 f=identity (alpha absorbed) w=e [const] n=43 | none | normBound 5.07e+55 | 1226.27981384600002456863876432 s
+JOB 25/122 f=identity (alpha absorbed) w=gamma n=42 | none | normBound 1.53e+57 | 1255.51023311299991291889455169 s
+JOB 22/122 f=identity (alpha absorbed) w=pi [const] n=43 | none | normBound 6.60e+55 | 1307.0759529550000479503069073 s
+JOB 27/122 f=identity (alpha absorbed) w=G n=42 | none | normBound 1.44e+57 | 1320.35175805099993340263608843 s
+JOB 23/122 f=identity (alpha absorbed) w=e n=42 | none | normBound 1.45e+57 | 1338.86084768499995334423147142 s
+JOB 26/122 f=identity (alpha absorbed) w=gamma [const] n=43 | none | normBound 6.68e+55 | 1351.65329674200006593309808522 s
+JOB 28/122 f=identity (alpha absorbed) w=G [const] n=43 | none | normBound 5.95e+55 | 1328.64535729099998206947930157 s
+JOB 21/122 f=identity (alpha absorbed) w=pi n=42 | none | normBound 1.47e+57 | 1380.16729663299997810099739581 s
+JOB 30/122 f=identity (alpha absorbed) w=log2 [const] n=42 | none | normBound 1.40e+57 | 1275.10966090400006578420288861 s
+JOB 31/122 f=identity (alpha absorbed) w=log3 n=41 | none | normBound 4.04e+58 | 1096.85624122500007615599315614 s
+JOB 39/122 f=identity (alpha absorbed) w=log13 n=41 | none | normBound 3.96e+58 | 1016.02950669899996682943310589 s
+JOB 36/122 f=identity (alpha absorbed) w=log7 [const] n=42 | none | normBound 1.39e+57 | 1060.84037192599998888908885419 s
+JOB 32/122 f=identity (alpha absorbed) w=log3 [const] n=42 | none | normBound 1.25e+57 | 1193.78507346900005359202623367 s
+JOB 35/122 f=identity (alpha absorbed) w=log7 n=41 | none | normBound 3.54e+58 | 1120.3035177209999346814583987 s
+JOB 34/122 f=identity (alpha absorbed) w=log5 [const] n=42 | none | normBound 1.51e+57 | 1164.29527495000002090819180012 s
+JOB 33/122 f=identity (alpha absorbed) w=log5 n=41 | none | normBound 3.84e+58 | 1258.66771920699989095737691969 s
+JOB 37/122 f=identity (alpha absorbed) w=log11 n=41 | none | normBound 3.71e+58 | 1275.30897615999992922297678888 s
+JOB 38/122 f=identity (alpha absorbed) w=log11 [const] n=42 | none | normBound 1.43e+57 | 1386.35184990800007653888314962 s
+JOB 41/122 f=identity (alpha absorbed) w=log17 n=41 | none | normBound 3.45e+58 | 990.66480942900000172812724486 s
+JOB 40/122 f=identity (alpha absorbed) w=log13 [const] n=42 | none | normBound 1.57e+57 | 1505.19512863899990406935103238 s
+JOB 45/122 f=identity (alpha absorbed) w=log23 n=41 | none | normBound 3.64e+58 | 959.719409284999983356101438403 s
+JOB 42/122 f=identity (alpha absorbed) w=log17 [const] n=42 | none | normBound 1.43e+57 | 1024.02604646400004639872349799 s
+JOB 43/122 f=identity (alpha absorbed) w=log19 n=41 | none | normBound 3.59e+58 | 1121.92658672700008537503890693 s
+JOB 47/122 f=identity (alpha absorbed) w=log29 n=41 | none | normBound 3.62e+58 | 1094.76236746099993979441933334 s
+JOB 44/122 f=identity (alpha absorbed) w=log19 [const] n=42 | none | normBound 1.47e+57 | 1230.03491358399992350314278156 s
+JOB 49/122 f=identity (alpha absorbed) w=log31 n=41 | none | normBound 3.60e+58 | 1051.04028521100008219946175814 s
+JOB 48/122 f=identity (alpha absorbed) w=log29 [const] n=42 | none | normBound 1.48e+57 | 1219.13621548500009339477401227 s
+JOB 46/122 f=identity (alpha absorbed) w=log23 [const] n=42 | none | normBound 1.47e+57 | 1395.18511711099995409313123673 s
+JOB 50/122 f=identity (alpha absorbed) w=log31 [const] n=42 | none | normBound 1.36e+57 | 1088.36593395999989297706633806 s
+JOB 51/122 f=identity (alpha absorbed) w=pi^2 n=42 | none | normBound 1.57e+57 | 1309.86313141300001916533801705 s
+JOB 53/122 f=identity (alpha absorbed) w=pi^3 n=42 | none | normBound 1.35e+57 | 1139.99377750100006778666283935 s
+JOB 52/122 f=identity (alpha absorbed) w=pi^2 [const] n=43 | none | normBound 4.72e+55 | 1240.42559756800005743571091443 s
+JOB 55/122 f=identity (alpha absorbed) w=sqrt2*pi n=42 | none | normBound 1.37e+57 | 1121.32147211999995306541677564 s
+JOB 57/122 f=identity (alpha absorbed) w=sqrt3*pi n=42 | none | normBound 1.46e+57 | 1000.95879833599997255078051239 s
+JOB 54/122 f=identity (alpha absorbed) w=pi^3 [const] n=43 | none | normBound 4.43e+55 | 1317.00947294000002329994458705 s
+JOB 59/122 f=identity (alpha absorbed) w=log(pi) n=42 | none | normBound 1.17e+57 | 1173.26161164099994493881240487 s
+JOB 58/122 f=identity (alpha absorbed) w=sqrt3*pi [const] n=43 | none | normBound 5.12e+55 | 1194.42444952300002114498056471 s
+JOB 61/122 f=log (alpha absorbed) w=1 n=33 | none | normBound 5.47e+72 | 629.105661557999951583042275161 s
+JOB 63/122 f=log (alpha absorbed) w=e n=34 | none | normBound 3.90e+70 | 516.277606659999946714378893375 s
+JOB 56/122 f=identity (alpha absorbed) w=sqrt2*pi [const] n=43 | none | normBound 4.93e+55 | 1554.51111255799992250103969127 s
+JOB 64/122 f=log (alpha absorbed) w=gamma n=34 | none | normBound 3.91e+70 | 579.933216154999968239280860871 s
+JOB 62/122 f=log (alpha absorbed) w=pi n=34 | none | normBound 4.05e+70 | 821.792385557999978118459694088 s
+JOB 65/122 f=log (alpha absorbed) w=G n=34 | none | normBound 3.90e+70 | 576.244845744000031118048354983 s
+JOB 60/122 f=identity (alpha absorbed) w=log(pi) [const] n=43 | none | normBound 4.57e+55 | 1188.46420069800001328985672444 s
+JOB 66/122 f=log (alpha absorbed) w=log2 n=34 | none | normBound 4.09e+70 | 673.874462363000020559411495924 s
+JOB 69/122 f=log (alpha absorbed) w=log7 n=34 | none | normBound 3.87e+70 | 535.840693395000016607809811831 s
+JOB 67/122 f=log (alpha absorbed) w=log3 n=34 | none | normBound 3.90e+70 | 630.61486650799997732974588871 s
+JOB 68/122 f=log (alpha absorbed) w=log5 n=34 | none | normBound 4.01e+70 | 643.724447529000030954193789512 s
+JOB 71/122 f=log (alpha absorbed) w=log13 n=34 | none | normBound 4.12e+70 | 508.241803474999983336601871997 s
+JOB 70/122 f=log (alpha absorbed) w=log11 n=34 | none | normBound 3.92e+70 | 576.236644146000003274821210653 s
+JOB 74/122 f=log (alpha absorbed) w=log23 n=34 | none | normBound 4.57e+70 | 625.741912568999964605609420687 s
+JOB 76/122 f=log (alpha absorbed) w=log31 n=34 | none | normBound 4.02e+70 | 507.256413755999972181598423049 s
+JOB 73/122 f=log (alpha absorbed) w=log19 n=34 | none | normBound 3.93e+70 | 668.514405045999978938198182732 s
+JOB 72/122 f=log (alpha absorbed) w=log17 n=34 | none | normBound 4.04e+70 | 742.157089744000018072256352752 s
+JOB 75/122 f=log (alpha absorbed) w=log29 n=34 | none | normBound 3.88e+70 | 647.20309681900005216448334977 s
+JOB 77/122 f=log (alpha absorbed) w=pi^2 n=34 | none | normBound 4.41e+70 | 507.572904576999974324280628935 s
+JOB 80/122 f=log (alpha absorbed) w=sqrt3*pi n=34 | none | normBound 4.04e+70 | 510.006299563000027319503715262 s
+JOB 78/122 f=log (alpha absorbed) w=pi^3 n=34 | none | normBound 4.03e+70 | 569.776144229999999879510141909 s
+JOB 81/122 f=log (alpha absorbed) w=log(pi) n=34 | none | normBound 3.88e+70 | 512.235815540999965378432534635 s
+JOB 82/122 f=exp (alpha absorbed) w=1 n=29 | none | normBound 5.80e+82 | 483.493684272999985296337399632 s
+JOB 79/122 f=log (alpha absorbed) w=sqrt2*pi n=34 | none | normBound 3.97e+70 | 841.531831584999963524751365185 s
+JOB 87/122 f=exp (alpha absorbed) w=gamma n=51 | none | normBound 2.68e+46 | 1896.93243198599998322606552392 s
+JOB 89/122 f=exp (alpha absorbed) w=G n=51 | none | normBound 2.15e+46 | 1975.75850911099996665143407881 s
+JOB 85/122 f=exp (alpha absorbed) w=e n=51 | none | normBound 2.16e+46 | 2188.17369466699983604485169053 s
+JOB 83/122 f=exp (alpha absorbed) w=pi n=51 | none | normBound 2.03e+46 | 2265.22013227700017523602582514 s
+JOB 92/122 f=exp (alpha absorbed) w=log2 [const] n=51 | none | normBound 2.05e+46 | 1926.74124168299999837472569197 s
+JOB 84/122 f=exp (alpha absorbed) w=pi [const] n=52 | none | normBound 2.10e+45 | 2435.92682224200007112813182175 s
+JOB 88/122 f=exp (alpha absorbed) w=gamma [const] n=52 | none | normBound 1.96e+45 | 2309.70407689900002878857776523 s
+JOB 90/122 f=exp (alpha absorbed) w=G [const] n=52 | none | normBound 2.73e+45 | 2485.93118969399984052870422602 s
+JOB 91/122 f=exp (alpha absorbed) w=log2 n=50 | none | normBound 2.53e+47 | 2497.84982322799987741746008396 s
+JOB 86/122 f=exp (alpha absorbed) w=e [const] n=52 | none | normBound 2.03e+45 | 2952.07000378000020646140910685 s
+JOB 94/122 f=exp (alpha absorbed) w=log3 [const] n=51 | none | normBound 2.34e+46 | 1992.86250463900000795547384769 s
+JOB 93/122 f=exp (alpha absorbed) w=log3 n=50 | none | normBound 2.58e+47 | 2169.63816113099983340362086892 s
+JOB 95/122 f=exp (alpha absorbed) w=log5 n=50 | none | normBound 1.92e+47 | 2015.28852600999994137964677066 s
+JOB 96/122 f=exp (alpha absorbed) w=log5 [const] n=51 | none | normBound 2.18e+46 | 2187.84285387499994612880982459 s
+JOB 97/122 f=exp (alpha absorbed) w=log7 n=50 | none | normBound 2.02e+47 | 2010.22894929299991417792625725 s
+JOB 98/122 f=exp (alpha absorbed) w=log7 [const] n=51 | none | normBound 2.23e+46 | 2020.76631374399994456325657666 s
+JOB 99/122 f=exp (alpha absorbed) w=log11 n=50 | none | normBound 2.24e+47 | 2256.0313752609999937703832984 s
+JOB 100/122 f=exp (alpha absorbed) w=log11 [const] n=51 | none | normBound 2.52e+46 | 2121.37323029700019105803221464 s
+JOB 102/122 f=exp (alpha absorbed) w=log13 [const] n=51 | none | normBound 2.12e+46 | 2362.76200276000008670962415636 s
+JOB 101/122 f=exp (alpha absorbed) w=log13 n=50 | none | normBound 2.00e+47 | 2733.40920704100017246673814952 s
+JOB 103/122 f=exp (alpha absorbed) w=log17 n=50 | none | normBound 2.12e+47 | 1784.58716369500007203896529973 s
+JOB 107/122 f=exp (alpha absorbed) w=log23 n=50 | none | normBound 3.00e+47 | 1782.62748062800005754979792982 s
+JOB 108/122 f=exp (alpha absorbed) w=log23 [const] n=51 | none | normBound 2.17e+46 | 1896.24740662499993959499988705 s
+JOB 105/122 f=exp (alpha absorbed) w=log19 n=50 | none | normBound 2.13e+47 | 2179.3852032790000521345064044 s
+JOB 104/122 f=exp (alpha absorbed) w=log17 [const] n=51 | none | normBound 2.25e+46 | 2287.39853775600022345315665007 s
+JOB 106/122 f=exp (alpha absorbed) w=log19 [const] n=51 | none | normBound 2.18e+46 | 2250.16832314300017969799228013 s
+JOB 109/122 f=exp (alpha absorbed) w=log29 n=50 | none | normBound 2.00e+47 | 2243.163708460000179911730811 s
+JOB 110/122 f=exp (alpha absorbed) w=log29 [const] n=51 | none | normBound 2.01e+46 | 2347.41327552900020236847922206 s
+JOB 111/122 f=exp (alpha absorbed) w=log31 n=50 | none | normBound 2.35e+47 | 2467.79908314900012555881403387 s
+JOB 113/122 f=exp (alpha absorbed) w=pi^2 n=51 | none | normBound 2.16e+46 | 1894.25821413600010600930545479 s
+JOB 112/122 f=exp (alpha absorbed) w=log31 [const] n=51 | none | normBound 2.15e+46 | 2467.54153567699995619477704167 s
+JOB 114/122 f=exp (alpha absorbed) w=pi^2 [const] n=52 | none | normBound 2.29e+45 | 2024.16488835900008780299685895 s
+JOB 115/122 f=exp (alpha absorbed) w=pi^3 n=51 | none | normBound 2.19e+46 | 1882.38311446400007298507262021 s
+JOB 117/122 f=exp (alpha absorbed) w=sqrt2*pi n=51 | none | normBound 2.47e+46 | 2274.59531119099983698106370866 s
+JOB 116/122 f=exp (alpha absorbed) w=pi^3 [const] n=52 | none | normBound 2.04e+45 | 2338.64183829900002820068039 s
+JOB 118/122 f=exp (alpha absorbed) w=sqrt2*pi [const] n=52 | none | normBound 2.15e+45 | 2258.51349265199996807496063411 s
+JOB 119/122 f=exp (alpha absorbed) w=sqrt3*pi n=51 | none | normBound 1.89e+46 | 1956.11333193700011179316788912 s
+JOB 120/122 f=exp (alpha absorbed) w=sqrt3*pi [const] n=52 | none | normBound 2.22e+45 | 2134.6490319190002082905266434 s
+JOB 122/122 f=exp (alpha absorbed) w=log(pi) [const] n=52 | none | normBound 2.19e+45 | 1754.13685103600005277257878333 s
+JOB 121/122 f=exp (alpha absorbed) w=log(pi) n=51 | none | normBound 2.20e+46 | 1825.50778205100004925043322146 s
+
+===== SUMMARY (3000 digits, variant 2) =====
+jobs run = 103, real relations = 0, degenerate = 0, unverified = 0
+min normBound (jobs without relation) overall = 1.9600000000000001412074185383e+45
+  f=identity: jobs 41, real 0, degenerate 0, min normBound 4.42999999999999981258820792649e+55, mean time 1187.40640601048767166503239423 s
+  f=log: jobs 21, real 0, degenerate 0, min normBound 3.86999999999999970601083097181e+70, mean time 610.661073643857093884435016662 s
+  f=exp: jobs 41, real 0, degenerate 0, min normBound 1.9600000000000001412074185383e+45, mean time 2130.17805628965925279771909118 s
+  f=sin: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=cos: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=tan: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=sinh: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=cosh: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=tanh: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=arctan: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=arcsinh: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=arccosh: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=arcsin(1/t): jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=arccos(1/t): jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=log(t-1): jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=t^t: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=Gamma: jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+  f=exp(1/t): jobs 0, real 0, degenerate 0, min normBound 1.0000000000000000525047602552e+300, mean time 0 s
+--- validation ---
+PASS [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 n=50 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4
+PASS [CHECK] f=exp alpha=3 branch=log(alpha) w=log2 [const] n=51 alpha0=3 (on grid), a0=sqrt2, x0=gamma, b0=-3/4
+PASS [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi n=42 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3
+PASS [CHECK] f=identity alpha=1/sqrt2 branch=u=alpha w=pi [const] n=43 alpha0=1/sqrt2 (on grid), a0=phi, x0=e, b0=1/3
+PASS [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e n=42 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4
+PASS [CHECK] f=identity alpha=2^(3/7)*3^(-1/5) branch=u=alpha w=e [const] n=43 alpha0=2^(3/7)3^(-1/5) (off grid), a0=1+sqrt2, x0=gamma, b0=3/4
+PASS [CHECK] f=log alpha=1/3+sqrt5/7 branch=exp(alpha) w=log3 n=34 alpha0=1/3+sqrt5/7 (off grid), a0=2, x0=pi, b0=-2/3
+PASS [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma n=51 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2
+PASS [CHECK] f=exp alpha=5^(2/9) branch=log(alpha) w=gamma [const] n=52 alpha0=5^(2/9) (off grid), a0=3, x0=e, b0=1/2
+PASS [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi n=42 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3
+PASS [CHECK] f=identity alpha=29^(1/3)/2 branch=u=alpha w=pi [const] n=43 alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3
+PASS [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 n=41 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2
+PASS [CHECK] f=identity alpha=7^(2/5)/3 branch=u=alpha w=log29 [const] n=42 [ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2
+PASS [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G n=51 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3
+PASS [CHECK] f=exp alpha=11^(3/4) branch=log(alpha) w=G [const] n=52 [ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3
+PASS [CHECK] f=log alpha=2/5+sqrt6/3 branch=exp(alpha) w=pi^3 n=34 [ext] x=log31, w=pi^3: alpha0=2/5+sqrt6/3 (off grid), a0=13, b0=1/3
+PASS [CHECK] f=log alpha=3/7+sqrt5/2 branch=exp(alpha) w=sqrt3*pi n=34 [ext] x=pi, w=sqrt3*pi, f=log: alpha0=3/7+sqrt5/2 (off grid), a0=phi, b0=1/2
+PASS [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e n=42 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2
+PASS [CHECK] f=identity alpha=3^(1/4)*13^(-1/2) branch=u=alpha w=e [const] n=43 alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2
+validation: all PASS
+total elapsed 15756.5952354799992463085800409 s

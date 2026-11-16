@@ -2210,7 +2210,7 @@ void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<in
 //   ZETA3_TE_PMAX / ZETA3_TE_QMAX (rational grid, default 60 / 30), ZETA3_TE_QUAD (0/1, default 1), ZETA3_TE_COUNT_ONLY (1: print job counts only),
 //   ZETA3_TE_SKIP_DONE=<old output path> (resume: skip production jobs whose old line has status none; others and CHECK jobs rerun).
 // variant: 0 = without constant column, 1 = with constant column only, 2 = both.
-static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorbedMode, int maxPrime, int maxPrimeLogLog)
+static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorbedMode, int maxPrime, int maxPrimeLogLog, bool extMode = false)
 {
 	std::cout.precision(30);
 	const auto tStart = std::chrono::steady_clock::now();
@@ -2300,17 +2300,6 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 						[=]() { mpreal r = mpfr::cbrt(mpreal(b)); if (inv) r = 1 / r; return sg ? -r : r; } });
 	}
 
-	// ---- w ----
-	struct WSpec { std::string name; std::function<mpreal()> val; };
-	const std::vector<WSpec> ws = {
-		{ "1", []() { return mpreal(1); } }, { "pi", []() { return mpfr::const_pi(); } }, { "e", []() { return mpfr::exp(mpreal(1)); } },
-		{ "gamma", []() { return mpfr::const_euler(); } }, { "log2", []() { return mpfr::log(mpreal(2)); } },
-		{ "log3", []() { return mpfr::log(mpreal(3)); } }, { "pi^2", []() { return mpfr::const_pi() * mpfr::const_pi(); } },
-		{ "sqrt2*pi", []() { return mpfr::sqrt(mpreal(2)) * mpfr::const_pi(); } },
-	};
-	auto findW = [&](const std::string& n) { for (size_t i = 0; i < ws.size(); ++i) if (ws[i].name == n) return (int)i; return -1; };
-
-	// ---- columns ----
 	std::vector<int> primes;
 	for (int q = 2; q <= std::max(maxPrime, maxPrimeLogLog); ++q)
 	{
@@ -2318,11 +2307,37 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 		for (int d = 2; d * d <= q; ++d) if (q % d == 0) pr = false;
 		if (pr) primes.push_back(q);
 	}
+	// ---- w ----
+	struct WSpec { std::string name; std::function<mpreal()> val; };
+	std::vector<WSpec> ws = {
+		{ "1", []() { return mpreal(1); } }, { "pi", []() { return mpfr::const_pi(); } }, { "e", []() { return mpfr::exp(mpreal(1)); } },
+		{ "gamma", []() { return mpfr::const_euler(); } }, { "log2", []() { return mpfr::log(mpreal(2)); } },
+		{ "log3", []() { return mpfr::log(mpreal(3)); } }, { "pi^2", []() { return mpfr::const_pi() * mpfr::const_pi(); } },
+		{ "sqrt2*pi", []() { return mpfr::sqrt(mpreal(2)) * mpfr::const_pi(); } },
+	};
+	if (extMode)
+	{
+		// extended w set: 1, pi, e, gamma, G, log p (p <= maxPrime), pi^2, pi^3, sqrt2*pi, sqrt3*pi, log pi
+		ws.clear();
+		ws.push_back({ "1", []() { return mpreal(1); } }); ws.push_back({ "pi", []() { return mpfr::const_pi(); } });
+		ws.push_back({ "e", []() { return mpfr::exp(mpreal(1)); } }); ws.push_back({ "gamma", []() { return mpfr::const_euler(); } });
+		ws.push_back({ "G", []() { return mpfr::const_catalan(); } });
+		for (int q : primes) if (q <= maxPrime) ws.push_back({ "log" + std::to_string(q), [q]() { return mpfr::log(mpreal(q)); } });
+		ws.push_back({ "pi^2", []() { return mpfr::const_pi() * mpfr::const_pi(); } });
+		ws.push_back({ "pi^3", []() { return mpfr::pow(mpfr::const_pi(), 3); } });
+		ws.push_back({ "sqrt2*pi", []() { return mpfr::sqrt(mpreal(2)) * mpfr::const_pi(); } });
+		ws.push_back({ "sqrt3*pi", []() { return mpfr::sqrt(mpreal(3)) * mpfr::const_pi(); } });
+		ws.push_back({ "log(pi)", []() { return mpfr::log(mpfr::const_pi()); } });
+	}
+	auto findW = [&](const std::string& n) { for (size_t i = 0; i < ws.size(); ++i) if (ws[i].name == n) return (int)i; return -1; };
+
+	// ---- columns ----
 	std::map<std::string, std::function<mpreal()>> base = {
 		{ "1", []() { return mpreal(1); } },
 		{ "log(1+sqrt2)", []() { return mpfr::log(1 + mpfr::sqrt(mpreal(2))); } },
 		{ "log(phi)", []() { return mpfr::log((1 + mpfr::sqrt(mpreal(5))) / 2); } },
 		{ "log(pi)", []() { return mpfr::log(mpfr::const_pi()); } }, { "log(gamma)", []() { return mpfr::log(mpfr::const_euler()); } },
+		{ "log(G)", []() { return mpfr::log(mpfr::const_catalan()); } },
 		{ "sqrt2", []() { return mpfr::sqrt(mpreal(2)); } }, { "sqrt3", []() { return mpfr::sqrt(mpreal(3)); } },
 		{ "sqrt5", []() { return mpfr::sqrt(mpreal(5)); } }, { "sqrt6", []() { return mpfr::sqrt(mpreal(6)); } },
 	};
@@ -2340,7 +2355,12 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 		if (form == LOG) plain = { "1", "sqrt2", "sqrt3", "sqrt5", "sqrt6" };
 		if (form == EXP) { plain = logP; plain.insert(plain.end(), llP.begin(), llP.end()); }
 		wf = logP;
-		for (const char* n : { "log(1+sqrt2)", "log(phi)", "1", "log(pi)", "log(gamma)", "log(log2)", "log(log3)" }) wf.push_back(n);
+		if (extMode)
+		{
+			for (const char* n : { "log(1+sqrt2)", "log(phi)", "1", "log(pi)", "log(gamma)", "log(G)" }) wf.push_back(n);
+			for (int q : primes) if (q <= maxPrime) wf.push_back("log(log" + std::to_string(q) + ")");
+		}
+		else for (const char* n : { "log(1+sqrt2)", "log(phi)", "1", "log(pi)", "log(gamma)", "log(log2)", "log(log3)" }) wf.push_back(n);
 		auto has = [&](const std::string& n) { return std::find(plain.begin(), plain.end(), n) != plain.end(); };
 		ColSpec cs;
 		for (const auto& p : plain) cs.push_back({ p, false });
@@ -2350,6 +2370,7 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 			if (wname == "1" && has(n)) continue;
 			if (n == "1" && wname == "log2" && has("log2")) continue;
 			if (n == "1" && wname == "log3" && has("log3")) continue;
+			if (extMode && n == "1" && wname.compare(0, 3, "log") == 0 && wname != "log(pi)" && has(wname)) continue;
 			cs.push_back({ n, true });
 		}
 		if (wc) cs.push_back({ "1", false });
@@ -2385,6 +2406,7 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 		std::string f; Alpha al; int br; std::string w, desc; std::function<mpreal()> a0, x0; long bp, bq;
 		std::vector<std::pair<std::string, long>> exp;
 		int needPrime = 0;
+		bool ext = false;
 	};
 	const std::vector<ChkSpec> specs = {
 		{ "tan", { "1/2", []() { return mpreal(1) / 2; } }, 0, "e", "a0=3, x0=pi, b0=2/5",
@@ -2410,6 +2432,23 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 			"alpha0=29^(1/3)/2 (prime 29, off grid), a0=phi, x0=e, b0=2/3",
 			[]() { return (1 + mpfr::sqrt(mpreal(5))) / 2; }, []() { return mpfr::exp(mpreal(1)); }, 2, 3,
 			{ { "logz", 3 }, { "log29", -1 }, { "log2", 3 }, { "w*log(phi)", 2 }, { "w*1", 2 } }, 29 },
+		// ---- extended-set validations (ext mode only) ----
+		{ "identity", { "7^(2/5)/3", []() { return mpfr::pow(mpreal(7), mpreal(2) / 5) / 3; } }, 0, "log29",
+			"[ext] x=G, w=log29: alpha0=7^(2/5)/3 (off grid), a0=5, b0=1/2",
+			[]() { return mpreal(5); }, []() { return mpfr::const_catalan(); }, 1, 2,
+			{ { "logz", 10 }, { "log7", -4 }, { "log3", 10 }, { "w*log5", 5 }, { "w*log(G)", 5 } }, 29, true },
+		{ "exp", { "11^(3/4)", []() { return mpfr::pow(mpreal(11), mpreal(3) / 4); } }, 0, "G",
+			"[ext] x=log23, w=G: alpha0=11^(3/4) (off grid), a0=7, b0=-1/3",
+			[]() { return mpreal(7); }, []() { return mpfr::log(mpreal(23)); }, -1, 3,
+			{ { "logz", 3 }, { "log3", -3 }, { "log2", 6 }, { "log(log11)", -3 }, { "w*log7", -1 }, { "w*log(log23)", -1 } }, 23, true },
+		{ "log", { "2/5+sqrt6/3", []() { return mpreal(2) / 5 + mpfr::sqrt(mpreal(6)) / 3; } }, 0, "pi^3",
+			"[ext] x=log31, w=pi^3: alpha0=2/5+sqrt6/3 (off grid), a0=13, b0=1/3",
+			[]() { return mpreal(13); }, []() { return mpfr::log(mpreal(31)); }, 1, 3,
+			{ { "logz", 15 }, { "1", -6 }, { "sqrt6", -5 }, { "w*log13", 5 }, { "w*log(log31)", 5 } }, 31, true },
+		{ "log", { "3/7+sqrt5/2", []() { return mpreal(3) / 7 + mpfr::sqrt(mpreal(5)) / 2; } }, 0, "sqrt3*pi",
+			"[ext] x=pi, w=sqrt3*pi, f=log: alpha0=3/7+sqrt5/2 (off grid), a0=phi, b0=1/2",
+			[]() { return (1 + mpfr::sqrt(mpreal(5))) / 2; }, []() { return mpfr::const_pi(); }, 1, 2,
+			{ { "logz", 14 }, { "1", -6 }, { "sqrt5", -7 }, { "w*log(phi)", 7 }, { "w*log(pi)", 7 } }, 0, true },
 		{ "identity", { "3^(1/4)*13^(-1/2)", []() { return mpfr::pow(mpreal(3), mpreal(1) / 4) * mpfr::pow(mpreal(13), -mpreal(1) / 2); } }, 0, "e",
 			"alpha0=3^(1/4)13^(-1/2), a0=23 (prime 23 in w*log), x0=gamma, b0=-1/2",
 			[]() { return mpreal(23); }, []() { return mpfr::const_euler(); }, -1, 2,
@@ -2420,7 +2459,7 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 	for (size_t ci = 0; ci < specs.size(); ++ci)
 	{
 		const int fi = findF(specs[ci].f);
-		if ((fns[fi].form == GEN) == absorbedMode || specs[ci].needPrime > maxPrime) continue;
+		if ((fns[fi].form == GEN) == absorbedMode || specs[ci].needPrime > maxPrime || (specs[ci].ext && !extMode)) continue;
 		for (int wc = 0; wc < 2; ++wc)
 		{
 			if (wc && fns[fi].form == LOG) continue; // plain 1 is already in the basis
@@ -2458,6 +2497,16 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 		<< ", alphas = " << alphas.size() << std::endl;
 	std::cout << "TOTAL production jobs = " << totalProd << " + " << checks.size() << " validation jobs" << std::endl;
 	for (size_t i = 0; i < fns.size(); ++i) std::cout << "  jobs for f=" << fns[i].name << ": " << jobsPerF[i] << std::endl;
+	if (extMode)
+	{
+		std::cout << "EXT MODE: x set = e, pi, gamma, G, log p (p<=" << maxPrime << ", as loglog p); w set size = " << ws.size() << ", loglog plain p<=" << maxPrimeLogLog << std::endl;
+		std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_absorbed_ext_" << digits << "digits_p" << maxPrime << ".txt" << std::endl;
+		std::map<int, int> nHist;
+		for (const auto& j : prod) ++nHist[(int)colSpec(fns[j.fi].form, ws[j.wi].name, j.wc != 0).size() + 1];
+		for (const auto& kv : nHist)
+			std::cout << "  n = " << kv.first << ": " << kv.second << " jobs, PSLQ power ~ 10^" << (int)(0.8 * digits / kv.first) << " (coefficient norm)" << std::endl;
+		std::cout << "  total production jobs " << prod.size() << ", n range " << (nHist.empty() ? 0 : nHist.begin()->first) << ".." << (nHist.empty() ? 0 : nHist.rbegin()->first) << std::endl;
+	}
 	mpreal::set_default_prec(savedPrec);
 	struct Built { std::string name; std::vector<std::string> labels; std::function<std::vector<mpreal>(int)> compute; };
 	auto build = [&](const Job& j)
@@ -2560,6 +2609,8 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 	}
 
 	// ---- run: validation first, then production ----
+	// ZETA3_TE_ONLY=<index>: run only that production job (0-based, no validation) -- timing tests.
+	if (const char* only = std::getenv("ZETA3_TE_ONLY")) { const size_t k = std::min((size_t)std::atol(only), prod.size() - 1); Job jj = prod[k]; prod.assign(1, jj); checks.clear(); }
 	std::vector<Job*> all;
 	for (auto& j : checks) all.push_back(&j);
 	for (auto& j : prod) all.push_back(&j);
@@ -2653,7 +2704,579 @@ void test_pslq_zeta3_transcendental_exponent_absorbed(int digits, int maxPrime, 
 	zeta3TranscendentalExponentImpl(digits, 2, true, maxPrime, maxPrimeLogLog);
 }
 
+void test_pslq_zeta3_transcendental_exponent_absorbed_ext(int digits, int maxPrime, int maxPrimeLogLog)
+{
+	zeta3TranscendentalExponentImpl(digits, 2, true, maxPrime, maxPrimeLogLog, true);
+}
+
 void test_pslq_zeta3_transcendental_exponent_grid(int digits, int maxPrime, int variant)
 {
 	zeta3TranscendentalExponentImpl(digits, variant, false, maxPrime, 3);
+}
+
+// ===================================================================================================================
+// y = f(zeta3 * (a x)^(b w)) with a GENERAL algebraic number y (degree <= `degree`): polynomial PSLQ on (1, y, ..., y^degree).
+// Targets: f in {identity, log, exp, sin, cos, tan, sinh, cosh, tanh, arctan, arcsinh, arccosh, arcsin(1/t), arccos(1/t), log(t-1), t^t, Gamma, exp(1/t)},
+//   a in {1,2,3,5,1/2,1/3,2/3,3/2}, x in {e,pi,gamma,G,log2,log3}, w in {1,pi,e,gamma,G,log2,log3,log5,pi^2,pi^3,sqrt2*pi,sqrt3*pi,log pi},
+//   b in {+-1,+-2,+-3,+-1/2,+-1/3,+-2/3,+-3/2}.
+// Dedup stages (per f, counts printed): (1) trivial rule, (2) symbolic key of u, (3) domain/non-finite, (4) range |y|>1e30 or <1e-30 (also pre-checks
+//   for overflow), (5) y within 10^-(D/2) of an integer (saturation artifacts), (6) ill-conditioned y: within 10^-(0.4 D/degree) of an integer,
+//   (7) numeric duplicates up to +-y and 1/y within 10^-(D/2) (global over all f; the earliest target is kept).
+// Env vars: ZETA3_TEP_THREADS (default 10), ZETA3_TEP_COUNT_ONLY=1 (dedup counts only), ZETA3_TEP_SKIP_DONE=<old output> (skip jobs with status none),
+//   ZETA3_TEP_ONLY=<idx> (run only the idx-th job after dedup, 0-based, no validation), ZETA3_TEP_JOBS=<n> (evenly spaced sample of n jobs),
+//   ZETA3_TEP_CHECK_ONLY=1 (run validation only), ZETA3_TEP_NOCHECK=1 (skip validation).
+// Output: results/zeta3_transcendental_exponent_polynomial_<digits>digits_deg<degree>.txt (redirect stdout).
+namespace
+{
+	struct TepQ
+	{
+		long n = 0, d = 1;
+		TepQ() {}
+		TepQ(long n_, long d_ = 1) { const long g = std::gcd(std::labs(n_), std::labs(d_)); n = n_ / (g ? g : 1); d = d_ / (g ? g : 1); if (d < 0) { n = -n; d = -d; } }
+		TepQ operator+(const TepQ& o) const { return TepQ(n * o.d + o.n * d, d * o.d); }
+		TepQ operator*(const TepQ& o) const { return TepQ(n * o.n, d * o.d); }
+		std::string str() const { return d == 1 ? std::to_string(n) : std::to_string(n) + "/" + std::to_string(d); }
+		mpreal val() const { return mpreal(n) / d; }
+	};
+
+	struct TepSpec { int f, a, x, w, b; }; // indices into the lists below
+
+	const char* const kTepF[] = { "identity", "log", "exp", "sin", "cos", "tan", "sinh", "cosh", "tanh", "arctan", "arcsinh", "arccosh",
+		"arcsin(1/t)", "arccos(1/t)", "log(t-1)", "t^t", "Gamma", "exp(1/t)" };
+	const int kTepNF = 18;
+	const TepQ kTepA[] = { TepQ(1), TepQ(2), TepQ(3), TepQ(5), TepQ(1, 2), TepQ(1, 3), TepQ(2, 3), TepQ(3, 2) };
+	const int kTepNA = 8;
+	const char* const kTepX[] = { "e", "pi", "gamma", "G", "log2", "log3" };
+	const int kTepNX = 6;
+	const char* const kTepW[] = { "1", "pi", "e", "gamma", "G", "log2", "log3", "log5", "pi^2", "pi^3", "sqrt2*pi", "sqrt3*pi", "log(pi)" };
+	const int kTepNW = 13;
+	const TepQ kTepB[] = { TepQ(1), TepQ(-1), TepQ(2), TepQ(-2), TepQ(3), TepQ(-3), TepQ(1, 2), TepQ(-1, 2), TepQ(1, 3), TepQ(-1, 3),
+		TepQ(2, 3), TepQ(-2, 3), TepQ(3, 2), TepQ(-3, 2) };
+	const int kTepNB = 14;
+
+	// atom names used in the symbolic key (w atoms and log atoms share one namespace so that equal products collide)
+	const char* const kTepWAtom[] = { "1", "pi", "e", "gamma", "G", "log2", "log3", "log5", "pi2", "pi3", "sqrt2pi", "sqrt3pi", "logpi" };
+	const char* const kTepXAtom[] = { "1", "logpi", "loggamma", "logG", "loglog2", "loglog3" };
+
+	mpreal tepXVal(int i)
+	{
+		switch (i)
+		{
+		case 0: return mpfr::exp(mpreal(1));
+		case 1: return mpfr::const_pi();
+		case 2: return mpfr::const_euler();
+		case 3: return mpfr::const_catalan();
+		case 4: return mpfr::log(mpreal(2));
+		default: return mpfr::log(mpreal(3));
+		}
+	}
+	mpreal tepWVal(int i)
+	{
+		const mpreal pi = mpfr::const_pi();
+		switch (i)
+		{
+		case 0: return mpreal(1);
+		case 1: return pi;
+		case 2: return mpfr::exp(mpreal(1));
+		case 3: return mpfr::const_euler();
+		case 4: return mpfr::const_catalan();
+		case 5: return mpfr::log(mpreal(2));
+		case 6: return mpfr::log(mpreal(3));
+		case 7: return mpfr::log(mpreal(5));
+		case 8: return pi * pi;
+		case 9: return pi * pi * pi;
+		case 10: return mpfr::sqrt(mpreal(2)) * pi;
+		case 11: return mpfr::sqrt(mpreal(3)) * pi;
+		default: return mpfr::log(pi);
+		}
+	}
+
+	std::string tepName(const TepSpec& s)
+	{
+		return std::string("f=") + kTepF[s.f] + " a=" + kTepA[s.a].str() + " x=" + kTepX[s.x] + " w=" + kTepW[s.w] + " b=" + kTepB[s.b].str();
+	}
+
+	// ---- symbolic key of log u - log zeta3 = b w (log a + log x) ----
+	typedef std::map<std::pair<std::string, std::string>, TepQ> TepKey;
+	TepKey tepKey(const TepSpec& s)
+	{
+		TepKey k;
+		auto add = [&](std::string p, std::string q, const TepQ& c)
+		{
+			if (p > q) std::swap(p, q);
+			auto it = k.find({ p, q });
+			if (it == k.end()) k[{p, q}] = c; else it->second = it->second + c;
+		};
+		const std::string wa = kTepWAtom[s.w];
+		const TepQ& b = kTepB[s.b];
+		const long primes[3] = { 2, 3, 5 };
+		for (long p : primes)
+		{
+			long e = 0, nn = kTepA[s.a].n, dd = kTepA[s.a].d;
+			while (nn % p == 0) { nn /= p; ++e; }
+			while (dd % p == 0) { dd /= p; --e; }
+			if (e) add(wa, "log" + std::to_string(p), b * TepQ(e));
+		}
+		add(wa, kTepXAtom[s.x], b);
+		for (auto it = k.begin(); it != k.end();)
+			if (it->second.n == 0) it = k.erase(it); else ++it;
+		return k;
+	}
+	bool tepIsLogPrime(const std::string& a) { return a == "log2" || a == "log3" || a == "log5"; }
+	bool tepAlgebraicPair(const std::pair<std::string, std::string>& p)
+	{
+		return (p.first == "1" && tepIsLogPrime(p.second)) || (p.second == "1" && tepIsLogPrime(p.first));
+	}
+	std::string tepKeyStr(const TepKey& k)
+	{
+		std::string s;
+		for (const auto& e : k) s += e.first.first + "*" + e.first.second + ":" + e.second.str() + ";";
+		return s;
+	}
+
+	// zeta(3) cache, accurate to (2*digits + 400) digits (rounded to the working precision on use)
+	mpreal& tepZ3(int digits)
+	{
+		static std::mutex mtx;
+		static std::map<int, mpreal> cache;
+		std::lock_guard<std::mutex> lk(mtx);
+		auto it = cache.find(digits);
+		if (it == cache.end())
+		{
+			const auto saved = mpreal::get_default_prec();
+			mpreal::set_default_prec(mpfr::digits2bits(2 * digits + 400));
+			mpreal z = mpfr::zeta(mpreal(3));
+			mpreal::set_default_prec(saved);
+			it = cache.emplace(digits, z).first;
+		}
+		return it->second;
+	}
+
+	mpreal tepRound(const mpreal& y, mp_prec_t bits) { mpreal o; o.set_prec(bits); o = y; return o; }
+	enum { TEP_OK = 0, TEP_DOMAIN = 1, TEP_RANGE = 2 };
+	// Evaluates y = f(c * (a x)^(b w)) with guard digits. cFn() is called at the working (default) precision.
+	// Returns y rounded to `digits` digits (mpreal prec set accordingly). st: TEP_OK / TEP_DOMAIN / TEP_RANGE.
+	mpreal tepEval(const TepSpec& s, const std::function<mpreal()>& cFn, int digits, int& st)
+	{
+		const auto saved = mpreal::get_default_prec();
+		st = TEP_OK;
+		auto uAt = [&](int dg)
+		{
+			mpreal::set_default_prec(mpfr::digits2bits(dg));
+			const mpreal ax = kTepA[s.a].val() * tepXVal(s.x);
+			return cFn() * mpfr::pow(ax, kTepB[s.b].val() * tepWVal(s.w));
+		};
+		const mpreal u0 = uAt(60);
+		mpreal::set_default_prec(mpfr::digits2bits(60));
+		const double l10 = (double)mpfr::log10(mpfr::abs(u0));
+		double lm1 = 0;
+		{ const mpreal d = mpfr::abs(u0 - 1); lm1 = d == 0 ? 400 : -(double)mpfr::log10(d); }
+		if (!(l10 < 150))
+		{
+			mpreal::set_default_prec(saved); st = TEP_RANGE; return mpreal(0);
+		}
+		const double u0d = (double)u0;
+		const int f = s.f;
+		// cheap pre-checks (domain and overflow) in double precision; margins are generous, final checks are done on y
+		bool dom = true, rng = false;
+		switch (f)
+		{
+		case 11: case 12: case 13: dom = u0d >= 1; break;                                   // arccosh, arcsin(1/t), arccos(1/t)
+		case 14: dom = u0d > 1; break;                                                      // log(t-1)
+		case 15: dom = u0d > 0.36787944117144233; rng = u0d > 40; break;                    // t^t (u > 1/e)
+		case 16: dom = u0d >= 1.4616321449683623; rng = u0d > 40; break;                    // Gamma (u >= argmin)
+		case 2: case 6: case 7: rng = u0d > 100; break;                                     // exp, sinh, cosh
+		case 17: rng = u0d < 1.0 / 100; break;                                              // exp(1/t)
+		default: break;
+		}
+		if (!dom) { mpreal::set_default_prec(saved); st = TEP_DOMAIN; return mpreal(0); }
+		if (rng) { mpreal::set_default_prec(saved); st = TEP_RANGE; return mpreal(0); }
+		const int guard = 40 + (int)std::max(0.0, l10) + (int)std::min(150.0, std::max(0.0, lm1));
+		const int dg = digits + guard;
+		const mpreal u = uAt(dg);
+		mpreal::set_default_prec(mpfr::digits2bits(dg));
+		mpreal y;
+		switch (f)
+		{
+		case 0: y = u; break;
+		case 1: y = mpfr::log(u); break;
+		case 2: y = mpfr::exp(u); break;
+		case 3: y = mpfr::sin(u); break;
+		case 4: y = mpfr::cos(u); break;
+		case 5: y = mpfr::tan(u); break;
+		case 6: y = mpfr::sinh(u); break;
+		case 7: y = mpfr::cosh(u); break;
+		case 8: y = mpfr::tanh(u); break;
+		case 9: y = mpfr::atan(u); break;
+		case 10: y = mpfr::asinh(u); break;
+		case 11: y = mpfr::acosh(u); break;
+		case 12: y = mpfr::asin(1 / u); break;
+		case 13: y = mpfr::acos(1 / u); break;
+		case 14: y = mpfr::log(u - 1); break;
+		case 15: y = mpfr::pow(u, u); break;
+		case 16: y = mpfr::gamma(u); break;
+		default: y = mpfr::exp(1 / u); break;
+		}
+		if (!mpfr::isfinite(y)) { mpreal::set_default_prec(saved); st = TEP_DOMAIN; return mpreal(0); }
+		const mpreal ay = mpfr::abs(y);
+		if (ay > mpreal("1e30") || ay < mpreal("1e-30")) st = TEP_RANGE;
+		mpreal out = tepRound(y, mpfr::digits2bits(digits));
+		mpreal::set_default_prec(saved);
+		return out;
+	}
+
+	// distance from y to the nearest integer (log10); y finite and |y| <= 1e30
+	double tepLogDistInt(const mpreal& y)
+	{
+		const auto saved = mpreal::get_default_prec();
+		mpreal::set_default_prec(y.get_prec());
+		const mpreal d = mpfr::abs(y - mpfr::round(y));
+		double r = d == 0 ? -1e9 : (double)mpfr::log10(d);
+		mpreal::set_default_prec(saved);
+		return r;
+	}
+
+	mpreal tepPolyRoot(const std::vector<long>& c, mpreal x) // Newton; c[k] = coefficient of t^k
+	{
+		for (int it = 0; it < 500; ++it)
+		{
+			mpreal p = 0, dp = 0;
+			for (size_t i = c.size(); i-- > 0;) { dp = dp * x + p; p = p * x + c[i]; }
+			const mpreal dx = p / dp;
+			x -= dx;
+			if (dx == 0 || mpfr::abs(dx) < mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() + 10)) break;
+		}
+		return x;
+	}
+
+	template <class Fn> void tepParallelFor(size_t n, unsigned nThreads, int digits, Fn fn)
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(digits));
+					for (size_t i; (i = next++) < n;) fn(i);
+				});
+		for (auto& t : th) t.join();
+	}
+
+	struct TepTarget { TepSpec s; std::string name; mpreal y; };
+	struct TepJobRes { PslqResult r; double secs = 0; bool verified = false; int trueDeg = 0; std::string poly; std::string resid; };
+
+	// Runs PSLQ on target y and verifies at 2x precision (y2 = recomputed y at 2*digits).
+	TepJobRes tepRunJob(const mpreal& y, const std::function<mpreal(int)>& yAt, int digits, int degree)
+	{
+		TepJobRes jr;
+		const auto t0 = std::chrono::steady_clock::now();
+		mpreal::set_default_prec(mpfr::digits2bits(digits));
+		jr.r = findIntegerPolynomial(y, degree);
+		jr.secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+		if (jr.r.status == PslqResult::Status::Found)
+		{
+			const mpreal y2 = yAt(2 * digits);
+			mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+			mpreal v = 0;
+			for (size_t i = jr.r.relation.size(); i-- > 0;) v = v * y2 + jr.r.relation[i];
+			jr.verified = mpfr::abs(v) < mpfr::pow(mpreal(10), -1.5 * digits);
+			jr.resid = mpfr::abs(v).toString("%.3Re");
+			mpreal::set_default_prec(mpfr::digits2bits(digits));
+			for (size_t i = 0; i < jr.r.relation.size(); ++i)
+				if (jr.r.relation[i] != 0) jr.trueDeg = (int)i;
+			std::string out;
+			for (size_t k = jr.r.relation.size(); k-- > 0;)
+				if (jr.r.relation[k] != 0) out += (out.empty() ? "" : " ") + jr.r.relation[k].toString("%.0Rf") + "*t^" + std::to_string(k);
+			jr.poly = out;
+		}
+		return jr;
+	}
+}
+
+void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
+{
+	std::cout.precision(30);
+	const auto tStart = std::chrono::steady_clock::now();
+	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
+	const unsigned nThreads = (unsigned)std::max(1, envInt("ZETA3_TEP_THREADS", 10));
+	const int countOnly = envInt("ZETA3_TEP_COUNT_ONLY", 0), sampleJobs = envInt("ZETA3_TEP_JOBS", 0);
+	const int checkOnly = envInt("ZETA3_TEP_CHECK_ONLY", 0), noCheck = envInt("ZETA3_TEP_NOCHECK", 0);
+	const auto savedPrec = mpreal::get_default_prec();
+	mpreal::set_default_prec(mpfr::digits2bits(digits));
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_" << digits << "digits_deg" << degree << ".txt" << std::endl;
+	std::cout << "digits " << digits << ", degree " << degree << " (only max degree, covers all lower), threads " << nThreads << std::endl;
+	tepZ3(digits); // warm the cache
+	auto z3 = [digits]() { return tepRound(tepZ3(digits), mpreal::get_default_prec()); };
+
+	// ---------------- validation ----------------
+	struct Check { std::string name; TepSpec s; std::function<mpreal()> uTarget; std::vector<long> poly; bool pass = false; std::string msg; };
+	auto findFn = [](const char* n) { for (int i = 0; i < kTepNF; ++i) if (std::string(n) == kTepF[i]) return i; return -1; };
+	auto idxA = [](TepQ q) { for (int i = 0; i < kTepNA; ++i) if (kTepA[i].n == q.n && kTepA[i].d == q.d) return i; return -1; };
+	auto idxB = [](TepQ q) { for (int i = 0; i < kTepNB; ++i) if (kTepB[i].n == q.n && kTepB[i].d == q.d) return i; return -1; };
+	auto idxS = [](const char* const* L, int n, const char* nm) { for (int i = 0; i < n; ++i) if (std::string(nm) == L[i]) return i; return -1; };
+	std::vector<Check> checks;
+	{
+		// alpha = root of poly near x0;  u = g(alpha);  c = u / (a x)^(b w);  the spec's (a,x,w,b) is used in the generic pipeline.
+		auto add = [&](const char* nm, const char* f, TepQ a, const char* x, const char* w, TepQ b, std::vector<long> poly, double x0,
+			std::function<mpreal(const mpreal&)> g)
+		{
+			Check c;
+			c.name = nm;
+			c.s = { findFn(f), idxA(a), idxS(kTepX, kTepNX, x), idxS(kTepW, kTepNW, w), idxB(b) };
+			c.poly = poly;
+			c.uTarget = [poly, x0, g]() { return g(tepPolyRoot(poly, mpreal(x0))); };
+			checks.push_back(c);
+		};
+		auto newtonU = [](const std::function<mpreal(const mpreal&)>& h, const std::function<mpreal(const mpreal&)>& dh, mpreal x)
+		{
+			for (int i = 0; i < 500; ++i)
+			{
+				const mpreal dx = h(x) / dh(x);
+				x -= dx;
+				if (dx == 0 || mpfr::abs(dx) < mpfr::pow(mpreal(2), -(long)mpreal::get_default_prec() + 10)) break;
+			}
+			return x;
+		};
+		add("identity: y = root of t^7-t-1, c = alpha (2e)^(-pi/3)", "identity", TepQ(2), "e", "pi", TepQ(1, 3), { -1, -1, 0, 0, 0, 0, 0, 1 }, 1.1,
+			[](const mpreal& a) { return a; });
+		add("sin: y = root of t^5-3t+1 in (0,1), sin(c pi^(gamma/2))", "sin", TepQ(1), "pi", "gamma", TepQ(1, 2), { 1, -3, 0, 0, 0, 1 }, 0.33,
+			[](const mpreal& a) { return mpfr::asin(a); });
+		add("Gamma: y = root of t^7-t-3, Gamma(u) = y", "Gamma", TepQ(3, 2), "G", "e", TepQ(-2, 3), { -3, -1, 0, 0, 0, 0, 0, 1 }, 1.3,
+			[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+				return newtonU([&](const mpreal& c) { return mpfr::lngamma(c) - la; }, [](const mpreal& c) { return mpfr::digamma(c); }, mpreal(2.5)); });
+		add("t^t: y = root of t^8-2t-2, u^u = y", "t^t", TepQ(1, 3), "log3", "pi^2", TepQ(1, 2), { -2, -2, 0, 0, 0, 0, 0, 0, 1 }, 1.3,
+			[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+				return newtonU([&](const mpreal& c) { return c * mpfr::log(c) - la; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, mpreal(1.2)); });
+		add("degree 12: y = root of t^12-2t-2 (Eisenstein), identity", "identity", TepQ(2, 3), "gamma", "log(pi)", TepQ(-3, 2),
+			{ -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, 1.3, [](const mpreal& a) { return a; });
+		add("log: y = root of t^7-t-1, u = exp(y)", "log", TepQ(5), "log2", "sqrt2*pi", TepQ(2, 3), { -1, -1, 0, 0, 0, 0, 0, 1 }, 1.1,
+			[](const mpreal& a) { return mpfr::exp(a); });
+		add("exp: y = root of t^7-t-1, u = log(y)", "exp", TepQ(1, 2), "G", "pi^3", TepQ(-1, 3), { -1, -1, 0, 0, 0, 0, 0, 1 }, 1.1,
+			[](const mpreal& a) { return mpfr::log(a); });
+	}
+	// c(prec) = u / (a x)^(b w) is computed per call at the working precision
+	auto checkC = [](const Check& ch) -> std::function<mpreal()>
+	{
+		const TepSpec s = ch.s;
+		auto uT = ch.uTarget;
+		return [s, uT]() { return uT() / mpfr::pow(kTepA[s.a].val() * tepXVal(s.x), kTepB[s.b].val() * tepWVal(s.w)); };
+	};
+	if (!countOnly && !noCheck && !std::getenv("ZETA3_TEP_ONLY"))
+	{
+		std::cout << "--- validation (synthetic c replaces zeta(3); y is a known algebraic number) ---" << std::endl;
+		tepParallelFor(checks.size(), nThreads, digits, [&](size_t i)
+			{
+				Check& ch = checks[i];
+				const auto cf = checkC(ch);
+				int st;
+				const mpreal y = tepEval(ch.s, cf, digits, st);
+				auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(ch.s, cf, dg, s2); mpreal::set_default_prec(sv); return r; };
+				const TepJobRes jr = tepRunJob(y, yAt, digits, degree);
+				bool ok = jr.r.status == PslqResult::Status::Found && jr.verified;
+				std::string why = ok ? "" : "not found or not verified";
+				if (ok)
+				{
+					// monic expected polynomial p must divide the found relation r exactly (integer long division)
+					std::vector<long long> r;
+					for (const auto& v : jr.r.relation) r.push_back(v.toLong());
+					const std::vector<long>& p = ch.poly;
+					const int dp = (int)p.size() - 1;
+					for (int k = (int)r.size() - 1; k >= dp; --k)
+					{
+						const long long q = r[k];
+						for (int j = 0; j <= dp; ++j) r[k - dp + j] -= q * p[j];
+					}
+					bool zero = true;
+					for (int k = 0; k < dp; ++k) if (r[k] != 0) zero = false;
+					ok = zero;
+					if (!zero) why = "relation is not a multiple of the expected polynomial";
+				}
+				ch.pass = ok;
+				std::ostringstream os;
+				os << (ok ? "PASS " : "FAIL ") << ch.name << " [" << tepName(ch.s) << "] : " << toString(jr.r.status) << ", verified " << jr.verified
+					<< ", true degree " << jr.trueDeg << ", " << jr.secs << " s; relation: " << jr.poly << " (residual@" << 2 * digits << ": " << jr.resid << ")" << (why.empty() ? "" : " -- " + why);
+				ch.msg = os.str();
+			});
+		int nfail = 0;
+		for (const auto& c : checks) { std::cout << c.msg << std::endl; nfail += !c.pass; }
+		std::cout << "validation: " << (nfail == 0 ? "all PASS" : "SOME FAIL") << std::endl;
+		if (checkOnly) { mpreal::set_default_prec(savedPrec); return; }
+	}
+	if (checkOnly) { mpreal::set_default_prec(savedPrec); return; }
+
+	// ---------------- enumeration and dedup ----------------
+	std::vector<long> cTotal(kTepNF), cRule4(kTepNF), cSym(kTepNF), cDom(kTepNF), cRng(kTepNF), cNear(kTepNF), cIll(kTepNF), cNum(kTepNF);
+	std::vector<long> dSymTriv(kTepNF), dSymDup(kTepNF), dSymPi(kTepNF);
+	std::vector<TepSpec> cand;
+	const int bPlain[] = { 0, 1, 2, 3, 4, 5 }; // integer b indices (|b| <= 3)
+	for (int f = 0; f < kTepNF; ++f)
+	{
+		std::set<std::string> seen;
+		for (int a = 0; a < kTepNA; ++a)
+			for (int x = 0; x < kTepNX; ++x)
+				for (int w = 0; w < kTepNW; ++w)
+					for (int b = 0; b < kTepNB; ++b)
+					{
+						++cTotal[f];
+						const TepSpec s{ f, a, x, w, b };
+						// rule 4: w=1, x=pi, a=1, b integer, |b|<=3: f(zeta3 pi^b), already tested
+						bool isInt = false;
+						for (int bi : bPlain) if (bi == b) isInt = true;
+						if (w == 0 && x == 1 && a == 0 && isInt) continue;
+						++cRule4[f];
+						TepKey key = tepKey(s);
+						if (f == 0) // identity: algebraic factors do not matter
+							for (auto it = key.begin(); it != key.end();)
+								if (tepAlgebraicPair(it->first)) it = key.erase(it); else ++it;
+						if (f == 0)
+						{
+							if (key.empty()) { ++dSymTriv[f]; continue; } // zeta3 * algebraic
+							if (key.size() == 1 && key.begin()->second.d == 1 && std::labs(key.begin()->second.n) <= 3 &&
+								((key.begin()->first.first == "1" && key.begin()->first.second == "logpi") ||
+									(key.begin()->first.second == "1" && key.begin()->first.first == "logpi")))
+							{ ++dSymPi[f]; continue; } // zeta3 * pi^k * algebraic, integer |k| <= 3
+						}
+						if (!seen.insert(tepKeyStr(key)).second) { ++dSymDup[f]; continue; }
+						++cSym[f];
+						cand.push_back(s);
+					}
+	}
+
+	// y values (parallel)
+	std::vector<int> st(cand.size(), TEP_OK);
+	std::vector<mpreal> ys(cand.size());
+	tepParallelFor(cand.size(), nThreads, digits, [&](size_t i)
+		{
+			int s;
+			ys[i] = tepEval(cand[i], z3, digits, s);
+			st[i] = s;
+		});
+	// classify
+	std::vector<char> alive(cand.size(), 1);
+	const double nearThr = -0.5 * digits, illThr = -0.4 * digits / degree;
+	for (size_t i = 0; i < cand.size(); ++i)
+	{
+		const int f = cand[i].f;
+		if (st[i] == TEP_DOMAIN) { alive[i] = 0; ++cDom[f]; continue; }
+		if (st[i] == TEP_RANGE) { alive[i] = 0; ++cRng[f]; continue; }
+		const double ld = tepLogDistInt(ys[i]);
+		if (ld < nearThr) { alive[i] = 0; ++cNear[f]; continue; }
+		if (ld < illThr) { alive[i] = 0; ++cIll[f]; continue; }
+	}
+	// numeric dedup (+-y, 1/y), global
+	{
+		std::vector<size_t> idx;
+		std::vector<mpreal> fold(cand.size());
+		for (size_t i = 0; i < cand.size(); ++i)
+			if (alive[i])
+			{
+				mpreal c = mpfr::abs(ys[i]);
+				if (c > 1) c = 1 / c;
+				fold[i] = c;
+				idx.push_back(i);
+			}
+		std::sort(idx.begin(), idx.end(), [&](size_t p, size_t q) { return fold[p] < fold[q] || (fold[p] == fold[q] && p < q); });
+		const mpreal tol = mpfr::pow(mpreal(10), -0.5 * digits);
+		// groups of consecutive entries whose neighbour difference is below tol; keep the smallest original index in each group
+		size_t g = 0;
+		while (g < idx.size())
+		{
+			size_t e = g + 1;
+			while (e < idx.size() && mpfr::abs(fold[idx[e]] - fold[idx[e - 1]]) < tol * std::max(mpreal(1e-30), fold[idx[e]])) ++e;
+			if (e - g > 1)
+			{
+				size_t keep = idx[g];
+				for (size_t k = g; k < e; ++k) keep = std::min(keep, idx[k]);
+				for (size_t k = g; k < e; ++k) if (idx[k] != keep) { alive[idx[k]] = 0; ++cNum[cand[idx[k]].f]; }
+			}
+			g = e;
+		}
+	}
+	std::vector<TepTarget> targets;
+	std::vector<long> cFinal(kTepNF);
+	for (size_t i = 0; i < cand.size(); ++i)
+		if (alive[i]) { targets.push_back({ cand[i], tepName(cand[i]), ys[i] }); ++cFinal[cand[i].f]; }
+
+	std::cout << "--- job counts per f ---" << std::endl;
+	std::cout << "f | all | after rule4 | symbolic: trivial(identity), zeta3*pi^k(identity), duplicate | after symbolic | domain | range | near-integer(D/2) | ill-conditioned | numeric dup | FINAL" << std::endl;
+	long tot[11] = {};
+	for (int f = 0; f < kTepNF; ++f)
+	{
+		const long v[11] = { cTotal[f], cRule4[f], dSymTriv[f], dSymPi[f], dSymDup[f], cSym[f], cDom[f], cRng[f], cNear[f], cIll[f], cNum[f] };
+		std::cout << kTepF[f] << " | " << v[0] << " | " << v[1] << " | " << v[2] << ", " << v[3] << ", " << v[4] << " | " << v[5] << " | " << v[6] << " | " << v[7]
+			<< " | " << v[8] << " | " << v[9] << " | " << v[10] << " | " << cFinal[f] << std::endl;
+		for (int k = 0; k < 11; ++k) tot[k] += v[k];
+	}
+	std::cout << "TOTAL | " << tot[0] << " | " << tot[1] << " | " << tot[2] << ", " << tot[3] << ", " << tot[4] << " | " << tot[5] << " | " << tot[6] << " | " << tot[7]
+		<< " | " << tot[8] << " | " << tot[9] << " | " << tot[10] << " | " << targets.size() << std::endl;
+	std::cout << "JOB COUNT after dedup: " << targets.size() << std::endl;
+	if (countOnly) { std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl; mpreal::set_default_prec(savedPrec); return; }
+
+	// ---------------- selection, resume ----------------
+	if (const char* only = std::getenv("ZETA3_TEP_ONLY"))
+	{
+		const size_t k = std::min((size_t)std::atol(only), targets.size() - 1);
+		const TepTarget t = targets[k];
+		targets.assign(1, t);
+	}
+	else if (sampleJobs > 0 && (size_t)sampleJobs < targets.size())
+	{
+		std::vector<TepTarget> sel;
+		for (int i = 0; i < sampleJobs; ++i) sel.push_back(targets[(size_t)((double)i * targets.size() / sampleJobs)]);
+		targets = sel;
+	}
+	if (const char* sk = std::getenv("ZETA3_TEP_SKIP_DONE"))
+	{
+		std::ifstream in(sk);
+		std::set<std::string> done;
+		std::string line;
+		while (std::getline(in, line))
+		{
+			if (line.compare(0, 4, "JOB ") != 0) continue;
+			const size_t sp = line.find(' ', 4), bar = line.find(" | ");
+			if (sp == std::string::npos || bar == std::string::npos) continue;
+			const size_t bar2 = line.find(" | ", bar + 3);
+			if (line.substr(bar + 3, bar2 - bar - 3) == "none") done.insert(line.substr(sp + 1, bar - sp - 1));
+		}
+		std::vector<TepTarget> rest;
+		for (auto& t : targets) if (!done.count(t.name)) rest.push_back(t);
+		std::cout << "RESUME: ZETA3_TEP_SKIP_DONE=" << sk << ": skipped " << targets.size() - rest.size() << " done jobs, " << rest.size() << " remain" << std::endl;
+		targets = rest;
+	}
+
+	// ---------------- PSLQ jobs ----------------
+	std::cout << "--- production: " << targets.size() << " jobs ---" << std::endl;
+	std::mutex outMtx;
+	std::vector<TepJobRes> res(targets.size());
+	std::atomic<size_t> done{ 0 };
+	tepParallelFor(targets.size(), nThreads, digits, [&](size_t i)
+		{
+			const TepSpec s = targets[i].s;
+			auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(s, z3, dg, s2); mpreal::set_default_prec(sv); return r; };
+			TepJobRes jr = tepRunJob(targets[i].y, yAt, digits, degree);
+			res[i] = jr;
+			const bool found = jr.r.status == PslqResult::Status::Found;
+			std::lock_guard<std::mutex> lk(outMtx);
+			const size_t c = ++done;
+			if (found)
+				std::cout << "RELATION " << targets[i].name << ": " << (jr.verified ? "VERIFIED" : "SPURIOUS") << ", true degree " << jr.trueDeg << ", " << jr.poly
+					<< " (residual@" << 2 * digits << ": " << jr.resid << ")" << std::endl;
+			std::cout << "JOB " << c << "/" << targets.size() << " " << targets[i].name << " | " << (!found ? "none" : (jr.verified ? "FOUND-VERIFIED" : "FOUND-SPURIOUS"))
+				<< " | " << toString(jr.r.status) << ", normBound " << jr.r.normBound.toString("%.2Re") << " | " << jr.secs << " s" << std::endl;
+		});
+
+	// ---------------- summary ----------------
+	int nVer = 0, nSp = 0;
+	double minNb = 1e300, sumSecs = 0;
+	for (size_t i = 0; i < res.size(); ++i)
+	{
+		sumSecs += res[i].secs;
+		if (res[i].r.status == PslqResult::Status::Found) { (res[i].verified ? nVer : nSp)++; if (res[i].verified) std::cout << "REAL RELATION: " << targets[i].name << ": " << res[i].poly << std::endl; }
+		else minNb = std::min(minNb, (double)res[i].r.normBound);
+	}
+	std::cout << "\n===== SUMMARY (" << digits << " digits, degree " << degree << ") =====" << std::endl;
+	std::cout << "jobs run = " << targets.size() << ", verified relations = " << nVer << ", spurious = " << nSp << ", min normBound (jobs without relation) = " << minNb
+		<< ", mean job time " << (targets.empty() ? 0.0 : sumSecs / targets.size()) << " s" << std::endl;
+	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
+	mpreal::set_default_prec(savedPrec);
 }

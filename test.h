@@ -27,4 +27,6 @@ void test_pslq_zeta3_composite_functions(int digits, int maxDegree, bool doAlgeb
 
 // y = f(zeta3 (a x)^(b w)) algebraic; log zeta3 = log g(alpha) - b w (log a + log x).
 void test_pslq_zeta3_transcendental_exponent_absorbed(int digits, int maxPrime, int maxPrimeLogLog); // f = identity, log, exp: alpha absorbed into the PSLQ basis (primes <= maxPrime; loglog p for p <= maxPrimeLogLog)
+void test_pslq_zeta3_transcendental_exponent_absorbed_ext(int digits, int maxPrime, int maxPrimeLogLog); // extended x set (e, pi, gamma, G, loglog p) and w set (1, pi, e, gamma, G, log p, pi^2, pi^3, sqrt2 pi, sqrt3 pi, log pi); output: results/zeta3_transcendental_exponent_absorbed_ext_<digits>digits_p<maxPrime>.txt
 void test_pslq_zeta3_transcendental_exponent_grid(int digits, int maxPrime, int variant = 0); // other f: alpha from a grid; variant 0: no constant column, 1: constant column, 2: both
+void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree); // y = f(zeta3 (a x)^(b w)) with GENERAL algebraic y (degree <= degree, only max degree): polynomial PSLQ, no alpha grid; output: results/zeta3_transcendental_exponent_polynomial_<digits>digits_deg<degree>.txt; env ZETA3_TEP_*

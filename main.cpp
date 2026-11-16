@@ -57,7 +57,10 @@ int main()
 
 	//test_pslq_zeta3_transcendental_exponent_absorbed(3000, 31, 13);
 
-	test_pslq_zeta3_transcendental_exponent_grid(800, 13);
+	//test_pslq_zeta3_transcendental_exponent_grid(800, 13);
+
+	//test_pslq_zeta3_transcendental_exponent_polynomial(800, 12);
+	test_pslq_zeta3_transcendental_exponent_absorbed_ext(3000, 31, 31);
 
 	//test_mpreal();
 

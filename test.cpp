@@ -2207,7 +2207,8 @@ void test_pslq_zeta3_multilevel_composite(int digits, int degree, std::vector<in
 //   exp (u = log(alpha)):  (log zeta3, log2,log3,log5,log7, loglog2,loglog3,loglog5,loglog7, w*{...11} [, 1])                    n = 20 [21]
 // When w = 1, the w*X columns that duplicate plain columns are dropped.
 // Env vars (smoke tests): ZETA3_TE_THREADS (default 10), ZETA3_TE_JOBS (evenly spaced sample of that many production jobs),
-//   ZETA3_TE_PMAX / ZETA3_TE_QMAX (rational grid, default 60 / 30), ZETA3_TE_QUAD (0/1, default 1), ZETA3_TE_COUNT_ONLY (1: print job counts only).
+//   ZETA3_TE_PMAX / ZETA3_TE_QMAX (rational grid, default 60 / 30), ZETA3_TE_QUAD (0/1, default 1), ZETA3_TE_COUNT_ONLY (1: print job counts only),
+//   ZETA3_TE_SKIP_DONE=<old output path> (resume: skip production jobs whose old line has status none; others and CHECK jobs rerun).
 // variant: 0 = without constant column, 1 = with constant column only, 2 = both.
 static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorbedMode, int maxPrime, int maxPrimeLogLog)
 {
@@ -2458,14 +2459,6 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 	std::cout << "TOTAL production jobs = " << totalProd << " + " << checks.size() << " validation jobs" << std::endl;
 	for (size_t i = 0; i < fns.size(); ++i) std::cout << "  jobs for f=" << fns[i].name << ": " << jobsPerF[i] << std::endl;
 	mpreal::set_default_prec(savedPrec);
-	if (countOnly) return;
-	if (sampleJobs > 0 && (size_t)sampleJobs < prod.size())
-	{
-		std::vector<Job> sub;
-		for (size_t i = 0; i < (size_t)sampleJobs; ++i) sub.push_back(prod[i * prod.size() / sampleJobs]);
-		prod.swap(sub);
-	}
-
 	struct Built { std::string name; std::vector<std::string> labels; std::function<std::vector<mpreal>(int)> compute; };
 	auto build = [&](const Job& j)
 	{
@@ -2508,6 +2501,63 @@ static void zeta3TranscendentalExponentImpl(int digits, int variant, bool absorb
 		};
 		return b;
 	};
+
+	// ---- resume: skip production jobs that a previous output shows as finished with status "none" ----
+	// Key = full job name (f, alpha, branch, w, [const], n) = text between "JOB i/N " and " | kind | normBound ...". The counter is ignored.
+	// Lines with [CHECK] and lines with any status other than none are never skipped.
+	if (const char* skipPath = std::getenv("ZETA3_TE_SKIP_DONE"))
+	{
+		std::map<std::string, int> nameCount;
+		for (const auto& j : prod) ++nameCount[build(j).name];
+		size_t dupNames = 0;
+		for (const auto& kv : nameCount) if (kv.second > 1) ++dupNames;
+		std::map<std::string, double> done; // name -> normBound
+		std::set<std::string> ambiguous;
+		std::ifstream in(skipPath);
+		std::string line;
+		size_t oldLines = 0;
+		while (std::getline(in, line))
+		{
+			if (line.compare(0, 4, "JOB ") != 0) continue;
+			const size_t sp = line.find(' ', 4);
+			if (sp == std::string::npos) continue;
+			const size_t sep = line.find(" | ", sp + 1);
+			if (sep == std::string::npos) continue;
+			const std::string name = line.substr(sp + 1, sep - sp - 1);
+			if (name.compare(0, 8, "[CHECK] ") == 0) continue;
+			const size_t sep2 = line.find(" | ", sep + 3);
+			if (sep2 == std::string::npos) continue;
+			const std::string kind = line.substr(sep + 3, sep2 - sep - 3);
+			const size_t nb = line.find("normBound ", sep2);
+			if (nb == std::string::npos) continue;
+			++oldLines;
+			if (kind != "none") { ambiguous.insert(name); continue; }
+			if (done.count(name)) ambiguous.insert(name);
+			done[name] = std::strtod(line.c_str() + nb + 10, nullptr);
+		}
+		// conservative: a name that also appears with a non-none status (or twice) is rerun
+		size_t skipped = 0;
+		double minSkippedNb = 1e300;
+		std::vector<Job> rest;
+		for (const auto& j : prod)
+		{
+			const std::string nm = build(j).name;
+			const auto it = done.find(nm);
+			if (it != done.end() && !ambiguous.count(nm) && nameCount[nm] == 1) { ++skipped; minSkippedNb = std::min(minSkippedNb, it->second); }
+			else rest.push_back(j);
+		}
+		prod.swap(rest);
+		std::cout << "RESUME from " << skipPath << ": old job lines parsed = " << oldLines << ", duplicate production names in this run = " << dupNames
+			<< ", skipped = " << skipped << ", remaining = " << prod.size() << std::endl;
+		std::cout << "RESUME skipped jobs: min normBound = " << minSkippedNb << " (combine with the min of this run's summary)" << std::endl;
+	}
+	if (countOnly) return;
+	if (sampleJobs > 0 && (size_t)sampleJobs < prod.size())
+	{
+		std::vector<Job> sub;
+		for (size_t i = 0; i < (size_t)sampleJobs; ++i) sub.push_back(prod[i * prod.size() / sampleJobs]);
+		prod.swap(sub);
+	}
 
 	// ---- run: validation first, then production ----
 	std::vector<Job*> all;

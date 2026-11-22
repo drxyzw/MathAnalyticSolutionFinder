@@ -1,0 +1,486 @@
+OUTPUT FILE (redirect stdout): results/zeta_gamma_rational_multiplicative_3000digits.txt
+PSLQ algorithm: Multipair2L (m2l)
+digits 3000, greedy digits 800, maxPrime 23, maxNs: 6 12 24, threads 10
+candidate columns: base 13, units+Gammas 268 (gcd(k,N)>1 skipped: they repeat lower levels)
+
+=== greedy independence (m2l PSLQ at 800 digits) ===
+DROP Gamma(1/2) [vs earlier blocks, 0.000724655999999999954688800762881 s]: log Gamma(1/2) = 1/2*pi
+-- N=2 done: kept so far 13, elapsed 0.240082746000000013530950582208 s
+DROP Gamma(2/3) [reflection (small PSLQ), 0.000260818000000000009032385950292 s]: log Gamma(2/3) = 1*pi + 1*p2 + -1*2sin(pi*1/3) + -1*Gamma(1/3)
+DROP 2sin(pi*1/3) [vs earlier blocks, 0.000945309999999999987091436892683 s]: log 2sin(pi*1/3) = 1/2*p3
+-- N=3 done: kept so far 14, elapsed 0.452316282000000013940876897323 s
+DROP Gamma(3/4) [reflection (small PSLQ), 0.000143661000000000005707989636505 s]: log Gamma(3/4) = 1*pi + 1/2*p2 + -1*Gamma(1/4)
+DROP 2sin(pi*1/4) [vs earlier blocks, 0.0015178649999999999694461072508 s]: log 2sin(pi*1/4) = 1/2*p2
+-- N=4 done: kept so far 15, elapsed 0.656697004999999944807598240004 s
+DROP Gamma(3/5) [reflection (small PSLQ), 0.000446046000000000018425455605708 s]: log Gamma(3/5) = 1*pi + 1*p2 + -1*2sin(pi*2/5) + -1*Gamma(2/5)
+DROP Gamma(4/5) [reflection (small PSLQ), 0.000217130000000000003123473701905 s]: log Gamma(4/5) = 1*pi + 1*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5)
+DROP 2sin(pi*2/5) [within block, 0.00443504200000000015080559023772 s]: log 2sin(pi*2/5) = 1/2*p5 + -1*2sin(pi*1/5)
+-- N=5 done: kept so far 18, elapsed 1.24983438900000010107760317624 s
+DROP Gamma(5/6) [reflection (small PSLQ), 0.000418798000000000010967921015848 s]: log Gamma(5/6) = 1*pi + 1*p2 + -1*Gamma(1/6)
+DROP 2sin(pi*1/6) [zero column, log 1 = 0]
+DROP Gamma(1/6) [vs earlier blocks, 0.0116165239999999996001189828121 s]: log Gamma(1/6) = -1/2*pi + -1/3*p2 + 1/2*p3 + 2*Gamma(1/3)
+-- N=6 done: kept so far 18, elapsed 1.42814005200000004869309577771 s
+DROP Gamma(4/7) [reflection (small PSLQ), 0.000794274999999999994047816809228 s]: log Gamma(4/7) = 1*pi + 1*p2 + -1*2sin(pi*3/7) + -1*Gamma(3/7)
+DROP Gamma(5/7) [reflection (small PSLQ), 0.000222405000000000009369865994202 s]: log Gamma(5/7) = 1*pi + 1*p2 + -1*2sin(pi*2/7) + -1*Gamma(2/7)
+DROP Gamma(6/7) [reflection (small PSLQ), 0.00020440700000000000991114135207 s]: log Gamma(6/7) = 1*pi + 1*p2 + -1*2sin(pi*1/7) + -1*Gamma(1/7)
+DROP 2sin(pi*3/7) [within block, 0.0120393830000000007229843390633 s]: log 2sin(pi*3/7) = 1/2*p7 + -1*2sin(pi*1/7) + -1*2sin(pi*2/7)
+-- N=7 done: kept so far 23, elapsed 2.58321247900000017239108274225 s
+DROP Gamma(5/8) [reflection (small PSLQ), 0.000197698999999999992143243088272 s]: log Gamma(5/8) = 1*pi + 1*p2 + -1*2sin(pi*3/8) + -1*Gamma(3/8)
+DROP Gamma(7/8) [reflection (small PSLQ), 9.63770000000000023800822424036e-05 s]: log Gamma(7/8) = 1*pi + 1*p2 + -1*2sin(pi*1/8) + -1*Gamma(1/8)
+DROP 2sin(pi*3/8) [within block, 0.00422900600000000043143799643985 s]: log 2sin(pi*3/8) = 1/2*p2 + -1*2sin(pi*1/8)
+DROP Gamma(3/8) [within block, 0.028615910000000001345288325183 s]: log Gamma(3/8) = 1/2*pi + -1/4*p2 + -1*Gamma(1/4) + 1*2sin(pi*1/8) + 1*Gamma(1/8)
+-- N=8 done: kept so far 25, elapsed 3.8421943390000001805617557693 s
+DROP Gamma(5/9) [reflection (small PSLQ), 0.000218237000000000004552511145839 s]: log Gamma(5/9) = 1*pi + 1*p2 + -1*2sin(pi*4/9) + -1*Gamma(4/9)
+DROP Gamma(7/9) [reflection (small PSLQ), 0.000186774000000000011192935467363 s]: log Gamma(7/9) = 1*pi + 1*p2 + -1*2sin(pi*2/9) + -1*Gamma(2/9)
+DROP Gamma(8/9) [reflection (small PSLQ), 9.23089999999999999934219285791e-05 s]: log Gamma(8/9) = 1*pi + 1*p2 + -1*2sin(pi*1/9) + -1*Gamma(1/9)
+DROP 2sin(pi*4/9) [within block, 0.0173091980000000013328875780871 s]: log 2sin(pi*4/9) = 1/2*p3 + -1*2sin(pi*1/9) + -1*2sin(pi*2/9)
+DROP Gamma(4/9) [within block, 0.058850642000000001619053335844 s]: log Gamma(4/9) = 1/6*p3 + 1*Gamma(1/3) + 1*2sin(pi*2/9) + -1*Gamma(1/9) + 1*Gamma(2/9)
+-- N=9 done: kept so far 29, elapsed 6.16184649100000036980873119319 s
+DROP Gamma(7/10) [reflection (small PSLQ), 0.000193804999999999991817586919574 s]: log Gamma(7/10) = 1*pi + 1*p2 + -1*2sin(pi*3/10) + -1*Gamma(3/10)
+DROP Gamma(9/10) [reflection (small PSLQ), 9.93760000000000053455712079042e-05 s]: log Gamma(9/10) = 1*pi + 1*p2 + -1*2sin(pi*1/10) + -1*Gamma(1/10)
+DROP 2sin(pi*1/10) [vs earlier blocks, 0.0344278540000000007892388964592 s]: log 2sin(pi*1/10) = -1/2*p5 + 2*2sin(pi*1/5)
+DROP 2sin(pi*3/10) [vs earlier blocks, 0.0341947079999999972721447250024 s]: log 2sin(pi*3/10) = 1/2*p5 + -2*2sin(pi*1/5)
+DROP Gamma(1/10) [vs earlier blocks, 0.0739522660000000026103705863534 s]: log Gamma(1/10) = -1/2*pi + -1/5*p2 + 1/2*p5 + -1*2sin(pi*1/5) + 1*Gamma(1/5) + 1*Gamma(2/5)
+DROP Gamma(3/10) [vs earlier blocks, 0.0713381609999999971583051205926 s]: log Gamma(3/10) = 1/2*pi + 2/5*p2 + -1/2*p5 + 2*2sin(pi*1/5) + 1*Gamma(1/5) + -1*Gamma(2/5)
+-- N=10 done: kept so far 29, elapsed 6.39679737899999967254416333162 s
+DROP Gamma(6/11) [reflection (small PSLQ), 0.000209902000000000010663039895498 s]: log Gamma(6/11) = 1*pi + 1*p2 + -1*2sin(pi*5/11) + -1*Gamma(5/11)
+DROP Gamma(7/11) [reflection (small PSLQ), 0.000186090999999999990796584192765 s]: log Gamma(7/11) = 1*pi + 1*p2 + -1*2sin(pi*4/11) + -1*Gamma(4/11)
+DROP Gamma(8/11) [reflection (small PSLQ), 0.00018260300000000001334997390412 s]: log Gamma(8/11) = 1*pi + 1*p2 + -1*2sin(pi*3/11) + -1*Gamma(3/11)
+DROP Gamma(9/11) [reflection (small PSLQ), 0.000184837999999999994492350108288 s]: log Gamma(9/11) = 1*pi + 1*p2 + -1*2sin(pi*2/11) + -1*Gamma(2/11)
+DROP Gamma(10/11) [reflection (small PSLQ), 9.25330000000000032697733409748e-05 s]: log Gamma(10/11) = 1*pi + 1*p2 + -1*2sin(pi*1/11) + -1*Gamma(1/11)
+DROP 2sin(pi*5/11) [within block, 0.0491334199999999970964736917267 s]: log 2sin(pi*5/11) = 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -1*2sin(pi*3/11) + -1*2sin(pi*4/11)
+-- N=11 done: kept so far 38, elapsed 11.4846992300000003695004124893 s
+DROP Gamma(7/12) [reflection (small PSLQ), 0.000734714000000000026779911621588 s]: log Gamma(7/12) = 1*pi + 1*p2 + -1*2sin(pi*5/12) + -1*Gamma(5/12)
+DROP Gamma(11/12) [reflection (small PSLQ), 0.000101879999999999993568616796225 s]: log Gamma(11/12) = 1*pi + 1*p2 + -1*2sin(pi*1/12) + -1*Gamma(1/12)
+DROP 2sin(pi*5/12) [within block, 0.00368758200000000001261835080868 s]: log 2sin(pi*5/12) = -1*2sin(pi*1/12)
+DROP Gamma(1/12) [within block, 0.191567559999999997844000176883 s]: log Gamma(1/12) = -1/2*pi + 3/8*p3 + 1*Gamma(1/3) + 1*Gamma(1/4) + -1/2*2sin(pi*1/12)
+DROP Gamma(5/12) [within block, 0.186892944000000005289052751323 s]: log Gamma(5/12) = 1/2*pi + 1/2*p2 + -1/8*p3 + -1*Gamma(1/3) + 1*Gamma(1/4) + 1/2*2sin(pi*1/12)
+-- N=12 done: kept so far 39, elapsed 14.5963662920000007972021194291 s
+DROP Gamma(7/13) [reflection (small PSLQ), 0.00021288000000000000823917323256 s]: log Gamma(7/13) = 1*pi + 1*p2 + -1*2sin(pi*6/13) + -1*Gamma(6/13)
+DROP Gamma(8/13) [reflection (small PSLQ), 0.000182527999999999997974425847147 s]: log Gamma(8/13) = 1*pi + 1*p2 + -1*2sin(pi*5/13) + -1*Gamma(5/13)
+DROP Gamma(9/13) [reflection (small PSLQ), 0.000186144000000000012142592487052 s]: log Gamma(9/13) = 1*pi + 1*p2 + -1*2sin(pi*4/13) + -1*Gamma(4/13)
+DROP Gamma(10/13) [reflection (small PSLQ), 0.000185054999999999995972249644538 s]: log Gamma(10/13) = 1*pi + 1*p2 + -1*2sin(pi*3/13) + -1*Gamma(3/13)
+DROP Gamma(11/13) [reflection (small PSLQ), 0.000184966999999999992749036281658 s]: log Gamma(11/13) = 1*pi + 1*p2 + -1*2sin(pi*2/13) + -1*Gamma(2/13)
+DROP Gamma(12/13) [reflection (small PSLQ), 9.09580000000000056439158901966e-05 s]: log Gamma(12/13) = 1*pi + 1*p2 + -1*2sin(pi*1/13) + -1*Gamma(1/13)
+DROP 2sin(pi*6/13) [within block, 0.197211639999999993611012882866 s]: log 2sin(pi*6/13) = 1/2*p13 + -1*2sin(pi*1/13) + -1*2sin(pi*2/13) + -1*2sin(pi*3/13) + -1*2sin(pi*4/13) + -1*2sin(pi*5/13)
+-- N=13 done: kept so far 50, elapsed 27.2808711929999994083573255921 s
+DROP Gamma(9/14) [reflection (small PSLQ), 0.000545295000000000002794708908738 s]: log Gamma(9/14) = 1*pi + 1*p2 + -1*2sin(pi*5/14) + -1*Gamma(5/14)
+DROP Gamma(11/14) [reflection (small PSLQ), 0.000428680000000000022402496524521 s]: log Gamma(11/14) = 1*pi + 1*p2 + -1*2sin(pi*3/14) + -1*Gamma(3/14)
+DROP Gamma(13/14) [reflection (small PSLQ), 0.000224772000000000008899589398759 s]: log Gamma(13/14) = 1*pi + 1*p2 + -1*2sin(pi*1/14) + -1*Gamma(1/14)
+DROP 2sin(pi*1/14) [vs earlier blocks, 0.445216033999999982739836923429 s]: log 2sin(pi*1/14) = -1/2*p7 + 2*2sin(pi*1/7) + 1*2sin(pi*2/7)
+DROP 2sin(pi*3/14) [vs earlier blocks, 0.356491473999999974875407815489 s]: log 2sin(pi*3/14) = 1/2*p7 + -1*2sin(pi*1/7) + -2*2sin(pi*2/7)
+DROP 2sin(pi*5/14) [vs earlier blocks, 0.0392646529999999965854229344586 s]: log 2sin(pi*5/14) = -1*2sin(pi*1/7) + 1*2sin(pi*2/7)
+DROP Gamma(1/14) [vs earlier blocks, 0.699297759999999990476737821155 s]: log Gamma(1/14) = -1/2*pi + -1/7*p2 + 1/2*p7 + -1*2sin(pi*1/7) + -1*2sin(pi*2/7) + 1*Gamma(1/7) + 1*Gamma(3/7)
+DROP Gamma(3/14) [vs earlier blocks, 0.616295566999999988588854193949 s]: log Gamma(3/14) = -1/2*pi + -3/7*p2 + 1*2sin(pi*2/7) + 1*Gamma(2/7) + 1*Gamma(3/7)
+DROP Gamma(5/14) [vs earlier blocks, 0.708585357000000026772568162414 s]: log Gamma(5/14) = 1/2*pi + 2/7*p2 + 1*2sin(pi*1/7) + -1*2sin(pi*2/7) + 1*Gamma(1/7) + -1*Gamma(2/7)
+-- N=14 done: kept so far 50, elapsed 28.3099192230000014092183846515 s
+DROP Gamma(8/15) [reflection (small PSLQ), 0.000574218000000000037413849796053 s]: log Gamma(8/15) = 1*pi + 1*p2 + -1*2sin(pi*7/15) + -1*Gamma(7/15)
+DROP Gamma(11/15) [reflection (small PSLQ), 0.000197934999999999994627075672327 s]: log Gamma(11/15) = 1*pi + 1*p2 + -1*2sin(pi*4/15) + -1*Gamma(4/15)
+DROP Gamma(13/15) [reflection (small PSLQ), 0.000195464000000000011000866884103 s]: log Gamma(13/15) = 1*pi + 1*p2 + -1*2sin(pi*2/15) + -1*Gamma(2/15)
+DROP Gamma(14/15) [reflection (small PSLQ), 9.74350000000000047864837093847e-05 s]: log Gamma(14/15) = 1*pi + 1*p2 + -1*2sin(pi*1/15) + -1*Gamma(1/15)
+DROP 2sin(pi*4/15) [within block, 0.265675041000000000668279653837 s]: log 2sin(pi*4/15) = -1/2*p5 + 2*2sin(pi*1/5) + -1*2sin(pi*1/15)
+DROP 2sin(pi*7/15) [within block, 0.225983067000000009683091661827 s]: log 2sin(pi*7/15) = 1/2*p5 + -2*2sin(pi*1/5) + -1*2sin(pi*2/15)
+DROP Gamma(2/15) [within block, 1.10055456100000004227013050695 s]: log Gamma(2/15) = -7/20*p3 + 1/6*p5 + -1*Gamma(1/3) + -1/2*2sin(pi*1/5) + 1*Gamma(2/5) + 1/2*2sin(pi*1/15) + -1/2*2sin(pi*2/15) + 1*Gamma(1/15)
+DROP Gamma(4/15) [within block, 0.678635034000000025855570129352 s]: log Gamma(4/15) = -3/10*p3 + 1/2*p5 + -2*2sin(pi*1/5) + -1*Gamma(1/5) + 1*Gamma(2/5) + 1*2sin(pi*1/15) + 1*Gamma(1/15)
+DROP Gamma(7/15) [within block, 1.07297511699999992274001670012 s]: log Gamma(7/15) = 9/20*p3 + -1/6*p5 + 1*Gamma(1/3) + 3/2*2sin(pi*1/5) + 1*Gamma(1/5) + -1/2*2sin(pi*1/15) + 1/2*2sin(pi*2/15) + -1*Gamma(1/15)
+-- N=15 done: kept so far 53, elapsed 46.9027415730000001303778844886 s
+DROP Gamma(9/16) [reflection (small PSLQ), 0.000454885999999999994774374512119 s]: log Gamma(9/16) = 1*pi + 1*p2 + -1*2sin(pi*7/16) + -1*Gamma(7/16)
+DROP Gamma(11/16) [reflection (small PSLQ), 0.000415982999999999977780440474362 s]: log Gamma(11/16) = 1*pi + 1*p2 + -1*2sin(pi*5/16) + -1*Gamma(5/16)
+DROP Gamma(13/16) [reflection (small PSLQ), 0.000555597000000000013596179737618 s]: log Gamma(13/16) = 1*pi + 1*p2 + -1*2sin(pi*3/16) + -1*Gamma(3/16)
+DROP Gamma(15/16) [reflection (small PSLQ), 0.000100656999999999995283085640896 s]: log Gamma(15/16) = 1*pi + 1*p2 + -1*2sin(pi*1/16) + -1*Gamma(1/16)
+DROP 2sin(pi*5/16) [within block, 0.183240574999999988881071999458 s]: log 2sin(pi*5/16) = 1/2*p2 + -1*2sin(pi*1/8) + -1*2sin(pi*3/16)
+DROP 2sin(pi*7/16) [within block, 0.0409091190000000007320757333673 s]: log 2sin(pi*7/16) = 1*2sin(pi*1/8) + -1*2sin(pi*1/16)
+DROP Gamma(5/16) [within block, 0.95472829699999994801373759401 s]: log Gamma(5/16) = 1/8*p2 + 1*Gamma(1/4) + -1*Gamma(1/8) + 1*2sin(pi*3/16) + 1*Gamma(3/16)
+DROP Gamma(7/16) [within block, 0.894717671999999963894367738249 s]: log Gamma(7/16) = 1/2*pi + 1/8*p2 + -1*2sin(pi*1/8) + -1*Gamma(1/8) + 1*2sin(pi*1/16) + 1*Gamma(1/16)
+-- N=16 done: kept so far 57, elapsed 66.2430619280000030357768991962 s
+DROP Gamma(9/17) [reflection (small PSLQ), 0.000218497000000000005451306073212 s]: log Gamma(9/17) = 1*pi + 1*p2 + -1*2sin(pi*8/17) + -1*Gamma(8/17)
+DROP Gamma(10/17) [reflection (small PSLQ), 0.000203529000000000009169484616045 s]: log Gamma(10/17) = 1*pi + 1*p2 + -1*2sin(pi*7/17) + -1*Gamma(7/17)
+DROP Gamma(11/17) [reflection (small PSLQ), 0.000192833999999999990441687525156 s]: log Gamma(11/17) = 1*pi + 1*p2 + -1*2sin(pi*6/17) + -1*Gamma(6/17)
+DROP Gamma(12/17) [reflection (small PSLQ), 0.000183964000000000002521538533529 s]: log Gamma(12/17) = 1*pi + 1*p2 + -1*2sin(pi*5/17) + -1*Gamma(5/17)
+DROP Gamma(13/17) [reflection (small PSLQ), 0.000196214999999999990766205715254 s]: log Gamma(13/17) = 1*pi + 1*p2 + -1*2sin(pi*4/17) + -1*Gamma(4/17)
+DROP Gamma(14/17) [reflection (small PSLQ), 0.000172461000000000001016603468074 s]: log Gamma(14/17) = 1*pi + 1*p2 + -1*2sin(pi*3/17) + -1*Gamma(3/17)
+DROP Gamma(15/17) [reflection (small PSLQ), 9.42669999999999971710198942709e-05 s]: log Gamma(15/17) = 1*pi + 1*p2 + -1*2sin(pi*2/17) + -1*Gamma(2/17)
+DROP Gamma(16/17) [reflection (small PSLQ), 9.10789999999999999114388971044e-05 s]: log Gamma(16/17) = 1*pi + 1*p2 + -1*2sin(pi*1/17) + -1*Gamma(1/17)
+DROP 2sin(pi*8/17) [within block, 1.21785765000000001379021341563 s]: log 2sin(pi*8/17) = 1/2*p17 + -1*2sin(pi*1/17) + -1*2sin(pi*2/17) + -1*2sin(pi*3/17) + -1*2sin(pi*4/17) + -1*2sin(pi*5/17) + -1*2sin(pi*6/17) + -1*2sin(pi*7/17)
+-- N=17 done: kept so far 72, elapsed 108.338027588000002765511453617 s
+DROP Gamma(11/18) [reflection (small PSLQ), 0.000292731000000000013330087034191 s]: log Gamma(11/18) = 1*pi + 1*p2 + -1*2sin(pi*7/18) + -1*Gamma(7/18)
+DROP Gamma(13/18) [reflection (small PSLQ), 0.000189516999999999994925420354619 s]: log Gamma(13/18) = 1*pi + 1*p2 + -1*2sin(pi*5/18) + -1*Gamma(5/18)
+DROP Gamma(17/18) [reflection (small PSLQ), 9.48510000000000037768607685784e-05 s]: log Gamma(17/18) = 1*pi + 1*p2 + -1*2sin(pi*1/18) + -1*Gamma(1/18)
+DROP 2sin(pi*1/18) [vs earlier blocks, 1.15196365700000002973979462695 s]: log 2sin(pi*1/18) = -1/2*p3 + 2*2sin(pi*1/9) + 1*2sin(pi*2/9)
+DROP 2sin(pi*5/18) [vs earlier blocks, 1.19044485999999993808273757168 s]: log 2sin(pi*5/18) = 1/2*p3 + -1*2sin(pi*1/9) + -2*2sin(pi*2/9)
+DROP 2sin(pi*7/18) [vs earlier blocks, 0.131962705000000013466632253767 s]: log 2sin(pi*7/18) = -1*2sin(pi*1/9) + 1*2sin(pi*2/9)
+DROP Gamma(1/18) [vs earlier blocks, 3.22423820499999980171423885622 s]: log Gamma(1/18) = -1/2*pi + -1/9*p2 + 2/3*p3 + 1*Gamma(1/3) + -1*2sin(pi*1/9) + 1*Gamma(2/9)
+DROP Gamma(5/18) [vs earlier blocks, 3.07102327300000021992332221998 s]: log Gamma(5/18) = 1/2*pi + 4/9*p2 + -2/3*p3 + -1*Gamma(1/3) + 1*2sin(pi*1/9) + 1*2sin(pi*2/9) + 1*Gamma(1/9)
+DROP Gamma(7/18) [vs earlier blocks, 3.11448950099999999352462509705 s]: log Gamma(7/18) = 1/2*pi + 2/9*p2 + 1*2sin(pi*1/9) + -1*2sin(pi*2/9) + 1*Gamma(1/9) + -1*Gamma(2/9)
+-- N=18 done: kept so far 72, elapsed 111.912410089000005086745659355 s
+DROP Gamma(10/19) [reflection (small PSLQ), 0.000462510999999999976826925429663 s]: log Gamma(10/19) = 1*pi + 1*p2 + -1*2sin(pi*9/19) + -1*Gamma(9/19)
+DROP Gamma(11/19) [reflection (small PSLQ), 0.000208442999999999996341149000045 s]: log Gamma(11/19) = 1*pi + 1*p2 + -1*2sin(pi*8/19) + -1*Gamma(8/19)
+DROP Gamma(12/19) [reflection (small PSLQ), 0.000206237999999999999664948568956 s]: log Gamma(12/19) = 1*pi + 1*p2 + -1*2sin(pi*7/19) + -1*Gamma(7/19)
+DROP Gamma(13/19) [reflection (small PSLQ), 0.00019995099999999999700918407175 s]: log Gamma(13/19) = 1*pi + 1*p2 + -1*2sin(pi*6/19) + -1*Gamma(6/19)
+DROP Gamma(14/19) [reflection (small PSLQ), 0.000198681000000000004086439520101 s]: log Gamma(14/19) = 1*pi + 1*p2 + -1*2sin(pi*5/19) + -1*Gamma(5/19)
+DROP Gamma(15/19) [reflection (small PSLQ), 0.000203281999999999996118354994579 s]: log Gamma(15/19) = 1*pi + 1*p2 + -1*2sin(pi*4/19) + -1*Gamma(4/19)
+DROP Gamma(16/19) [reflection (small PSLQ), 0.000217579999999999986956544795191 s]: log Gamma(16/19) = 1*pi + 1*p2 + -1*2sin(pi*3/19) + -1*Gamma(3/19)
+DROP Gamma(17/19) [reflection (small PSLQ), 9.93979999999999993751109705897e-05 s]: log Gamma(17/19) = 1*pi + 1*p2 + -1*2sin(pi*2/19) + -1*Gamma(2/19)
+DROP Gamma(18/19) [reflection (small PSLQ), 0.000100040999999999999825646412877 s]: log Gamma(18/19) = 1*pi + 1*p2 + -1*2sin(pi*1/19) + -1*Gamma(1/19)
+DROP 2sin(pi*9/19) [within block, 1.50215313799999994337497355446 s]: log 2sin(pi*9/19) = 1/2*p19 + -1*2sin(pi*1/19) + -1*2sin(pi*2/19) + -1*2sin(pi*3/19) + -1*2sin(pi*4/19) + -1*2sin(pi*5/19) + -1*2sin(pi*6/19) + -1*2sin(pi*7/19) + -1*2sin(pi*8/19)
+-- N=19 done: kept so far 89, elapsed 226.614119168000001991458702832 s
+DROP Gamma(11/20) [reflection (small PSLQ), 0.000560401999999999992155275130301 s]: log Gamma(11/20) = 1*pi + 1*p2 + -1*2sin(pi*9/20) + -1*Gamma(9/20)
+DROP Gamma(13/20) [reflection (small PSLQ), 0.000413540000000000001340039190723 s]: log Gamma(13/20) = 1*pi + 1*p2 + -1*2sin(pi*7/20) + -1*Gamma(7/20)
+DROP Gamma(17/20) [reflection (small PSLQ), 0.000481612999999999984689080800848 s]: log Gamma(17/20) = 1*pi + 1*p2 + -1*2sin(pi*3/20) + -1*Gamma(3/20)
+DROP Gamma(19/20) [reflection (small PSLQ), 9.82440000000000033088601303355e-05 s]: log Gamma(19/20) = 1*pi + 1*p2 + -1*2sin(pi*1/20) + -1*Gamma(1/20)
+DROP 2sin(pi*7/20) [within block, 3.60167502100000014308989193523 s]: log 2sin(pi*7/20) = 1/2*p5 + -2*2sin(pi*1/5) + -1*2sin(pi*3/20)
+DROP 2sin(pi*9/20) [within block, 3.59145600999999992097855283646 s]: log 2sin(pi*9/20) = -1/2*p5 + 2*2sin(pi*1/5) + -1*2sin(pi*1/20)
+DROP Gamma(3/20) [within block, 9.21464356299999920452137303073 s]: log Gamma(3/20) = 1/2*pi + 1/5*p2 + -3/8*p5 + 1/2*2sin(pi*1/5) + -1*Gamma(2/5) + 1/2*2sin(pi*1/20) + -1/2*2sin(pi*3/20) + 1*Gamma(1/20)
+DROP Gamma(7/20) [within block, 8.42901357500000081302005128236 s]: log Gamma(7/20) = 1/2*pi + 1/10*p2 + -3/8*p5 + 1/2*2sin(pi*1/5) + -1*Gamma(1/5) + 1/2*2sin(pi*1/20) + 1/2*2sin(pi*3/20) + 1*Gamma(1/20)
+DROP Gamma(9/20) [within block, 6.68946599800000019087065084022 s]: log Gamma(9/20) = 1*pi + 3/10*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5) + -1*Gamma(2/5) + 1*2sin(pi*1/20) + 1*Gamma(1/20)
+-- N=20 done: kept so far 92, elapsed 313.133893288000024313078029081 s
+DROP Gamma(11/21) [reflection (small PSLQ), 0.000394622000000000017466000867827 s]: log Gamma(11/21) = 1*pi + 1*p2 + -1*2sin(pi*10/21) + -1*Gamma(10/21)
+DROP Gamma(13/21) [reflection (small PSLQ), 0.0001859809999999999935438310672 s]: log Gamma(13/21) = 1*pi + 1*p2 + -1*2sin(pi*8/21) + -1*Gamma(8/21)
+DROP Gamma(16/21) [reflection (small PSLQ), 0.00019642400000000000180946924111 s]: log Gamma(16/21) = 1*pi + 1*p2 + -1*2sin(pi*5/21) + -1*Gamma(5/21)
+DROP Gamma(17/21) [reflection (small PSLQ), 0.000174396000000000001971950380764 s]: log Gamma(17/21) = 1*pi + 1*p2 + -1*2sin(pi*4/21) + -1*Gamma(4/21)
+DROP Gamma(19/21) [reflection (small PSLQ), 9.21620000000000029255139977202e-05 s]: log Gamma(19/21) = 1*pi + 1*p2 + -1*2sin(pi*2/21) + -1*Gamma(2/21)
+DROP Gamma(20/21) [reflection (small PSLQ), 9.78860000000000043647932490565e-05 s]: log Gamma(20/21) = 1*pi + 1*p2 + -1*2sin(pi*1/21) + -1*Gamma(1/21)
+DROP 2sin(pi*5/21) [within block, 4.74929613100000036496339816949 s]: log 2sin(pi*5/21) = -1/2*p7 + 1*2sin(pi*1/7) + 2*2sin(pi*2/7) + -1*2sin(pi*2/21)
+DROP 2sin(pi*8/21) [within block, 1.56309848599999989815501066914 s]: log 2sin(pi*8/21) = 1*2sin(pi*1/7) + -1*2sin(pi*2/7) + -1*2sin(pi*1/21)
+DROP 2sin(pi*10/21) [within block, 3.05946825100000019403978512855 s]: log 2sin(pi*10/21) = 1/2*p7 + -2*2sin(pi*1/7) + -1*2sin(pi*2/7) + -1*2sin(pi*4/21)
+DROP Gamma(4/21) [within block, 12.994234491000000275562342722 s]: log Gamma(4/21) = 1/28*p3 + 1/12*p7 + 1/2*2sin(pi*1/7) + 1*Gamma(1/7) + -1/2*2sin(pi*1/21) + 1/2*2sin(pi*2/21) + -1/2*2sin(pi*4/21) + -1*Gamma(1/21) + 1*Gamma(2/21)
+DROP Gamma(5/21) [within block, 9.22260737599999913527426542714 s]: log Gamma(5/21) = -3/14*p3 + 1/2*p7 + -1*2sin(pi*1/7) + -2*2sin(pi*2/7) + -1*Gamma(2/7) + 1*Gamma(3/7) + 1*2sin(pi*2/21) + 1*Gamma(2/21)
+DROP Gamma(8/21) [within block, 8.82443671799999940219549898757 s]: log Gamma(8/21) = 5/14*p3 + 1*2sin(pi*2/7) + 1*Gamma(1/7) + 1*Gamma(2/7) + -1*Gamma(1/21)
+DROP Gamma(10/21) [within block, 12.7870334969999994711997715058 s]: log Gamma(10/21) = 3/28*p3 + 1/12*p7 + 1/2*2sin(pi*1/7) + 1*Gamma(3/7) + -1/2*2sin(pi*1/21) + 1/2*2sin(pi*2/21) + 1/2*2sin(pi*4/21) + -1*Gamma(1/21) + 1*Gamma(2/21)
+-- N=21 done: kept so far 97, elapsed 464.167382004999979017156874761 s
+DROP Gamma(13/22) [reflection (small PSLQ), 0.000418213000000000015721896007292 s]: log Gamma(13/22) = 1*pi + 1*p2 + -1*2sin(pi*9/22) + -1*Gamma(9/22)
+DROP Gamma(15/22) [reflection (small PSLQ), 0.000408249999999999975755504699748 s]: log Gamma(15/22) = 1*pi + 1*p2 + -1*2sin(pi*7/22) + -1*Gamma(7/22)
+DROP Gamma(17/22) [reflection (small PSLQ), 0.000586324000000000046528558783621 s]: log Gamma(17/22) = 1*pi + 1*p2 + -1*2sin(pi*5/22) + -1*Gamma(5/22)
+DROP Gamma(19/22) [reflection (small PSLQ), 0.000207256000000000009230588515763 s]: log Gamma(19/22) = 1*pi + 1*p2 + -1*2sin(pi*3/22) + -1*Gamma(3/22)
+DROP Gamma(21/22) [reflection (small PSLQ), 0.000103402999999999999146231555169 s]: log Gamma(21/22) = 1*pi + 1*p2 + -1*2sin(pi*1/22) + -1*Gamma(1/22)
+DROP 2sin(pi*1/22) [vs earlier blocks, 5.64675862100000003351851773914 s]: log 2sin(pi*1/22) = -1/2*p11 + 2*2sin(pi*1/11) + 1*2sin(pi*2/11) + 1*2sin(pi*3/11) + 1*2sin(pi*4/11)
+DROP 2sin(pi*3/22) [vs earlier blocks, 1.1233944440000001030455223372 s]: log 2sin(pi*3/22) = 1*2sin(pi*3/11) + -1*2sin(pi*4/11)
+DROP 2sin(pi*5/22) [vs earlier blocks, 3.89058430299999979951053319382 s]: log 2sin(pi*5/22) = 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -2*2sin(pi*3/11) + -1*2sin(pi*4/11)
+DROP 2sin(pi*7/22) [vs earlier blocks, 1.71597632199999994284667081956 s]: log 2sin(pi*7/22) = -1*2sin(pi*2/11) + 1*2sin(pi*4/11)
+DROP 2sin(pi*9/22) [vs earlier blocks, 2.46355222999999989852426551806 s]: log 2sin(pi*9/22) = -1*2sin(pi*1/11) + 1*2sin(pi*2/11)
+DROP Gamma(1/22) [vs earlier blocks, 11.6350663319999991784925441607 s]: log Gamma(1/22) = -1/2*pi + -1/11*p2 + 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -1*2sin(pi*3/11) + -1*2sin(pi*4/11) + 1*Gamma(1/11) + 1*Gamma(5/11)
+DROP Gamma(3/22) [vs earlier blocks, 10.2796650009999996910892150481 s]: log Gamma(3/22) = -1/2*pi + -3/11*p2 + 1*2sin(pi*4/11) + 1*Gamma(3/11) + 1*Gamma(4/11)
+DROP Gamma(5/22) [vs earlier blocks, 10.2245010539999992005277817952 s]: log Gamma(5/22) = -1/2*pi + -5/11*p2 + 1*2sin(pi*3/11) + 1*Gamma(3/11) + 1*Gamma(5/11)
+DROP Gamma(7/22) [vs earlier blocks, 10.2295212919999993772535162861 s]: log Gamma(7/22) = 1/2*pi + 4/11*p2 + 1*2sin(pi*2/11) + -1*2sin(pi*4/11) + 1*Gamma(2/11) + -1*Gamma(4/11)
+DROP Gamma(9/22) [vs earlier blocks, 10.5944426880000008850402082317 s]: log Gamma(9/22) = 1/2*pi + 2/11*p2 + 1*2sin(pi*1/11) + -1*2sin(pi*2/11) + 1*Gamma(1/11) + -1*Gamma(2/11)
+-- N=22 done: kept so far 97, elapsed 476.271610956000017722544725984 s
+DROP Gamma(12/23) [reflection (small PSLQ), 0.000214488000000000010461867483436 s]: log Gamma(12/23) = 1*pi + 1*p2 + -1*2sin(pi*11/23) + -1*Gamma(11/23)
+DROP Gamma(13/23) [reflection (small PSLQ), 0.000205321999999999996915425737321 s]: log Gamma(13/23) = 1*pi + 1*p2 + -1*2sin(pi*10/23) + -1*Gamma(10/23)
+DROP Gamma(14/23) [reflection (small PSLQ), 0.000186810999999999997455563116588 s]: log Gamma(14/23) = 1*pi + 1*p2 + -1*2sin(pi*9/23) + -1*Gamma(9/23)
+DROP Gamma(15/23) [reflection (small PSLQ), 0.000185493999999999996343078012551 s]: log Gamma(15/23) = 1*pi + 1*p2 + -1*2sin(pi*8/23) + -1*Gamma(8/23)
+DROP Gamma(16/23) [reflection (small PSLQ), 0.000185698000000000009975312242894 s]: log Gamma(16/23) = 1*pi + 1*p2 + -1*2sin(pi*7/23) + -1*Gamma(7/23)
+DROP Gamma(17/23) [reflection (small PSLQ), 0.00019708099999999999230038127962 s]: log Gamma(17/23) = 1*pi + 1*p2 + -1*2sin(pi*6/23) + -1*Gamma(6/23)
+DROP Gamma(18/23) [reflection (small PSLQ), 0.000184169999999999993434141032367 s]: log Gamma(18/23) = 1*pi + 1*p2 + -1*2sin(pi*5/23) + -1*Gamma(5/23)
+DROP Gamma(19/23) [reflection (small PSLQ), 0.000183572999999999998980634852153 s]: log Gamma(19/23) = 1*pi + 1*p2 + -1*2sin(pi*4/23) + -1*Gamma(4/23)
+DROP Gamma(20/23) [reflection (small PSLQ), 0.000174653000000000009845138593256 s]: log Gamma(20/23) = 1*pi + 1*p2 + -1*2sin(pi*3/23) + -1*Gamma(3/23)
+DROP Gamma(21/23) [reflection (small PSLQ), 9.38469999999999978041245740634e-05 s]: log Gamma(21/23) = 1*pi + 1*p2 + -1*2sin(pi*2/23) + -1*Gamma(2/23)
+DROP Gamma(22/23) [reflection (small PSLQ), 9.14650000000000060413132829673e-05 s]: log Gamma(22/23) = 1*pi + 1*p2 + -1*2sin(pi*1/23) + -1*Gamma(1/23)
+DROP 2sin(pi*11/23) [within block, 3.88224974699999991756271811028 s]: log 2sin(pi*11/23) = 1/2*p23 + -1*2sin(pi*1/23) + -1*2sin(pi*2/23) + -1*2sin(pi*3/23) + -1*2sin(pi*4/23) + -1*2sin(pi*5/23) + -1*2sin(pi*6/23) + -1*2sin(pi*7/23) + -1*2sin(pi*8/23) + -1*2sin(pi*9/23) + -1*2sin(pi*10/23)
+-- N=23 done: kept so far 118, elapsed 790.147979125999995630991179496 s
+DROP Gamma(13/24) [reflection (small PSLQ), 0.000784155000000000029954094760143 s]: log Gamma(13/24) = 1*pi + 1*p2 + -1*2sin(pi*11/24) + -1*Gamma(11/24)
+DROP Gamma(17/24) [reflection (small PSLQ), 0.000184601999999999992008517524233 s]: log Gamma(17/24) = 1*pi + 1*p2 + -1*2sin(pi*7/24) + -1*Gamma(7/24)
+DROP Gamma(19/24) [reflection (small PSLQ), 0.000189089999999999993762073158265 s]: log Gamma(19/24) = 1*pi + 1*p2 + -1*2sin(pi*5/24) + -1*Gamma(5/24)
+DROP Gamma(23/24) [reflection (small PSLQ), 9.10510000000000062781585485894e-05 s]: log Gamma(23/24) = 1*pi + 1*p2 + -1*2sin(pi*1/24) + -1*Gamma(1/24)
+DROP 2sin(pi*5/24) [within block, 10.6043872910000001041908035404 s]: log 2sin(pi*5/24) = 1/2*p2 + -2*2sin(pi*1/8) + -1*2sin(pi*1/12) + 1*2sin(pi*1/24)
+DROP 2sin(pi*7/24) [within block, 11.307916455999999172377101786 s]: log 2sin(pi*7/24) = -1/2*p2 + 2*2sin(pi*1/8) + -1*2sin(pi*1/24)
+DROP 2sin(pi*11/24) [within block, 0.140225744000000013267381859805 s]: log 2sin(pi*11/24) = 1*2sin(pi*1/12) + -1*2sin(pi*1/24)
+DROP Gamma(5/24) [within block, 30.9721303580000011379524949007 s]: log Gamma(5/24) = 1/2*pi + -1/6*p2 + -1/2*p3 + -1*Gamma(1/3) + 1*2sin(pi*1/8) + 1/2*2sin(pi*1/12) + 1*Gamma(1/24)
+DROP Gamma(7/24) [within block, 18.3011057579999985023277986329 s]: log Gamma(7/24) = 1/2*pi + 1/4*p2 + -3/8*p3 + -1*Gamma(1/4) + -1*2sin(pi*1/8) + 1*2sin(pi*1/24) + 1*Gamma(1/24)
+DROP Gamma(11/24) [within block, 25.2318953969999988373729138402 s]: log Gamma(11/24) = 1*pi + 1/12*p2 + -3/8*p3 + -1*Gamma(1/3) + -1*Gamma(1/4) + -1/2*2sin(pi*1/12) + 1*2sin(pi*1/24) + 1*Gamma(1/24)
+-- N=24 done: kept so far 120, elapsed 1042.15256996399989475321490318 s
+
+KEPT columns for maxN=6: 1(e) pi gamma G p2 p3 p5 p7 p11 p13 p17 p19 p23 Gamma(1/3) Gamma(1/4) 2sin(pi*1/5) Gamma(1/5) Gamma(2/5)
+  counts: base 13, units 1, Gamma 4; total 18
+
+KEPT columns for maxN=12: 1(e) pi gamma G p2 p3 p5 p7 p11 p13 p17 p19 p23 Gamma(1/3) Gamma(1/4) 2sin(pi*1/5) Gamma(1/5) Gamma(2/5) 2sin(pi*1/7) 2sin(pi*2/7) Gamma(1/7) Gamma(2/7) Gamma(3/7) 2sin(pi*1/8) Gamma(1/8) 2sin(pi*1/9) 2sin(pi*2/9) Gamma(1/9) Gamma(2/9) 2sin(pi*1/11) 2sin(pi*2/11) 2sin(pi*3/11) 2sin(pi*4/11) Gamma(1/11) Gamma(2/11) Gamma(3/11) Gamma(4/11) Gamma(5/11) 2sin(pi*1/12)
+  counts: base 13, units 11, Gamma 15; total 39
+
+KEPT columns for maxN=24: 1(e) pi gamma G p2 p3 p5 p7 p11 p13 p17 p19 p23 Gamma(1/3) Gamma(1/4) 2sin(pi*1/5) Gamma(1/5) Gamma(2/5) 2sin(pi*1/7) 2sin(pi*2/7) Gamma(1/7) Gamma(2/7) Gamma(3/7) 2sin(pi*1/8) Gamma(1/8) 2sin(pi*1/9) 2sin(pi*2/9) Gamma(1/9) Gamma(2/9) 2sin(pi*1/11) 2sin(pi*2/11) 2sin(pi*3/11) 2sin(pi*4/11) Gamma(1/11) Gamma(2/11) Gamma(3/11) Gamma(4/11) Gamma(5/11) 2sin(pi*1/12) 2sin(pi*1/13) 2sin(pi*2/13) 2sin(pi*3/13) 2sin(pi*4/13) 2sin(pi*5/13) Gamma(1/13) Gamma(2/13) Gamma(3/13) Gamma(4/13) Gamma(5/13) Gamma(6/13) 2sin(pi*1/15) 2sin(pi*2/15) Gamma(1/15) 2sin(pi*1/16) 2sin(pi*3/16) Gamma(1/16) Gamma(3/16) 2sin(pi*1/17) 2sin(pi*2/17) 2sin(pi*3/17) 2sin(pi*4/17) 2sin(pi*5/17) 2sin(pi*6/17) 2sin(pi*7/17) Gamma(1/17) Gamma(2/17) Gamma(3/17) Gamma(4/17) Gamma(5/17) Gamma(6/17) Gamma(7/17) Gamma(8/17) 2sin(pi*1/19) 2sin(pi*2/19) 2sin(pi*3/19) 2sin(pi*4/19) 2sin(pi*5/19) 2sin(pi*6/19) 2sin(pi*7/19) 2sin(pi*8/19) Gamma(1/19) Gamma(2/19) Gamma(3/19) Gamma(4/19) Gamma(5/19) Gamma(6/19) Gamma(7/19) Gamma(8/19) Gamma(9/19) 2sin(pi*1/20) 2sin(pi*3/20) Gamma(1/20) 2sin(pi*1/21) 2sin(pi*2/21) 2sin(pi*4/21) Gamma(1/21) Gamma(2/21) 2sin(pi*1/23) 2sin(pi*2/23) 2sin(pi*3/23) 2sin(pi*4/23) 2sin(pi*5/23) 2sin(pi*6/23) 2sin(pi*7/23) 2sin(pi*8/23) 2sin(pi*9/23) 2sin(pi*10/23) Gamma(1/23) Gamma(2/23) Gamma(3/23) Gamma(4/23) Gamma(5/23) Gamma(6/23) Gamma(7/23) Gamma(8/23) Gamma(9/23) Gamma(10/23) Gamma(11/23) 2sin(pi*1/24) Gamma(1/24)
+  counts: base 13, units 51, Gamma 56; total 120
+
+DROPPED columns, expanded in the kept basis:
+  Gamma(1/2) = 1/2*pi
+  2sin(pi*1/3) = 1/2*p3
+  Gamma(2/3) = 1*pi + 1*p2 + -1/2*p3 + -1*Gamma(1/3)
+  2sin(pi*1/4) = 1/2*p2
+  Gamma(3/4) = 1*pi + 1/2*p2 + -1*Gamma(1/4)
+  2sin(pi*2/5) = 1/2*p5 + -1*2sin(pi*1/5)
+  Gamma(3/5) = 1*pi + 1*p2 + -1/2*p5 + 1*2sin(pi*1/5) + -1*Gamma(2/5)
+  Gamma(4/5) = 1*pi + 1*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5)
+  2sin(pi*1/6) = 0 (log 1)
+  Gamma(1/6) = -1/2*pi + -1/3*p2 + 1/2*p3 + 2*Gamma(1/3)
+  Gamma(5/6) = 3/2*pi + 4/3*p2 + -1/2*p3 + -2*Gamma(1/3)
+  2sin(pi*3/7) = 1/2*p7 + -1*2sin(pi*1/7) + -1*2sin(pi*2/7)
+  Gamma(4/7) = 1*pi + 1*p2 + -1/2*p7 + 1*2sin(pi*1/7) + 1*2sin(pi*2/7) + -1*Gamma(3/7)
+  Gamma(5/7) = 1*pi + 1*p2 + -1*2sin(pi*2/7) + -1*Gamma(2/7)
+  Gamma(6/7) = 1*pi + 1*p2 + -1*2sin(pi*1/7) + -1*Gamma(1/7)
+  2sin(pi*3/8) = 1/2*p2 + -1*2sin(pi*1/8)
+  Gamma(3/8) = 1/2*pi + -1/4*p2 + -1*Gamma(1/4) + 1*2sin(pi*1/8) + 1*Gamma(1/8)
+  Gamma(5/8) = 1/2*pi + 3/4*p2 + 1*Gamma(1/4) + -1*Gamma(1/8)
+  Gamma(7/8) = 1*pi + 1*p2 + -1*2sin(pi*1/8) + -1*Gamma(1/8)
+  2sin(pi*4/9) = 1/2*p3 + -1*2sin(pi*1/9) + -1*2sin(pi*2/9)
+  Gamma(4/9) = 1/6*p3 + 1*Gamma(1/3) + 1*2sin(pi*2/9) + -1*Gamma(1/9) + 1*Gamma(2/9)
+  Gamma(5/9) = 1*pi + 1*p2 + -2/3*p3 + -1*Gamma(1/3) + 1*2sin(pi*1/9) + 1*Gamma(1/9) + -1*Gamma(2/9)
+  Gamma(7/9) = 1*pi + 1*p2 + -1*2sin(pi*2/9) + -1*Gamma(2/9)
+  Gamma(8/9) = 1*pi + 1*p2 + -1*2sin(pi*1/9) + -1*Gamma(1/9)
+  2sin(pi*1/10) = -1/2*p5 + 2*2sin(pi*1/5)
+  2sin(pi*3/10) = 1/2*p5 + -2*2sin(pi*1/5)
+  Gamma(1/10) = -1/2*pi + -1/5*p2 + 1/2*p5 + -1*2sin(pi*1/5) + 1*Gamma(1/5) + 1*Gamma(2/5)
+  Gamma(3/10) = 1/2*pi + 2/5*p2 + -1/2*p5 + 2*2sin(pi*1/5) + 1*Gamma(1/5) + -1*Gamma(2/5)
+  Gamma(7/10) = 1/2*pi + 3/5*p2 + -1*Gamma(1/5) + 1*Gamma(2/5)
+  Gamma(9/10) = 3/2*pi + 6/5*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5) + -1*Gamma(2/5)
+  2sin(pi*5/11) = 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -1*2sin(pi*3/11) + -1*2sin(pi*4/11)
+  Gamma(6/11) = 1*pi + 1*p2 + -1/2*p11 + 1*2sin(pi*1/11) + 1*2sin(pi*2/11) + 1*2sin(pi*3/11) + 1*2sin(pi*4/11) + -1*Gamma(5/11)
+  Gamma(7/11) = 1*pi + 1*p2 + -1*2sin(pi*4/11) + -1*Gamma(4/11)
+  Gamma(8/11) = 1*pi + 1*p2 + -1*2sin(pi*3/11) + -1*Gamma(3/11)
+  Gamma(9/11) = 1*pi + 1*p2 + -1*2sin(pi*2/11) + -1*Gamma(2/11)
+  Gamma(10/11) = 1*pi + 1*p2 + -1*2sin(pi*1/11) + -1*Gamma(1/11)
+  2sin(pi*5/12) = -1*2sin(pi*1/12)
+  Gamma(1/12) = -1/2*pi + 3/8*p3 + 1*Gamma(1/3) + 1*Gamma(1/4) + -1/2*2sin(pi*1/12)
+  Gamma(5/12) = 1/2*pi + 1/2*p2 + -1/8*p3 + -1*Gamma(1/3) + 1*Gamma(1/4) + 1/2*2sin(pi*1/12)
+  Gamma(7/12) = 1/2*pi + 1/2*p2 + 1/8*p3 + 1*Gamma(1/3) + -1*Gamma(1/4) + 1/2*2sin(pi*1/12)
+  Gamma(11/12) = 3/2*pi + 1*p2 + -3/8*p3 + -1*Gamma(1/3) + -1*Gamma(1/4) + -1/2*2sin(pi*1/12)
+  2sin(pi*6/13) = 1/2*p13 + -1*2sin(pi*1/13) + -1*2sin(pi*2/13) + -1*2sin(pi*3/13) + -1*2sin(pi*4/13) + -1*2sin(pi*5/13)
+  Gamma(7/13) = 1*pi + 1*p2 + -1/2*p13 + 1*2sin(pi*1/13) + 1*2sin(pi*2/13) + 1*2sin(pi*3/13) + 1*2sin(pi*4/13) + 1*2sin(pi*5/13) + -1*Gamma(6/13)
+  Gamma(8/13) = 1*pi + 1*p2 + -1*2sin(pi*5/13) + -1*Gamma(5/13)
+  Gamma(9/13) = 1*pi + 1*p2 + -1*2sin(pi*4/13) + -1*Gamma(4/13)
+  Gamma(10/13) = 1*pi + 1*p2 + -1*2sin(pi*3/13) + -1*Gamma(3/13)
+  Gamma(11/13) = 1*pi + 1*p2 + -1*2sin(pi*2/13) + -1*Gamma(2/13)
+  Gamma(12/13) = 1*pi + 1*p2 + -1*2sin(pi*1/13) + -1*Gamma(1/13)
+  2sin(pi*1/14) = -1/2*p7 + 2*2sin(pi*1/7) + 1*2sin(pi*2/7)
+  2sin(pi*3/14) = 1/2*p7 + -1*2sin(pi*1/7) + -2*2sin(pi*2/7)
+  2sin(pi*5/14) = -1*2sin(pi*1/7) + 1*2sin(pi*2/7)
+  Gamma(1/14) = -1/2*pi + -1/7*p2 + 1/2*p7 + -1*2sin(pi*1/7) + -1*2sin(pi*2/7) + 1*Gamma(1/7) + 1*Gamma(3/7)
+  Gamma(3/14) = -1/2*pi + -3/7*p2 + 1*2sin(pi*2/7) + 1*Gamma(2/7) + 1*Gamma(3/7)
+  Gamma(5/14) = 1/2*pi + 2/7*p2 + 1*2sin(pi*1/7) + -1*2sin(pi*2/7) + 1*Gamma(1/7) + -1*Gamma(2/7)
+  Gamma(9/14) = 1/2*pi + 5/7*p2 + -1*Gamma(1/7) + 1*Gamma(2/7)
+  Gamma(11/14) = 3/2*pi + 10/7*p2 + -1/2*p7 + 1*2sin(pi*1/7) + 1*2sin(pi*2/7) + -1*Gamma(2/7) + -1*Gamma(3/7)
+  Gamma(13/14) = 3/2*pi + 8/7*p2 + -1*2sin(pi*1/7) + -1*Gamma(1/7) + -1*Gamma(3/7)
+  2sin(pi*4/15) = -1/2*p5 + 2*2sin(pi*1/5) + -1*2sin(pi*1/15)
+  2sin(pi*7/15) = 1/2*p5 + -2*2sin(pi*1/5) + -1*2sin(pi*2/15)
+  Gamma(2/15) = -7/20*p3 + 1/6*p5 + -1*Gamma(1/3) + -1/2*2sin(pi*1/5) + 1*Gamma(2/5) + 1/2*2sin(pi*1/15) + -1/2*2sin(pi*2/15) + 1*Gamma(1/15)
+  Gamma(4/15) = -3/10*p3 + 1/2*p5 + -2*2sin(pi*1/5) + -1*Gamma(1/5) + 1*Gamma(2/5) + 1*2sin(pi*1/15) + 1*Gamma(1/15)
+  Gamma(7/15) = 9/20*p3 + -1/6*p5 + 1*Gamma(1/3) + 3/2*2sin(pi*1/5) + 1*Gamma(1/5) + -1/2*2sin(pi*1/15) + 1/2*2sin(pi*2/15) + -1*Gamma(1/15)
+  Gamma(8/15) = 1*pi + 1*p2 + -9/20*p3 + -1/3*p5 + -1*Gamma(1/3) + 1/2*2sin(pi*1/5) + -1*Gamma(1/5) + 1/2*2sin(pi*1/15) + 1/2*2sin(pi*2/15) + 1*Gamma(1/15)
+  Gamma(11/15) = 1*pi + 1*p2 + 3/10*p3 + 1*Gamma(1/5) + -1*Gamma(2/5) + -1*Gamma(1/15)
+  Gamma(13/15) = 1*pi + 1*p2 + 7/20*p3 + -1/6*p5 + 1*Gamma(1/3) + 1/2*2sin(pi*1/5) + -1*Gamma(2/5) + -1/2*2sin(pi*1/15) + -1/2*2sin(pi*2/15) + -1*Gamma(1/15)
+  Gamma(14/15) = 1*pi + 1*p2 + -1*2sin(pi*1/15) + -1*Gamma(1/15)
+  2sin(pi*5/16) = 1/2*p2 + -1*2sin(pi*1/8) + -1*2sin(pi*3/16)
+  2sin(pi*7/16) = 1*2sin(pi*1/8) + -1*2sin(pi*1/16)
+  Gamma(5/16) = 1/8*p2 + 1*Gamma(1/4) + -1*Gamma(1/8) + 1*2sin(pi*3/16) + 1*Gamma(3/16)
+  Gamma(7/16) = 1/2*pi + 1/8*p2 + -1*2sin(pi*1/8) + -1*Gamma(1/8) + 1*2sin(pi*1/16) + 1*Gamma(1/16)
+  Gamma(9/16) = 1/2*pi + 7/8*p2 + 1*Gamma(1/8) + -1*Gamma(1/16)
+  Gamma(11/16) = 1*pi + 3/8*p2 + -1*Gamma(1/4) + 1*2sin(pi*1/8) + 1*Gamma(1/8) + -1*Gamma(3/16)
+  Gamma(13/16) = 1*pi + 1*p2 + -1*2sin(pi*3/16) + -1*Gamma(3/16)
+  Gamma(15/16) = 1*pi + 1*p2 + -1*2sin(pi*1/16) + -1*Gamma(1/16)
+  2sin(pi*8/17) = 1/2*p17 + -1*2sin(pi*1/17) + -1*2sin(pi*2/17) + -1*2sin(pi*3/17) + -1*2sin(pi*4/17) + -1*2sin(pi*5/17) + -1*2sin(pi*6/17) + -1*2sin(pi*7/17)
+  Gamma(9/17) = 1*pi + 1*p2 + -1/2*p17 + 1*2sin(pi*1/17) + 1*2sin(pi*2/17) + 1*2sin(pi*3/17) + 1*2sin(pi*4/17) + 1*2sin(pi*5/17) + 1*2sin(pi*6/17) + 1*2sin(pi*7/17) + -1*Gamma(8/17)
+  Gamma(10/17) = 1*pi + 1*p2 + -1*2sin(pi*7/17) + -1*Gamma(7/17)
+  Gamma(11/17) = 1*pi + 1*p2 + -1*2sin(pi*6/17) + -1*Gamma(6/17)
+  Gamma(12/17) = 1*pi + 1*p2 + -1*2sin(pi*5/17) + -1*Gamma(5/17)
+  Gamma(13/17) = 1*pi + 1*p2 + -1*2sin(pi*4/17) + -1*Gamma(4/17)
+  Gamma(14/17) = 1*pi + 1*p2 + -1*2sin(pi*3/17) + -1*Gamma(3/17)
+  Gamma(15/17) = 1*pi + 1*p2 + -1*2sin(pi*2/17) + -1*Gamma(2/17)
+  Gamma(16/17) = 1*pi + 1*p2 + -1*2sin(pi*1/17) + -1*Gamma(1/17)
+  2sin(pi*1/18) = -1/2*p3 + 2*2sin(pi*1/9) + 1*2sin(pi*2/9)
+  2sin(pi*5/18) = 1/2*p3 + -1*2sin(pi*1/9) + -2*2sin(pi*2/9)
+  2sin(pi*7/18) = -1*2sin(pi*1/9) + 1*2sin(pi*2/9)
+  Gamma(1/18) = -1/2*pi + -1/9*p2 + 2/3*p3 + 1*Gamma(1/3) + -1*2sin(pi*1/9) + 1*Gamma(2/9)
+  Gamma(5/18) = 1/2*pi + 4/9*p2 + -2/3*p3 + -1*Gamma(1/3) + 1*2sin(pi*1/9) + 1*2sin(pi*2/9) + 1*Gamma(1/9)
+  Gamma(7/18) = 1/2*pi + 2/9*p2 + 1*2sin(pi*1/9) + -1*2sin(pi*2/9) + 1*Gamma(1/9) + -1*Gamma(2/9)
+  Gamma(11/18) = 1/2*pi + 7/9*p2 + -1*Gamma(1/9) + 1*Gamma(2/9)
+  Gamma(13/18) = 1/2*pi + 5/9*p2 + 1/6*p3 + 1*Gamma(1/3) + 1*2sin(pi*2/9) + -1*Gamma(1/9)
+  Gamma(17/18) = 3/2*pi + 10/9*p2 + -1/6*p3 + -1*Gamma(1/3) + -1*2sin(pi*1/9) + -1*2sin(pi*2/9) + -1*Gamma(2/9)
+  2sin(pi*9/19) = 1/2*p19 + -1*2sin(pi*1/19) + -1*2sin(pi*2/19) + -1*2sin(pi*3/19) + -1*2sin(pi*4/19) + -1*2sin(pi*5/19) + -1*2sin(pi*6/19) + -1*2sin(pi*7/19) + -1*2sin(pi*8/19)
+  Gamma(10/19) = 1*pi + 1*p2 + -1/2*p19 + 1*2sin(pi*1/19) + 1*2sin(pi*2/19) + 1*2sin(pi*3/19) + 1*2sin(pi*4/19) + 1*2sin(pi*5/19) + 1*2sin(pi*6/19) + 1*2sin(pi*7/19) + 1*2sin(pi*8/19) + -1*Gamma(9/19)
+  Gamma(11/19) = 1*pi + 1*p2 + -1*2sin(pi*8/19) + -1*Gamma(8/19)
+  Gamma(12/19) = 1*pi + 1*p2 + -1*2sin(pi*7/19) + -1*Gamma(7/19)
+  Gamma(13/19) = 1*pi + 1*p2 + -1*2sin(pi*6/19) + -1*Gamma(6/19)
+  Gamma(14/19) = 1*pi + 1*p2 + -1*2sin(pi*5/19) + -1*Gamma(5/19)
+  Gamma(15/19) = 1*pi + 1*p2 + -1*2sin(pi*4/19) + -1*Gamma(4/19)
+  Gamma(16/19) = 1*pi + 1*p2 + -1*2sin(pi*3/19) + -1*Gamma(3/19)
+  Gamma(17/19) = 1*pi + 1*p2 + -1*2sin(pi*2/19) + -1*Gamma(2/19)
+  Gamma(18/19) = 1*pi + 1*p2 + -1*2sin(pi*1/19) + -1*Gamma(1/19)
+  2sin(pi*7/20) = 1/2*p5 + -2*2sin(pi*1/5) + -1*2sin(pi*3/20)
+  2sin(pi*9/20) = -1/2*p5 + 2*2sin(pi*1/5) + -1*2sin(pi*1/20)
+  Gamma(3/20) = 1/2*pi + 1/5*p2 + -3/8*p5 + 1/2*2sin(pi*1/5) + -1*Gamma(2/5) + 1/2*2sin(pi*1/20) + -1/2*2sin(pi*3/20) + 1*Gamma(1/20)
+  Gamma(7/20) = 1/2*pi + 1/10*p2 + -3/8*p5 + 1/2*2sin(pi*1/5) + -1*Gamma(1/5) + 1/2*2sin(pi*1/20) + 1/2*2sin(pi*3/20) + 1*Gamma(1/20)
+  Gamma(9/20) = 1*pi + 3/10*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5) + -1*Gamma(2/5) + 1*2sin(pi*1/20) + 1*Gamma(1/20)
+  Gamma(11/20) = 7/10*p2 + 1/2*p5 + -1*2sin(pi*1/5) + 1*Gamma(1/5) + 1*Gamma(2/5) + -1*Gamma(1/20)
+  Gamma(13/20) = 1/2*pi + 9/10*p2 + -1/8*p5 + 3/2*2sin(pi*1/5) + 1*Gamma(1/5) + -1/2*2sin(pi*1/20) + 1/2*2sin(pi*3/20) + -1*Gamma(1/20)
+  Gamma(17/20) = 1/2*pi + 4/5*p2 + 3/8*p5 + -1/2*2sin(pi*1/5) + 1*Gamma(2/5) + -1/2*2sin(pi*1/20) + -1/2*2sin(pi*3/20) + -1*Gamma(1/20)
+  Gamma(19/20) = 1*pi + 1*p2 + -1*2sin(pi*1/20) + -1*Gamma(1/20)
+  2sin(pi*5/21) = -1/2*p7 + 1*2sin(pi*1/7) + 2*2sin(pi*2/7) + -1*2sin(pi*2/21)
+  2sin(pi*8/21) = 1*2sin(pi*1/7) + -1*2sin(pi*2/7) + -1*2sin(pi*1/21)
+  2sin(pi*10/21) = 1/2*p7 + -2*2sin(pi*1/7) + -1*2sin(pi*2/7) + -1*2sin(pi*4/21)
+  Gamma(4/21) = 1/28*p3 + 1/12*p7 + 1/2*2sin(pi*1/7) + 1*Gamma(1/7) + -1/2*2sin(pi*1/21) + 1/2*2sin(pi*2/21) + -1/2*2sin(pi*4/21) + -1*Gamma(1/21) + 1*Gamma(2/21)
+  Gamma(5/21) = -3/14*p3 + 1/2*p7 + -1*2sin(pi*1/7) + -2*2sin(pi*2/7) + -1*Gamma(2/7) + 1*Gamma(3/7) + 1*2sin(pi*2/21) + 1*Gamma(2/21)
+  Gamma(8/21) = 5/14*p3 + 1*2sin(pi*2/7) + 1*Gamma(1/7) + 1*Gamma(2/7) + -1*Gamma(1/21)
+  Gamma(10/21) = 3/28*p3 + 1/12*p7 + 1/2*2sin(pi*1/7) + 1*Gamma(3/7) + -1/2*2sin(pi*1/21) + 1/2*2sin(pi*2/21) + 1/2*2sin(pi*4/21) + -1*Gamma(1/21) + 1*Gamma(2/21)
+  Gamma(11/21) = 1*pi + 1*p2 + -3/28*p3 + -7/12*p7 + 3/2*2sin(pi*1/7) + 1*2sin(pi*2/7) + -1*Gamma(3/7) + 1/2*2sin(pi*1/21) + -1/2*2sin(pi*2/21) + 1/2*2sin(pi*4/21) + 1*Gamma(1/21) + -1*Gamma(2/21)
+  Gamma(13/21) = 1*pi + 1*p2 + -5/14*p3 + -1*2sin(pi*1/7) + -1*Gamma(1/7) + -1*Gamma(2/7) + 1*2sin(pi*1/21) + 1*Gamma(1/21)
+  Gamma(16/21) = 1*pi + 1*p2 + 3/14*p3 + 1*Gamma(2/7) + -1*Gamma(3/7) + -1*Gamma(2/21)
+  Gamma(17/21) = 1*pi + 1*p2 + -1/28*p3 + -1/12*p7 + -1/2*2sin(pi*1/7) + -1*Gamma(1/7) + 1/2*2sin(pi*1/21) + -1/2*2sin(pi*2/21) + -1/2*2sin(pi*4/21) + 1*Gamma(1/21) + -1*Gamma(2/21)
+  Gamma(19/21) = 1*pi + 1*p2 + -1*2sin(pi*2/21) + -1*Gamma(2/21)
+  Gamma(20/21) = 1*pi + 1*p2 + -1*2sin(pi*1/21) + -1*Gamma(1/21)
+  2sin(pi*1/22) = -1/2*p11 + 2*2sin(pi*1/11) + 1*2sin(pi*2/11) + 1*2sin(pi*3/11) + 1*2sin(pi*4/11)
+  2sin(pi*3/22) = 1*2sin(pi*3/11) + -1*2sin(pi*4/11)
+  2sin(pi*5/22) = 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -2*2sin(pi*3/11) + -1*2sin(pi*4/11)
+  2sin(pi*7/22) = -1*2sin(pi*2/11) + 1*2sin(pi*4/11)
+  2sin(pi*9/22) = -1*2sin(pi*1/11) + 1*2sin(pi*2/11)
+  Gamma(1/22) = -1/2*pi + -1/11*p2 + 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -1*2sin(pi*3/11) + -1*2sin(pi*4/11) + 1*Gamma(1/11) + 1*Gamma(5/11)
+  Gamma(3/22) = -1/2*pi + -3/11*p2 + 1*2sin(pi*4/11) + 1*Gamma(3/11) + 1*Gamma(4/11)
+  Gamma(5/22) = -1/2*pi + -5/11*p2 + 1*2sin(pi*3/11) + 1*Gamma(3/11) + 1*Gamma(5/11)
+  Gamma(7/22) = 1/2*pi + 4/11*p2 + 1*2sin(pi*2/11) + -1*2sin(pi*4/11) + 1*Gamma(2/11) + -1*Gamma(4/11)
+  Gamma(9/22) = 1/2*pi + 2/11*p2 + 1*2sin(pi*1/11) + -1*2sin(pi*2/11) + 1*Gamma(1/11) + -1*Gamma(2/11)
+  Gamma(13/22) = 1/2*pi + 9/11*p2 + -1*Gamma(1/11) + 1*Gamma(2/11)
+  Gamma(15/22) = 1/2*pi + 7/11*p2 + -1*Gamma(2/11) + 1*Gamma(4/11)
+  Gamma(17/22) = 3/2*pi + 16/11*p2 + -1/2*p11 + 1*2sin(pi*1/11) + 1*2sin(pi*2/11) + 1*2sin(pi*3/11) + 1*2sin(pi*4/11) + -1*Gamma(3/11) + -1*Gamma(5/11)
+  Gamma(19/22) = 3/2*pi + 14/11*p2 + -1*2sin(pi*3/11) + -1*Gamma(3/11) + -1*Gamma(4/11)
+  Gamma(21/22) = 3/2*pi + 12/11*p2 + -1*2sin(pi*1/11) + -1*Gamma(1/11) + -1*Gamma(5/11)
+  2sin(pi*11/23) = 1/2*p23 + -1*2sin(pi*1/23) + -1*2sin(pi*2/23) + -1*2sin(pi*3/23) + -1*2sin(pi*4/23) + -1*2sin(pi*5/23) + -1*2sin(pi*6/23) + -1*2sin(pi*7/23) + -1*2sin(pi*8/23) + -1*2sin(pi*9/23) + -1*2sin(pi*10/23)
+  Gamma(12/23) = 1*pi + 1*p2 + -1/2*p23 + 1*2sin(pi*1/23) + 1*2sin(pi*2/23) + 1*2sin(pi*3/23) + 1*2sin(pi*4/23) + 1*2sin(pi*5/23) + 1*2sin(pi*6/23) + 1*2sin(pi*7/23) + 1*2sin(pi*8/23) + 1*2sin(pi*9/23) + 1*2sin(pi*10/23) + -1*Gamma(11/23)
+  Gamma(13/23) = 1*pi + 1*p2 + -1*2sin(pi*10/23) + -1*Gamma(10/23)
+  Gamma(14/23) = 1*pi + 1*p2 + -1*2sin(pi*9/23) + -1*Gamma(9/23)
+  Gamma(15/23) = 1*pi + 1*p2 + -1*2sin(pi*8/23) + -1*Gamma(8/23)
+  Gamma(16/23) = 1*pi + 1*p2 + -1*2sin(pi*7/23) + -1*Gamma(7/23)
+  Gamma(17/23) = 1*pi + 1*p2 + -1*2sin(pi*6/23) + -1*Gamma(6/23)
+  Gamma(18/23) = 1*pi + 1*p2 + -1*2sin(pi*5/23) + -1*Gamma(5/23)
+  Gamma(19/23) = 1*pi + 1*p2 + -1*2sin(pi*4/23) + -1*Gamma(4/23)
+  Gamma(20/23) = 1*pi + 1*p2 + -1*2sin(pi*3/23) + -1*Gamma(3/23)
+  Gamma(21/23) = 1*pi + 1*p2 + -1*2sin(pi*2/23) + -1*Gamma(2/23)
+  Gamma(22/23) = 1*pi + 1*p2 + -1*2sin(pi*1/23) + -1*Gamma(1/23)
+  2sin(pi*5/24) = 1/2*p2 + -2*2sin(pi*1/8) + -1*2sin(pi*1/12) + 1*2sin(pi*1/24)
+  2sin(pi*7/24) = -1/2*p2 + 2*2sin(pi*1/8) + -1*2sin(pi*1/24)
+  2sin(pi*11/24) = 1*2sin(pi*1/12) + -1*2sin(pi*1/24)
+  Gamma(5/24) = 1/2*pi + -1/6*p2 + -1/2*p3 + -1*Gamma(1/3) + 1*2sin(pi*1/8) + 1/2*2sin(pi*1/12) + 1*Gamma(1/24)
+  Gamma(7/24) = 1/2*pi + 1/4*p2 + -3/8*p3 + -1*Gamma(1/4) + -1*2sin(pi*1/8) + 1*2sin(pi*1/24) + 1*Gamma(1/24)
+  Gamma(11/24) = 1*pi + 1/12*p2 + -3/8*p3 + -1*Gamma(1/3) + -1*Gamma(1/4) + -1/2*2sin(pi*1/12) + 1*2sin(pi*1/24) + 1*Gamma(1/24)
+  Gamma(13/24) = 11/12*p2 + 3/8*p3 + 1*Gamma(1/3) + 1*Gamma(1/4) + -1/2*2sin(pi*1/12) + -1*Gamma(1/24)
+  Gamma(17/24) = 1/2*pi + 5/4*p2 + 3/8*p3 + 1*Gamma(1/4) + -1*2sin(pi*1/8) + -1*Gamma(1/24)
+  Gamma(19/24) = 1/2*pi + 2/3*p2 + 1/2*p3 + 1*Gamma(1/3) + 1*2sin(pi*1/8) + 1/2*2sin(pi*1/12) + -1*2sin(pi*1/24) + -1*Gamma(1/24)
+  Gamma(23/24) = 1*pi + 1*p2 + -1*2sin(pi*1/24) + -1*Gamma(1/24)
+
+=== jobs: 32 ===
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : log zeta(3)
+  maxN=6 -e n=18 power 10^133.333333333333342807236476801 : log zeta(3)
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : log zeta(5)
+  maxN=6 -e n=18 power 10^133.333333333333342807236476801 : log zeta(5)
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : log zeta(7)
+  maxN=6 -e n=18 power 10^133.333333333333342807236476801 : log zeta(7)
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=6 -e n=18 power 10^133.333333333333342807236476801 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))
+  maxN=6 +e n=19 power 10^126.315789473684205290737736505 : [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step)
+  maxN=12 +e n=40 power 10^60 : log zeta(3)
+  maxN=12 -e n=39 power 10^61.5384615384615401012524671387 : log zeta(3)
+  maxN=12 +e n=40 power 10^60 : log zeta(5)
+  maxN=12 -e n=39 power 10^61.5384615384615401012524671387 : log zeta(5)
+  maxN=12 +e n=40 power 10^60 : log zeta(7)
+  maxN=12 -e n=39 power 10^61.5384615384615401012524671387 : log zeta(7)
+  maxN=12 +e n=40 power 10^60 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=12 -e n=39 power 10^61.5384615384615401012524671387 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=12 +e n=40 power 10^60 : [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))
+  maxN=12 +e n=40 power 10^60 : [VALIDATION] 3^(1/5) pi^(2/3) Gamma(1/5)^(1/2) / Gamma(2/7) e^(1/3) (2 sin(pi/7))^(1/4)
+  maxN=12 +e n=40 power 10^60 : [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : log zeta(3)
+  maxN=24 -e n=120 power 10^20 : log zeta(3)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : log zeta(5)
+  maxN=24 -e n=120 power 10^20 : log zeta(5)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : log zeta(7)
+  maxN=24 -e n=120 power 10^20 : log zeta(7)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=24 -e n=120 power 10^20 : log(zeta(3)zeta(7)/zeta(5)^2)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : [VALIDATION] 3^(1/5) pi^(2/3) Gamma(1/5)^(1/2) / Gamma(2/7) e^(1/3) (2 sin(pi/7))^(1/4)
+  maxN=24 +e n=121 power 10^19.8347107438016543312642170349 : [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step)
+JOB maxN=24 +e n=121 power10^19.8347 [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi)) : Found, iter 1670, 141.01 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient 2:
+    log T = -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    expected: -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    => PASS (exact expected coefficients)
+JOB maxN=24 +e n=121 power10^19.8347 [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step) : Found, iter 2327, 186.639 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient -18:
+    log T = -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    expected: -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    => PASS (exact expected coefficients)
+JOB maxN=24 +e n=121 power10^19.8347 [VALIDATION] 3^(1/5) pi^(2/3) Gamma(1/5)^(1/2) / Gamma(2/7) e^(1/3) (2 sin(pi/7))^(1/4) : Found, iter 2387, 205.839 s
+    VERIFIED relation, residual@2D 9.49e-5999, target coefficient 60:
+    log T = 1/3*1(e) + 2/3*pi + 1/5*p3 + 1/2*Gamma(1/5) + 1/4*2sin(pi*1/7) + -1*Gamma(2/7)
+    expected: 1/3*1(e) + 2/3*pi + 1/5*p3 + 1/2*Gamma(1/5) + 1/4*2sin(pi*1/7) + -1*Gamma(2/7)
+    => PASS (exact expected coefficients)
+JOB maxN=12 +e n=40 power10^60 log zeta(5) : PrecisionExhausted, iter 13107, 90.126 s
+    no relation with |m|_2 < 1.004e+60
+JOB maxN=12 +e n=40 power10^60 log zeta(3) : PrecisionExhausted, iter 13088, 111.607 s
+    no relation with |m|_2 < 1.038e+60
+JOB maxN=12 +e n=40 power10^60 log zeta(7) : PrecisionExhausted, iter 13133, 90.5251 s
+    no relation with |m|_2 < 1.026e+60
+JOB maxN=12 +e n=40 power10^60 [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi)) : Found, iter 194, 1.66835 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient -2:
+    log T = -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    expected: -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    => PASS (exact expected coefficients)
+JOB maxN=12 +e n=40 power10^60 [VALIDATION] 3^(1/5) pi^(2/3) Gamma(1/5)^(1/2) / Gamma(2/7) e^(1/3) (2 sin(pi/7))^(1/4) : Found, iter 494, 3.55232 s
+    VERIFIED relation, residual@2D 9.49e-5999, target coefficient 60:
+    log T = 1/3*1(e) + 2/3*pi + 1/5*p3 + 1/2*Gamma(1/5) + 1/4*2sin(pi*1/7) + -1*Gamma(2/7)
+    expected: 1/3*1(e) + 2/3*pi + 1/5*p3 + 1/2*Gamma(1/5) + 1/4*2sin(pi*1/7) + -1*Gamma(2/7)
+    => PASS (exact expected coefficients)
+JOB maxN=12 +e n=40 power10^60 [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step) : Found, iter 392, 2.75447 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient -18:
+    log T = -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    expected: -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    => PASS (exact expected coefficients)
+JOB maxN=12 +e n=40 power10^60 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 13050, 118.317 s
+    no relation with |m|_2 < 1.027e+60
+JOB maxN=12 -e n=39 power10^61.5385 log zeta(3) : PrecisionExhausted, iter 13377, 89.8483 s
+    no relation with |m|_2 < 3.853e+61
+JOB maxN=12 -e n=39 power10^61.5385 log zeta(5) : PrecisionExhausted, iter 13395, 84.5369 s
+    no relation with |m|_2 < 4.008e+61
+JOB maxN=12 -e n=39 power10^61.5385 log zeta(7) : PrecisionExhausted, iter 13425, 84.127 s
+    no relation with |m|_2 < 3.475e+61
+JOB maxN=6 +e n=19 power10^126.316 log zeta(3) : PrecisionExhausted, iter 12454, 15.3789 s
+    no relation with |m|_2 < 2.454e+126
+JOB maxN=6 +e n=19 power10^126.316 log zeta(5) : PrecisionExhausted, iter 12378, 15.1808 s
+    no relation with |m|_2 < 2.271e+126
+JOB maxN=12 -e n=39 power10^61.5385 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 13375, 99.8342 s
+    no relation with |m|_2 < 3.559e+61
+JOB maxN=6 +e n=19 power10^126.316 log zeta(7) : PrecisionExhausted, iter 12408, 15.1028 s
+    no relation with |m|_2 < 2.104e+126
+JOB maxN=6 +e n=19 power10^126.316 [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi)) : Found, iter 61, 0.25262 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient 2:
+    log T = -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    expected: -1/2*pi + -3/2*p2 + 2*Gamma(1/4)
+    => PASS (exact expected coefficients)
+JOB maxN=6 +e n=19 power10^126.316 [VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step) : Found, iter 178, 0.316272 s
+    VERIFIED relation, residual@2D 0.00e+00, target coefficient 18:
+    log T = -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    expected: -1/6*pi + 2*gamma + -1/9*p2 + 1/6*p3 + 2/3*Gamma(1/3)
+    => PASS (exact expected coefficients)
+JOB maxN=6 -e n=18 power10^133.333 log zeta(3) : PrecisionExhausted, iter 11674, 14.0789 s
+    no relation with |m|_2 < 2.225e+133
+JOB maxN=6 +e n=19 power10^126.316 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 12421, 26.9107 s
+    no relation with |m|_2 < 2.075e+126
+JOB maxN=6 -e n=18 power10^133.333 log zeta(5) : PrecisionExhausted, iter 11678, 14.8273 s
+    no relation with |m|_2 < 2.184e+133
+JOB maxN=6 -e n=18 power10^133.333 log zeta(7) : PrecisionExhausted, iter 11574, 13.9891 s
+    no relation with |m|_2 < 2.167e+133
+JOB maxN=6 -e n=18 power10^133.333 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 11682, 25.6229 s
+    no relation with |m|_2 < 2.481e+133
+JOB maxN=24 +e n=121 power10^19.8347 log zeta(5) : PrecisionExhausted, iter 13485, 1251.63 s
+    no relation with |m|_2 < 1.372e+17
+JOB maxN=24 -e n=120 power10^20 log zeta(3) : PrecisionExhausted, iter 13416, 1276.03 s
+    no relation with |m|_2 < 2.256e+17
+JOB maxN=24 +e n=121 power10^19.8347 log zeta(7) : PrecisionExhausted, iter 13503, 1277.58 s
+    no relation with |m|_2 < 1.561e+17
+JOB maxN=24 -e n=120 power10^20 log zeta(7) : PrecisionExhausted, iter 13450, 1299.39 s
+    no relation with |m|_2 < 2.447e+17
+JOB maxN=24 +e n=121 power10^19.8347 log zeta(3) : PrecisionExhausted, iter 13519, 1313.75 s
+    no relation with |m|_2 < 1.647e+17
+JOB maxN=24 -e n=120 power10^20 log zeta(5) : PrecisionExhausted, iter 13437, 1332.19 s
+    no relation with |m|_2 < 2.971e+17
+JOB maxN=24 +e n=121 power10^19.8347 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 13530, 1403.1 s
+    no relation with |m|_2 < 1.829e+17
+JOB maxN=24 -e n=120 power10^20 log(zeta(3)zeta(7)/zeta(5)^2) : PrecisionExhausted, iter 13466, 1284.09 s
+    no relation with |m|_2 < 2.271e+17
+
+===== SUMMARY: validation 8/8 PASS; verified relations with target (real hits): 0; total elapsed 2487.18869232399993052240461111 s =====

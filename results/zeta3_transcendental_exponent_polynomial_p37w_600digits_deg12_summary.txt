@@ -1,0 +1,60 @@
+# Excerpt of results/zeta3_transcendental_exponent_polynomial_p37w_600digits_deg12.txt (100MB, gitignored; zip 22.6MB > 10MB). Header, validations, non-'none' JOB lines, summary.
+OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_p37w_600digits_deg12.txt
+digits 600, degree 12 (only max degree, covers all lower), threads 10
+PSLQ algorithm: Multipair2L (m2l)
+--- validation (synthetic c replaces zeta(3); y is a known algebraic number) ---
+PASS identity: y = root of t^7-t-1, c = alpha (2e)^(-pi/3) [f=identity a=2 x=e w=pi b=1/3] : Found, verified 1, true degree 9, 0.00242946 s; relation: 1*t^9 -1*t^3 -1*t^2 (residual@1200: 3.533e-1240)
+PASS sin: y = root of t^5-3t+1 in (0,1), sin(c pi^(gamma/2)) [f=sin a=1 x=pi w=gamma b=1/2] : Found, verified 1, true degree 12, 0.000414365 s; relation: 1*t^12 -3*t^8 1*t^7 (residual@1200: 0.000e+00)
+PASS Gamma: y = root of t^7-t-3, Gamma(u) = y [f=Gamma a=3/2 x=G w=e b=-2/3] : Found, verified 1, true degree 12, 0.00149062 s; relation: -1*t^12 1*t^6 3*t^5 (residual@1200: 3.197e-1239)
+PASS t^t: y = root of t^8-2t-2, u^u = y [f=t^t a=1/3 x=log3 w=pi^2 b=1/2] : Found, verified 1, true degree 12, 0.00116402 s; relation: 1*t^12 -1*t^11 -2*t^5 2*t^3 (residual@1200: 5.972e-1240)
+PASS degree 12: y = root of t^12-2t-2 (Eisenstein), identity [f=identity a=2/3 x=gamma w=log(pi) b=-3/2] : Found, verified 1, true degree 12, 0.00148042 s; relation: 1*t^12 -2*t^1 -2*t^0 (residual@1200: 2.169e-1239)
+PASS log: y = root of t^7-t-1, u = exp(y) [f=log a=5 x=log2 w=sqrt2*pi b=2/3] : Found, verified 1, true degree 9, 0.00109497 s; relation: 1*t^9 -1*t^3 -1*t^2 (residual@1200: 3.533e-1240)
+PASS exp: y = root of t^7-t-1, u = log(y) [f=exp a=1/2 x=G w=pi^3 b=-1/3] : Found, verified 1, true degree 9, 0.00107699 s; relation: 1*t^9 -1*t^3 -1*t^2 (residual@1200: 3.533e-1240)
+PASS p37 identity: y = root of t^9-2t-2, a=37 x=log29 w=log31 [f=identity a=37 x=log29 w=log31 b=1/2] : Found, verified 1, true degree 11, 0.00251903 s; relation: 1*t^11 -2*t^3 -2*t^2 (residual@1200: 1.425e-1239)
+PASS p37 sin: y = root of t^9-3t+1 in (0,1), sin(u) [f=sin a=1 x=log17 w=G b=-1/2] : Found, verified 1, true degree 10, 0.000407168 s; relation: 1*t^10 -3*t^2 1*t^1 (residual@1200: 0.000e+00)
+PASS p37 Gamma: y = root of t^10-t-3, Gamma(u) = y, a=11 x=e w=log23 [f=Gamma a=11 x=e w=log23 b=-1/3] : Found, verified 1, true degree 12, 0.00148434 s; relation: 1*t^12 -1*t^3 -3*t^2 (residual@1200: 9.105e-1240)
+PASS p37 t^t: y = root of t^8-2t-2, u^u = y, a=19 x=pi w=log37 [f=t^t a=19 x=pi w=log37 b=-1/2] : Found, verified 1, true degree 12, 0.0011716 s; relation: 1*t^12 -1*t^11 -2*t^5 2*t^3 (residual@1200: 5.972e-1240)
+PASS p37 log: y = root of t^12-2t-2, u = exp(y), a=7 x=log37 w=log13 [f=log a=7 x=log37 w=log13 b=2] : Found, verified 1, true degree 12, 0.0015546 s; relation: 1*t^12 -2*t^1 -2*t^0 (residual@1200: 2.169e-1239)
+PASS wide Gamma u<1: y = root of t^4-82 (Eisenstein), Gamma(u) = y with u ~ 0.29, a=5 x=gamma w=log29 [f=Gamma a=5 x=gamma w=log29 b=-2/3] : Found, verified 1, true degree 12, 0.00269374 s; relation: -1*t^12 82*t^8 1*t^5 -82*t^1 (residual@1200: 9.822e-1235)
+PASS wide t^t u<1/e: y = root of t^5+2t-2 (Eisenstein), u^u = y with u ~ 0.085, a=3/2 x=G w=log19 [f=t^t a=3/2 x=G w=log19 b=1/3] : Found, verified 1, true degree 12, 0.000973955 s; relation: -1*t^12 -2*t^8 2*t^7 (residual@1200: 0.000e+00)
+validation: all PASS
+old run rebuilt (600 digits, degree 12): raw 157248, candidates 156192, FINAL old job list 122889 (expected 122889 for 600 digits); 16.7551475009999997212162270444 s
+--- job counts per f ---
+f | all | after rule4 | symbolic: trivial(identity), zeta3*pi^k(identity), duplicate | after symbolic | domain | range | near-integer(D/2) | ill-conditioned | numeric dup | FINAL
+identity | 83776 | 83770 | 168, 102, 4924 | 70821 | 0 | 2306 | 0 | 748 | 0 | 67767
+log | 83776 | 83770 | 0, 0, 8 | 75040 | 0 | 69 | 0 | 0 | 0 | 74971
+exp | 83776 | 83770 | 0, 0, 8 | 76306 | 0 | 22883 | 0 | 1898 | 0 | 51525
+sin | 83776 | 83770 | 0, 0, 8 | 75145 | 0 | 1217 | 0 | 750 | 0 | 73178
+cos | 83776 | 83770 | 0, 0, 8 | 75285 | 0 | 69 | 69 | 5293 | 0 | 69854
+tan | 83776 | 83770 | 0, 0, 8 | 75145 | 0 | 1217 | 0 | 750 | 0 | 73178
+sinh | 83776 | 83770 | 0, 0, 8 | 76306 | 0 | 24005 | 0 | 750 | 0 | 51551
+cosh | 83776 | 83770 | 0, 0, 8 | 76446 | 0 | 22857 | 69 | 5293 | 0 | 48227
+tanh | 83776 | 83770 | 0, 0, 8 | 76589 | 0 | 1217 | 18768 | 8226 | 0 | 48378
+arctan | 83776 | 83770 | 0, 0, 8 | 75145 | 0 | 1217 | 0 | 750 | 0 | 73178
+arcsinh | 83776 | 83770 | 0, 0, 8 | 75145 | 0 | 1217 | 0 | 750 | 0 | 73178
+arccosh | 83776 | 83770 | 0, 0, 8 | 78941 | 40317 | 69 | 0 | 0 | 5 | 38550
+arcsin(1/t) | 83776 | 83770 | 0, 0, 8 | 79048 | 40317 | 1158 | 0 | 763 | 0 | 36810
+arccos(1/t) | 83776 | 83770 | 0, 0, 8 | 78943 | 40317 | 69 | 0 | 0 | 143 | 38412
+log(t-1) | 83776 | 83770 | 0, 0, 8 | 78941 | 40317 | 69 | 0 | 0 | 0 | 38555
+t^t | 83776 | 83770 | 0, 0, 8 | 78898 | 0 | 26488 | 0 | 1680 | 0 | 50730
+Gamma | 83776 | 83770 | 0, 0, 8 | 81252 | 0 | 26689 | 0 | 0 | 0 | 54563
+exp(1/t) | 83776 | 83770 | 0, 0, 8 | 76245 | 0 | 21922 | 0 | 1852 | 0 | 52471
+already tested in previous run (removed after symbolic dedup), per f: identity=7755 log=8722 exp=7456 sin=8617 cos=8477 tan=8617 sinh=7456 cosh=7316 tanh=7173 arctan=8617 arcsinh=8617 arccosh=4821 arcsin(1/t)=4714 arccos(1/t)=4819 log(t-1)=4821 t^t=4864 Gamma=2510 exp(1/t)=7517
+TOTAL already tested (removed): 122889
+numerically equal to an old final target (removed), per f: identity=0 log=0 exp=0 sin=0 cos=0 tan=0 sinh=0 cosh=0 tanh=0 arctan=0 arcsinh=0 arccosh=0 arcsin(1/t)=0 arccos(1/t)=2 log(t-1)=0 t^t=0 Gamma=0 exp(1/t)=0
+TOTAL numerically equal to an old final target (removed): 2
+RE-INCLUDED targets (final now, but (f,key) was dropped by the old run): 7094  [old reason: domain 7094, range 0, near-integer 0, ill-cond 0, numeric dup 0]
+TOTAL | 1507968 | 1507860 | 168, 102, 5060 | 1379641 | 161268 | 154738 | 18906 | 29503 | 148 | 1015076
+--- production: 1015076 jobs ---
+
+===== SUMMARY (600 digits, degree 12) =====
+jobs run = 1015076, verified relations = 0, spurious = 0, min normBound (jobs without relation) = 8.37677828988621553652714370416e+36, mean job time 0.131507259513329283207028197467 s
+total elapsed 13597.9138725140001042746007442 s
+--- non-none JOB lines:
+JOB COUNT after dedup: 1015076
+--- tail
+JOB 1015076/1015076 f=exp(1/t) a=3/2 x=log37 w=log37 b=3/2 | none | PrecisionExhausted, normBound 8.68e+36 | 0.130316826999999996195001017441 s
+
+===== SUMMARY (600 digits, degree 12) =====
+jobs run = 1015076, verified relations = 0, spurious = 0, min normBound (jobs without relation) = 8.37677828988621553652714370416e+36, mean job time 0.131507259513329283207028197467 s
+total elapsed 13597.9138725140001042746007442 s

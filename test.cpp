@@ -2881,7 +2881,7 @@ namespace
 	enum { TEP_OK = 0, TEP_DOMAIN = 1, TEP_RANGE = 2 };
 	// Evaluates y = f(c * (a x)^(b w)) with guard digits. cFn() is called at the working (default) precision.
 	// Returns y rounded to `digits` digits (mpreal prec set accordingly). st: TEP_OK / TEP_DOMAIN / TEP_RANGE.
-	mpreal tepEval(const TepSpec& s, const std::function<mpreal()>& cFn, int digits, int& st)
+	mpreal tepEval(const TepSpec& s, const std::function<mpreal()>& cFn, int digits, int& st, bool wide = false)
 	{
 		const auto saved = mpreal::get_default_prec();
 		st = TEP_OK;
@@ -2908,8 +2908,8 @@ namespace
 		{
 		case 11: case 12: case 13: dom = u0d >= 1; break;                                   // arccosh, arcsin(1/t), arccos(1/t)
 		case 14: dom = u0d > 1; break;                                                      // log(t-1)
-		case 15: dom = u0d > 0.36787944117144233; rng = u0d > 40; break;                    // t^t (u > 1/e)
-		case 16: dom = u0d >= 1.4616321449683623; rng = u0d > 40; break;                    // Gamma (u >= argmin)
+		case 15: dom = wide ? u0d > 0 : u0d > 0.36787944117144233; rng = u0d > 40; break;   // t^t (old: u > 1/e; wide: every u > 0, y = u^u needs no inverse)
+		case 16: dom = wide ? u0d > 0 : u0d >= 1.4616321449683623; rng = u0d > 40; break;   // Gamma (old: u >= argmin; wide: every u > 0, y = Gamma(u) needs no inverse)
 		case 2: case 6: case 7: rng = u0d > 100; break;                                     // exp, sinh, cosh
 		case 17: rng = u0d < 1.0 / 100; break;                                              // exp(1/t)
 		default: break;
@@ -3018,13 +3018,138 @@ namespace
 	}
 }
 
-static void tepImpl(int digits, int degree, bool p37)
+
+namespace
 {
-	const std::string PF = p37 ? "ZETA3_TEP37_" : "ZETA3_TEP_";
-	const TepGrid& G = p37 ? tepP37Grid() : tepOldGrid();
+	// extra grid for the widened p37 run: union of the old and p37 grids (b: full 14 values)
+	const TepGrid& tepWideGrid()
+	{
+		static TepGrid g;
+		if (g.A.empty())
+		{
+			g.A.push_back(TepQ(1));
+			for (int i = 0; i < kTepNPrimes; ++i) g.A.push_back(TepQ(kTepPrimes[i]));
+			g.A.push_back(TepQ(1, 2)); g.A.push_back(TepQ(1, 3)); g.A.push_back(TepQ(2, 3)); g.A.push_back(TepQ(3, 2));
+			g.B = { TepQ(1), TepQ(-1), TepQ(2), TepQ(-2), TepQ(3), TepQ(-3), TepQ(1, 2), TepQ(-1, 2), TepQ(1, 3), TepQ(-1, 3),
+				TepQ(2, 3), TepQ(-2, 3), TepQ(3, 2), TepQ(-3, 2) };
+			tepAddCommonX(g);
+			for (int i = 0; i < kTepNPrimes; ++i) tepAddLogX(g, kTepPrimes[i]);
+			tepAddCommonW(g, true);
+			tepAddTailW(g);
+			for (int i = 0; i < kTepNPrimes; ++i) tepAddLogW(g, kTepPrimes[i]);
+		}
+		return g;
+	}
+
+	struct TepEnum
+	{
+		std::vector<TepSpec> cand;
+		std::vector<std::string> keys; // symbolic key string of every candidate
+		std::vector<long> cTotal, cRule4, cSym, dSymTriv, dSymDup, dSymPi, dOld;
+	};
+	// all specs of the grid, after rule 4 and symbolic dedup; skipKeys (optional): (f,key) pairs removed (already tested)
+	TepEnum tepEnumerate(const TepGrid& G, const std::set<std::pair<int, std::string>>* skipKeys)
+	{
+		TepEnum E;
+		for (auto* v : { &E.cTotal, &E.cRule4, &E.cSym, &E.dSymTriv, &E.dSymDup, &E.dSymPi, &E.dOld }) v->assign(kTepNF, 0);
+		const int NA = (int)G.A.size(), NX = (int)G.X.size(), NW = (int)G.W.size(), NB = (int)G.B.size();
+		for (int f = 0; f < kTepNF; ++f)
+		{
+			std::set<std::string> seen;
+			for (int a = 0; a < NA; ++a)
+				for (int x = 0; x < NX; ++x)
+					for (int w = 0; w < NW; ++w)
+						for (int b = 0; b < NB; ++b)
+						{
+							++E.cTotal[f];
+							const TepSpec s{ f, a, x, w, b, &G };
+							const bool isInt = G.B[b].d == 1 && std::labs(G.B[b].n) <= 3;
+							if (w == 0 && x == 1 && a == 0 && isInt) continue; // rule 4: f(zeta3 pi^k), k integer |k|<=3, already tested
+							++E.cRule4[f];
+							TepKey key = tepKey(s);
+							if (f == 0) // identity: algebraic factors do not matter
+								for (auto it = key.begin(); it != key.end();)
+									if (tepAlgebraicPair(it->first)) it = key.erase(it); else ++it;
+							if (f == 0)
+							{
+								if (key.empty()) { ++E.dSymTriv[f]; continue; } // zeta3 * algebraic
+								if (key.size() == 1 && key.begin()->second.d == 1 && std::labs(key.begin()->second.n) <= 3 &&
+									((key.begin()->first.first == "1" && key.begin()->first.second == "logpi") ||
+										(key.begin()->first.second == "1" && key.begin()->first.first == "logpi")))
+								{ ++E.dSymPi[f]; continue; } // zeta3 * pi^k * algebraic
+							}
+							const std::string ks = tepKeyStr(key);
+							if (!seen.insert(ks).second) { ++E.dSymDup[f]; continue; }
+							if (skipKeys && skipKeys->count({ f, ks })) { ++E.dOld[f]; continue; }
+							++E.cSym[f];
+							E.cand.push_back(s);
+							E.keys.push_back(ks);
+						}
+		}
+		return E;
+	}
+
+	enum { TR_ALIVE = 0, TR_DOM = 1, TR_RNG = 2, TR_NEAR = 3, TR_ILL = 4, TR_NUMDUP = 5 };
+	// y = f(zeta3 (a x)^(b w)) for all candidates (parallel), then domain/range/near-integer/ill-conditioned filters and the global numeric dedup (+-y, 1/y).
+	// reason[i] = TR_*; ys[i] of dead candidates is released.
+	void tepEvaluateFilter(const std::vector<TepSpec>& cand, int digits, int degree, unsigned nThreads, bool wide, std::vector<mpreal>& ys, std::vector<char>& reason)
+	{
+		auto z3 = [digits]() { return tepRound(tepZ3(digits), mpreal::get_default_prec()); };
+		const size_t n = cand.size();
+		ys.assign(n, mpreal());
+		reason.assign(n, TR_ALIVE);
+		tepParallelFor(n, nThreads, digits, [&](size_t i)
+			{
+				int s;
+				ys[i] = tepEval(cand[i], z3, digits, s, wide);
+				if (s == TEP_DOMAIN) reason[i] = TR_DOM;
+				else if (s == TEP_RANGE) reason[i] = TR_RNG;
+				else
+				{
+					const double ld = tepLogDistInt(ys[i]);
+					if (ld < -0.5 * digits) reason[i] = TR_NEAR;
+					else if (ld < -0.4 * digits / degree) reason[i] = TR_ILL;
+				}
+				if (reason[i] != TR_ALIVE) ys[i] = mpreal(0.0, (mp_prec_t)8);
+			});
+		std::vector<size_t> idx;
+		for (size_t i = 0; i < n; ++i) if (reason[i] == TR_ALIVE) idx.push_back(i);
+		std::vector<mpreal> fold(idx.size());
+		for (size_t k = 0; k < idx.size(); ++k)
+		{
+			mpreal c = mpfr::abs(ys[idx[k]]);
+			if (c > 1) c = 1 / c;
+			fold[k] = c;
+		}
+		std::vector<size_t> ord(idx.size());
+		for (size_t k = 0; k < ord.size(); ++k) ord[k] = k;
+		std::sort(ord.begin(), ord.end(), [&](size_t p, size_t q) { return fold[p] < fold[q] || (fold[p] == fold[q] && p < q); });
+		const mpreal tol = mpfr::pow(mpreal(10), -0.5 * digits);
+		size_t g = 0;
+		while (g < ord.size())
+		{
+			size_t e = g + 1;
+			while (e < ord.size() && mpfr::abs(fold[ord[e]] - fold[ord[e - 1]]) < tol * std::max(mpreal(1e-30), fold[ord[e]])) ++e;
+			if (e - g > 1)
+			{
+				size_t keep = ord[g];
+				for (size_t k = g; k < e; ++k) keep = std::min(keep, ord[k]);
+				for (size_t k = g; k < e; ++k) if (ord[k] != keep) { reason[idx[ord[k]]] = TR_NUMDUP; ys[idx[ord[k]]] = mpreal(0.0, (mp_prec_t)8); }
+			}
+			g = e;
+		}
+	}
+}
+
+// mode 0: old grid; 1: p37 grid (skips every old-grid key); 2: wide grid (union of old and p37, full b set, Gamma/t^t on all u > 0,
+// skips only the (f,key) pairs that are in the final job list of the old 600-digit run, rebuilt with the old filters and domains)
+static void tepImpl(int digits, int degree, int mode)
+{
+	const bool p37 = mode >= 1, wide = mode == 2;
+	const std::string PF = wide ? "ZETA3_TEP37W_" : p37 ? "ZETA3_TEP37_" : "ZETA3_TEP_";
+	const TepGrid& G = wide ? tepWideGrid() : p37 ? tepP37Grid() : tepOldGrid();
 	const TepGrid& OG = tepOldGrid();
-	const int NA = (int)G.A.size(), NX = (int)G.X.size(), NW = (int)G.W.size(), NB = (int)G.B.size();
-	std::cout.precision(30);
+		std::cout.precision(30);
 	const auto tStart = std::chrono::steady_clock::now();
 	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
 	const unsigned nThreads = (unsigned)std::max(1, envInt((PF + "THREADS").c_str(), 10));
@@ -3032,8 +3157,10 @@ static void tepImpl(int digits, int degree, bool p37)
 	const int checkOnly = envInt((PF + "CHECK_ONLY").c_str(), 0), noCheck = envInt((PF + "NOCHECK").c_str(), 0);
 	const auto savedPrec = mpreal::get_default_prec();
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
-	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_" << (p37 ? "p37_" : "") << digits << "digits_deg" << degree << ".txt" << std::endl;
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_" << (wide ? "p37w_" : p37 ? "p37_" : "") << digits << "digits_deg" << degree << ".txt" << std::endl;
 	std::cout << "digits " << digits << ", degree " << degree << " (only max degree, covers all lower), threads " << nThreads << std::endl;
+	if (wide) setPslqAlgorithm(PslqAlgo::Multipair2L);
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
 	tepZ3(digits); // warm the cache
 	auto z3 = [digits]() { return tepRound(tepZ3(digits), mpreal::get_default_prec()); };
 
@@ -3099,6 +3226,15 @@ static void tepImpl(int digits, int degree, bool p37)
 					return newtonU([&](const mpreal& c) { return c * mpfr::log(c) - la; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, mpreal(1.2)); });
 			add("p37 log: y = root of t^12-2t-2, u = exp(y), a=7 x=log37 w=log13", "log", TepQ(7), "log37", "log13", TepQ(2), { -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, 1.1,
 				[](const mpreal& a) { return mpfr::exp(a); });
+			if (wide)
+			{
+				add("wide Gamma u<1: y = root of t^4-82 (Eisenstein), Gamma(u) = y with u ~ 0.29, a=5 x=gamma w=log29", "Gamma", TepQ(5), "gamma", "log29", TepQ(-2, 3), { -82, 0, 0, 0, 1 }, 3.0,
+					[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+						return newtonU([&](const mpreal& c) { return mpfr::lngamma(c) - la; }, [](const mpreal& c) { return mpfr::digamma(c); }, mpreal(0.3)); });
+				add("wide t^t u<1/e: y = root of t^5+2t-2 (Eisenstein), u^u = y with u ~ 0.085, a=3/2 x=G w=log19", "t^t", TepQ(3, 2), "G", "log19", TepQ(1, 3), { -2, 2, 0, 0, 0, 1 }, 0.8,
+					[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+						return newtonU([&](const mpreal& c) { return c * mpfr::log(c) - la; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, mpreal(0.08)); });
+			}
 		}
 	}
 	// c(prec) = u / (a x)^(b w) is computed per call at the working precision
@@ -3116,8 +3252,8 @@ static void tepImpl(int digits, int degree, bool p37)
 				Check& ch = checks[i];
 				const auto cf = checkC(ch);
 				int st;
-				const mpreal y = tepEval(ch.s, cf, digits, st);
-				auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(ch.s, cf, dg, s2); mpreal::set_default_prec(sv); return r; };
+				const mpreal y = tepEval(ch.s, cf, digits, st, wide);
+				auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(ch.s, cf, dg, s2, wide); mpreal::set_default_prec(sv); return r; };
 				const TepJobRes jr = tepRunJob(y, yAt, digits, degree);
 				bool ok = jr.r.status == PslqResult::Status::Found && jr.verified;
 				std::string why = ok ? "" : "not found or not verified";
@@ -3152,12 +3288,16 @@ static void tepImpl(int digits, int degree, bool p37)
 	if (checkOnly) { mpreal::set_default_prec(savedPrec); return; }
 
 	// ---------------- enumeration and dedup ----------------
-	std::vector<long> cTotal(kTepNF), cRule4(kTepNF), cSym(kTepNF), cDom(kTepNF), cRng(kTepNF), cNear(kTepNF), cIll(kTepNF), cNum(kTepNF);
-	std::vector<long> dSymTriv(kTepNF), dSymDup(kTepNF), dSymPi(kTepNF), dOld(kTepNF);
-	// keys of every target of the previous grid (same canonical form, identity-only erasure of algebraic pairs)
-	std::set<std::pair<int, std::string>> oldKeys;
-	if (p37)
-		for (int f = 0; f < kTepNF; ++f)
+	const int NF = kTepNF;
+	std::set<std::pair<int, std::string>> skipKeys; // (f, key) pairs that are not enumerated again
+	std::map<std::pair<int, std::string>, int> oldDropped; // mode 2: old-grid keys NOT in the old final list, with the reason (TR_*)
+	std::vector<mpreal> oldFolds; // mode 2: sorted fold values (|y| or 1/|y|) of the old final list
+	int oldDigits = digits;
+	long oldFinalCount = 0;
+	if (mode == 1)
+	{
+		// keys of every target of the previous grid (same canonical form, identity-only erasure of algebraic pairs)
+		for (int f = 0; f < NF; ++f)
 			for (int a = 0; a < (int)OG.A.size(); ++a)
 				for (int x = 0; x < (int)OG.X.size(); ++x)
 					for (int w = 0; w < (int)OG.W.size(); ++w)
@@ -3167,98 +3307,90 @@ static void tepImpl(int digits, int degree, bool p37)
 							if (f == 0)
 								for (auto it = key.begin(); it != key.end();)
 									if (tepAlgebraicPair(it->first)) it = key.erase(it); else ++it;
-							oldKeys.insert({ f, tepKeyStr(key) });
+							skipKeys.insert({ f, tepKeyStr(key) });
 						}
-	if (p37) std::cout << "old-grid distinct (f,key) pairs: " << oldKeys.size() << std::endl;
-	std::vector<TepSpec> cand;
-	for (int f = 0; f < kTepNF; ++f)
-	{
-		std::set<std::string> seen;
-		for (int a = 0; a < NA; ++a)
-			for (int x = 0; x < NX; ++x)
-				for (int w = 0; w < NW; ++w)
-					for (int b = 0; b < NB; ++b)
-					{
-						++cTotal[f];
-						const TepSpec s{ f, a, x, w, b, &G };
-						// rule 4: w=1, x=pi, a=1, b integer, |b|<=3: f(zeta3 pi^b), already tested
-						bool isInt = false;
-						isInt = G.B[b].d == 1 && std::labs(G.B[b].n) <= 3;
-						if (w == 0 && x == 1 && a == 0 && isInt) continue;
-						++cRule4[f];
-						TepKey key = tepKey(s);
-						if (f == 0) // identity: algebraic factors do not matter
-							for (auto it = key.begin(); it != key.end();)
-								if (tepAlgebraicPair(it->first)) it = key.erase(it); else ++it;
-						if (f == 0)
-						{
-							if (key.empty()) { ++dSymTriv[f]; continue; } // zeta3 * algebraic
-							if (key.size() == 1 && key.begin()->second.d == 1 && std::labs(key.begin()->second.n) <= 3 &&
-								((key.begin()->first.first == "1" && key.begin()->first.second == "logpi") ||
-									(key.begin()->first.second == "1" && key.begin()->first.first == "logpi")))
-							{ ++dSymPi[f]; continue; } // zeta3 * pi^k * algebraic, integer |k| <= 3
-						}
-						if (!seen.insert(tepKeyStr(key)).second) { ++dSymDup[f]; continue; }
-						if (p37 && oldKeys.count({ f, tepKeyStr(key) })) { ++dOld[f]; continue; } // already tested in the previous run
-						++cSym[f];
-						cand.push_back(s);
-					}
+		std::cout << "old-grid distinct (f,key) pairs: " << skipKeys.size() << std::endl;
 	}
-
-	// y values (parallel)
-	std::vector<int> st(cand.size(), TEP_OK);
-	std::vector<mpreal> ys(cand.size());
-	tepParallelFor(cand.size(), nThreads, digits, [&](size_t i)
+	if (mode == 2)
+	{
+		// rebuild the final job list of the old 600-digit / degree-12 run with the old grid, old filters and old (narrow) Gamma / t^t domains
+		oldDigits = envInt((PF + "OLD_DIGITS").c_str(), 600);
+		const int oldDegree = 12;
+		const auto tOld = std::chrono::steady_clock::now();
+		mpreal::set_default_prec(mpfr::digits2bits(oldDigits));
+		tepZ3(oldDigits);
+		TepEnum OE = tepEnumerate(OG, nullptr);
+		std::vector<mpreal> oys; std::vector<char> orsn;
+		tepEvaluateFilter(OE.cand, oldDigits, oldDegree, nThreads, false, oys, orsn);
+		std::vector<long> oFinal(NF, 0), oDom(NF, 0);
+		for (size_t i = 0; i < OE.cand.size(); ++i)
 		{
-			int s;
-			ys[i] = tepEval(cand[i], z3, digits, s);
-			st[i] = s;
-		});
-	// classify
-	std::vector<char> alive(cand.size(), 1);
-	const double nearThr = -0.5 * digits, illThr = -0.4 * digits / degree;
+			const int f = OE.cand[i].f;
+			if (orsn[i] == TR_ALIVE)
+			{
+				skipKeys.insert({ f, OE.keys[i] }); ++oFinal[f]; ++oldFinalCount;
+				mpreal c = mpfr::abs(oys[i]); if (c > 1) c = 1 / c;
+				oldFolds.push_back(c);
+			}
+			else { oldDropped[{ f, OE.keys[i] }] = orsn[i]; if (orsn[i] == TR_DOM) ++oDom[f]; }
+		}
+		std::sort(oldFolds.begin(), oldFolds.end());
+		mpreal::set_default_prec(mpfr::digits2bits(digits));
+		tepZ3(digits);
+		std::cout << "old run rebuilt (" << oldDigits << " digits, degree " << oldDegree << "): raw " << OE.cTotal[0] * 0 + [&] { long t = 0; for (long v : OE.cTotal) t += v; return t; }()
+			<< ", candidates " << OE.cand.size() << ", FINAL old job list " << oldFinalCount << " (expected 122889 for 600 digits); " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tOld).count() << " s" << std::endl;
+		std::cout << "  old final per f:"; for (int f = 0; f < NF; ++f) std::cout << " " << kTepF[f] << "=" << oFinal[f];
+		std::cout << "\n  old domain drops per f:"; for (int f = 0; f < NF; ++f) std::cout << " " << kTepF[f] << "=" << oDom[f];
+		std::cout << std::endl;
+	}
+	TepEnum E = tepEnumerate(G, p37 ? &skipKeys : nullptr);
+	std::vector<TepSpec>& cand = E.cand;
+	std::vector<long> cTotal = E.cTotal, cRule4 = E.cRule4, cSym = E.cSym, dSymTriv = E.dSymTriv, dSymDup = E.dSymDup, dSymPi = E.dSymPi, dOld = E.dOld;
+	std::vector<long> cDom(NF), cRng(NF), cNear(NF), cIll(NF), cNum(NF), cOldNum(NF), cFinal(NF);
+
+	// y values (parallel), filters, numeric dedup
+	std::vector<mpreal> ys;
+	std::vector<char> reason;
+	tepEvaluateFilter(cand, digits, degree, nThreads, wide, ys, reason);
+	// mode 2: drop targets numerically equal to a target of the old final list (same test, different symbolic key)
+	if (wide && !oldFolds.empty())
+	{
+		const mpreal tol = mpfr::pow(mpreal(10), -0.5 * std::min(digits, oldDigits));
+		for (size_t i = 0; i < cand.size(); ++i)
+			if (reason[i] == TR_ALIVE)
+			{
+				mpreal c = mpfr::abs(ys[i]); if (c > 1) c = 1 / c;
+				auto it = std::lower_bound(oldFolds.begin(), oldFolds.end(), c);
+				bool hit = false;
+				if (it != oldFolds.end() && mpfr::abs(*it - c) < tol * std::max(mpreal(1e-30), c)) hit = true;
+				if (!hit && it != oldFolds.begin() && mpfr::abs(*(it - 1) - c) < tol * std::max(mpreal(1e-30), c)) hit = true;
+				if (hit) { reason[i] = 6; ++cOldNum[cand[i].f]; ys[i] = mpreal(0.0, (mp_prec_t)8); }
+			}
+	}
+	std::vector<TepTarget> targets;
+	std::map<int, long> reinc; // mode 2: final targets whose (f,key) was dropped by the old run, by old reason
+	std::vector<long> reincF(NF, 0);
 	for (size_t i = 0; i < cand.size(); ++i)
 	{
 		const int f = cand[i].f;
-		if (st[i] == TEP_DOMAIN) { alive[i] = 0; ++cDom[f]; continue; }
-		if (st[i] == TEP_RANGE) { alive[i] = 0; ++cRng[f]; continue; }
-		const double ld = tepLogDistInt(ys[i]);
-		if (ld < nearThr) { alive[i] = 0; ++cNear[f]; continue; }
-		if (ld < illThr) { alive[i] = 0; ++cIll[f]; continue; }
-	}
-	// numeric dedup (+-y, 1/y), global
-	{
-		std::vector<size_t> idx;
-		std::vector<mpreal> fold(cand.size());
-		for (size_t i = 0; i < cand.size(); ++i)
-			if (alive[i])
-			{
-				mpreal c = mpfr::abs(ys[i]);
-				if (c > 1) c = 1 / c;
-				fold[i] = c;
-				idx.push_back(i);
-			}
-		std::sort(idx.begin(), idx.end(), [&](size_t p, size_t q) { return fold[p] < fold[q] || (fold[p] == fold[q] && p < q); });
-		const mpreal tol = mpfr::pow(mpreal(10), -0.5 * digits);
-		// groups of consecutive entries whose neighbour difference is below tol; keep the smallest original index in each group
-		size_t g = 0;
-		while (g < idx.size())
+		switch (reason[i])
 		{
-			size_t e = g + 1;
-			while (e < idx.size() && mpfr::abs(fold[idx[e]] - fold[idx[e - 1]]) < tol * std::max(mpreal(1e-30), fold[idx[e]])) ++e;
-			if (e - g > 1)
+		case TR_DOM: ++cDom[f]; break;
+		case TR_RNG: ++cRng[f]; break;
+		case TR_NEAR: ++cNear[f]; break;
+		case TR_ILL: ++cIll[f]; break;
+		case TR_NUMDUP: ++cNum[f]; break;
+		case 6: break;
+		default:
+			targets.push_back({ cand[i], std::string(), std::move(ys[i]) }); ++cFinal[f];
+			if (wide)
 			{
-				size_t keep = idx[g];
-				for (size_t k = g; k < e; ++k) keep = std::min(keep, idx[k]);
-				for (size_t k = g; k < e; ++k) if (idx[k] != keep) { alive[idx[k]] = 0; ++cNum[cand[idx[k]].f]; }
+				auto it = oldDropped.find({ f, E.keys[i] });
+				if (it != oldDropped.end()) { ++reinc[it->second]; ++reincF[f]; }
 			}
-			g = e;
 		}
 	}
-	std::vector<TepTarget> targets;
-	std::vector<long> cFinal(kTepNF);
-	for (size_t i = 0; i < cand.size(); ++i)
-		if (alive[i]) { targets.push_back({ cand[i], tepName(cand[i]), ys[i] }); ++cFinal[cand[i].f]; }
+	{ std::vector<mpreal>().swap(ys); }
 
 	std::cout << "--- job counts per f ---" << std::endl;
 	std::cout << "f | all | after rule4 | symbolic: trivial(identity), zeta3*pi^k(identity), duplicate | after symbolic | domain | range | near-integer(D/2) | ill-conditioned | numeric dup | FINAL" << std::endl;
@@ -3276,6 +3408,18 @@ static void tepImpl(int digits, int degree, bool p37)
 		std::cout << "already tested in previous run (removed after symbolic dedup), per f:";
 		for (int f = 0; f < kTepNF; ++f) std::cout << " " << kTepF[f] << "=" << dOld[f];
 		std::cout << "\nTOTAL already tested (removed): " << to << std::endl;
+	}
+	if (wide)
+	{
+		long to = 0; for (int f = 0; f < kTepNF; ++f) to += cOldNum[f];
+		std::cout << "numerically equal to an old final target (removed), per f:";
+		for (int f = 0; f < kTepNF; ++f) std::cout << " " << kTepF[f] << "=" << cOldNum[f];
+		std::cout << "\nTOTAL numerically equal to an old final target (removed): " << to << std::endl;
+		long rt = 0; for (auto& kv : reinc) rt += kv.second;
+		std::cout << "RE-INCLUDED targets (final now, but (f,key) was dropped by the old run): " << rt
+			<< "  [old reason: domain " << reinc[TR_DOM] << ", range " << reinc[TR_RNG] << ", near-integer " << reinc[TR_NEAR] << ", ill-cond " << reinc[TR_ILL] << ", numeric dup " << reinc[TR_NUMDUP] << "]" << std::endl;
+		std::cout << "  re-included per f:"; for (int f = 0; f < kTepNF; ++f) if (reincF[f]) std::cout << " " << kTepF[f] << "=" << reincF[f];
+		std::cout << "\n  Gamma / t^t final now: " << cFinal[16] << " / " << cFinal[15] << std::endl;
 	}
 	std::cout << "TOTAL | " << tot[0] << " | " << tot[1] << " | " << tot[2] << ", " << tot[3] << ", " << tot[4] << " | " << tot[5] << " | " << tot[6] << " | " << tot[7]
 		<< " | " << tot[8] << " | " << tot[9] << " | " << tot[10] << " | " << targets.size() << std::endl;
@@ -3309,7 +3453,7 @@ static void tepImpl(int digits, int degree, bool p37)
 			if (line.substr(bar + 3, bar2 - bar - 3) == "none") done.insert(line.substr(sp + 1, bar - sp - 1));
 		}
 		std::vector<TepTarget> rest;
-		for (auto& t : targets) if (!done.count(t.name)) rest.push_back(t);
+		for (auto& t : targets) if (!done.count(tepName(t.s))) rest.push_back(std::move(t));
 		std::cout << "RESUME: " << PF << "SKIP_DONE=" << sk << ": skipped " << targets.size() - rest.size() << " done jobs, " << rest.size() << " remain" << std::endl;
 		targets = rest;
 	}
@@ -3322,16 +3466,16 @@ static void tepImpl(int digits, int degree, bool p37)
 	tepParallelFor(targets.size(), nThreads, digits, [&](size_t i)
 		{
 			const TepSpec s = targets[i].s;
-			auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(s, z3, dg, s2); mpreal::set_default_prec(sv); return r; };
+			auto yAt = [&](int dg) { int s2; const auto sv = mpreal::get_default_prec(); mpreal r = tepEval(s, z3, dg, s2, wide); mpreal::set_default_prec(sv); return r; };
 			TepJobRes jr = tepRunJob(targets[i].y, yAt, digits, degree);
 			res[i] = jr;
 			const bool found = jr.r.status == PslqResult::Status::Found;
 			std::lock_guard<std::mutex> lk(outMtx);
 			const size_t c = ++done;
 			if (found)
-				std::cout << "RELATION " << targets[i].name << ": " << (jr.verified ? "VERIFIED" : "SPURIOUS") << ", true degree " << jr.trueDeg << ", " << jr.poly
+				std::cout << "RELATION " << tepName(targets[i].s) << ": " << (jr.verified ? "VERIFIED" : "SPURIOUS") << ", true degree " << jr.trueDeg << ", " << jr.poly
 					<< " (residual@" << 2 * digits << ": " << jr.resid << ")" << std::endl;
-			std::cout << "JOB " << c << "/" << targets.size() << " " << targets[i].name << " | " << (!found ? "none" : (jr.verified ? "FOUND-VERIFIED" : "FOUND-SPURIOUS"))
+			std::cout << "JOB " << c << "/" << targets.size() << " " << tepName(targets[i].s) << " | " << (!found ? "none" : (jr.verified ? "FOUND-VERIFIED" : "FOUND-SPURIOUS"))
 				<< " | " << toString(jr.r.status) << ", normBound " << jr.r.normBound.toString("%.2Re") << " | " << jr.secs << " s" << std::endl;
 		});
 
@@ -3341,7 +3485,7 @@ static void tepImpl(int digits, int degree, bool p37)
 	for (size_t i = 0; i < res.size(); ++i)
 	{
 		sumSecs += res[i].secs;
-		if (res[i].r.status == PslqResult::Status::Found) { (res[i].verified ? nVer : nSp)++; if (res[i].verified) std::cout << "REAL RELATION: " << targets[i].name << ": " << res[i].poly << std::endl; }
+		if (res[i].r.status == PslqResult::Status::Found) { (res[i].verified ? nVer : nSp)++; if (res[i].verified) std::cout << "REAL RELATION: " << tepName(targets[i].s) << ": " << res[i].poly << std::endl; }
 		else minNb = std::min(minNb, (double)res[i].r.normBound);
 	}
 	std::cout << "\n===== SUMMARY (" << digits << " digits, degree " << degree << ") =====" << std::endl;
@@ -3351,9 +3495,403 @@ static void tepImpl(int digits, int degree, bool p37)
 	mpreal::set_default_prec(savedPrec);
 }
 
-void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree) { tepImpl(digits, degree, false); }
+void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree) { tepImpl(digits, degree, 0); }
 
 // Same search on the extended grid (primes up to 37), skipping every target already tested by the previous grid.
 // a in {1} u {p<=37}, x in {e,pi,gamma,G} u {log p}, w in {1,pi,e,gamma,G,pi^2,pi^3,sqrt2 pi,sqrt3 pi,log pi} u {log p}, b in {+-1,+-2,+-1/2,+-1/3}.
 // Env vars as for the old function with prefix ZETA3_TEP37_. Output: results/zeta3_transcendental_exponent_polynomial_p37_<digits>digits_deg<degree>.txt
-void test_pslq_zeta3_transcendental_exponent_polynomial_p37(int digits, int degree) { tepImpl(digits, degree, true); }
+void test_pslq_zeta3_transcendental_exponent_polynomial_p37(int digits, int degree) { tepImpl(digits, degree, 1); }
+
+// Widened p37 run: union grid (a in {1, p<=37, 1/2, 1/3, 2/3, 3/2}, b full 14 values), Gamma and t^t on every u > 0, skips only the (f,key) pairs
+// of the final job list of the old 600-digit run (rebuilt) and targets numerically equal to one of them. Env prefix ZETA3_TEP37W_ (also OLD_DIGITS).
+// Output: results/zeta3_transcendental_exponent_polynomial_p37w_<digits>digits_deg<degree>.txt
+void test_pslq_zeta3_transcendental_exponent_polynomial_p37w(int digits, int degree) { tepImpl(digits, degree, 2); }
+
+// ============================================================================================================
+// Multiplicative relations with Gamma at rational points:
+//   log T = sum c_i log Gamma(k_i/N_i) + s log pi + t*1 + v log gamma + w log G + sum r_p log p + sum u_j log|2 sin(pi k/N)|
+// The Gamma columns are made multiplicatively independent (modulo pi, primes, cyclotomic units, ...) by a numerical greedy procedure.
+// ============================================================================================================
+namespace
+{
+	typedef __int128 gi128;
+	gi128 gGcd(gi128 a, gi128 b) { if (a < 0) a = -a; if (b < 0) b = -b; while (b) { gi128 t = a % b; a = b; b = t; } return a; }
+	struct GRat
+	{
+		gi128 n = 0, d = 1;
+		GRat() {}
+		GRat(gi128 n_, gi128 d_ = 1) { if (d_ < 0) { n_ = -n_; d_ = -d_; } const gi128 g = gGcd(n_, d_); n = g ? n_ / g : n_; d = g ? d_ / g : 1; }
+		GRat operator+(const GRat& o) const { return GRat(n * o.d + o.n * d, d * o.d); }
+		GRat operator*(const GRat& o) const { return GRat(n * o.n, d * o.d); }
+		GRat operator-() const { return GRat(-n, d); }
+		bool zero() const { return n == 0; }
+		std::string str() const { return d == 1 ? std::to_string((long long)n) : std::to_string((long long)n) + "/" + std::to_string((long long)d); }
+		mpreal val() const { return mpreal((long)n) / mpreal((long)d); }
+	};
+	typedef std::map<int, GRat> GExpr; // column index -> rational coefficient
+
+	struct GCol
+	{
+		std::string name;
+		int level = 0;            // 0: base (1, pi, gamma, G, primes); N: unit / Gamma at denominator N
+		std::function<mpreal()> val; // value of the log at the current default precision
+		bool kept = false, zero = false;
+		GExpr expr;               // dropped column: log(col) = sum expr[j] * log(col j)  (j may itself be dropped; expanded recursively)
+		std::string note;
+	};
+
+	GExpr gExpand(const std::vector<GCol>& cols, int idx, std::map<int, GExpr>& memo)
+	{
+		auto it = memo.find(idx);
+		if (it != memo.end()) return it->second;
+		GExpr r;
+		if (cols[idx].kept) r[idx] = GRat(1);
+		else if (!cols[idx].zero)
+			for (const auto& kv : cols[idx].expr)
+				for (const auto& e2 : gExpand(cols, kv.first, memo))
+				{
+					auto& slot = r[e2.first];
+					slot = slot + kv.second * e2.second;
+				}
+		for (auto it2 = r.begin(); it2 != r.end();) if (it2->second.zero()) it2 = r.erase(it2); else ++it2;
+		memo[idx] = r;
+		return r;
+	}
+
+	struct GTestOut
+	{
+		int kind = 0; // 0 independent, 1 dependent (expr filled), 2 relation among the basis only (candidate coefficient 0 / unverified)
+		GExpr expr;
+		std::string text, status;
+		double secs = 0;
+		std::string normBound;
+	};
+
+	// PSLQ on (log basis[0..], log cand). Result expr is over the basis column indices.
+	GTestOut gTest(const std::vector<GCol>& cols, const std::vector<int>& basis, int cand, int gd)
+	{
+		GTestOut o;
+		mpreal::set_default_prec(mpfr::digits2bits(gd));
+		if (basis.empty()) { o.kind = 0; return o; }
+		std::vector<mpreal> v;
+		for (int k : basis) v.push_back(cols[k].val());
+		v.push_back(cols[cand].val());
+		const auto t0 = std::chrono::steady_clock::now();
+		const PslqResult r = pslq(v);
+		o.secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+		o.status = toString(r.status);
+		o.normBound = r.normBound.toString("%.2Re");
+		if (r.status != PslqResult::Status::Found) return o;
+		// verify at 2x precision
+		mpreal::set_default_prec(mpfr::digits2bits(2 * gd));
+		mpreal sum = 0;
+		for (size_t i = 0; i < basis.size(); ++i) sum += r.relation[i] * cols[basis[i]].val();
+		sum += r.relation.back() * cols[cand].val();
+		const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * gd);
+		mpreal::set_default_prec(mpfr::digits2bits(gd));
+		if (!ok) { o.kind = 2; o.text = "relation found but NOT verified at 2x precision (spurious)"; return o; }
+		const long mc = r.relation.back().toLong();
+		if (mc == 0) { o.kind = 2; o.text = "verified relation among the BASIS columns (candidate coefficient 0): basis is dependent"; return o; }
+		o.kind = 1;
+		for (size_t i = 0; i < basis.size(); ++i)
+		{
+			const long m = r.relation[i].toLong();
+			if (m) o.expr[basis[i]] = GRat(-m, mc);
+		}
+		return o;
+	}
+
+	std::string gExprStr(const std::vector<GCol>& cols, const GExpr& e)
+	{
+		std::string s;
+		for (const auto& kv : e)
+			s += (s.empty() ? "" : " + ") + kv.second.str() + "*" + cols[kv.first].name;
+		return s.empty() ? "0" : s;
+	}
+
+	template <class Fn> void gParallel(size_t n, unsigned nThreads, int digits, Fn fn)
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < std::min<size_t>(nThreads, std::max<size_t>(n, 1)); ++t)
+			th.emplace_back([&]()
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(digits));
+					for (size_t i; (i = next++) < n;) fn(i);
+				});
+		for (auto& t : th) t.join();
+	}
+}
+
+void test_pslq_zeta_gamma_rational_multiplicative(int digits, int maxPrime, std::vector<int> maxNs)
+{
+	setPslqAlgorithm(PslqAlgo::Multipair2L);
+	std::sort(maxNs.begin(), maxNs.end());
+	const int maxN = maxNs.back();
+	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
+	const unsigned nThreads = (unsigned)std::max(1, envInt("ZETA_GAMMA_THREADS", 10));
+	const int gd = std::min(digits, envInt("ZETA_GAMMA_GREEDY_DIGITS", 800)); // precision of the greedy independence tests
+	const int skipJobs = envInt("ZETA_GAMMA_NOJOBS", 0);
+	const auto tStart = std::chrono::steady_clock::now();
+	mpreal::set_default_prec(mpfr::digits2bits(digits));
+	std::cout.precision(30);
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta_gamma_rational_multiplicative_" << digits << "digits.txt" << std::endl;
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+	std::cout << "digits " << digits << ", greedy digits " << gd << ", maxPrime " << maxPrime << ", maxNs:";
+	for (int m : maxNs) std::cout << " " << m;
+	std::cout << ", threads " << nThreads << std::endl;
+
+	// ---------------- columns ----------------
+	std::vector<GCol> cols;
+	std::map<std::string, int> byName;
+	auto addCol = [&](const std::string& nm, int level, std::function<mpreal()> v)
+	{
+		GCol c; c.name = nm; c.level = level; c.val = v;
+		byName[nm] = (int)cols.size();
+		cols.push_back(c);
+		return (int)cols.size() - 1;
+	};
+	addCol("1(e)", 0, []() { return mpreal(1); });
+	addCol("pi", 0, []() { return mpfr::log(mpfr::const_pi()); });
+	addCol("gamma", 0, []() { return mpfr::log(mpfr::const_euler()); });
+	addCol("G", 0, []() { return mpfr::log(mpfr::const_catalan()); });
+	for (int p = 2; p <= maxPrime; ++p)
+	{
+		bool isPrime = true;
+		for (int d = 2; d * d <= p && isPrime; ++d) isPrime = p % d != 0;
+		if (isPrime) addCol("p" + std::to_string(p), 0, [p]() { return mpfr::log(mpreal(p)); });
+	}
+	const int nBase = (int)cols.size();
+	// per level N: units 2 sin(pi k/N) (1 <= k < N/2, gcd(k,N) = 1; other k repeat lower levels) then Gamma(k/N) (gcd(k,N) = 1)
+	std::vector<std::vector<int>> unitsOf(maxN + 1), gammasOf(maxN + 1);
+	for (int N = 2; N <= maxN; ++N)
+	{
+		for (int k = 1; 2 * k < N; ++k)
+			if (std::gcd(k, N) == 1)
+				unitsOf[N].push_back(addCol("2sin(pi*" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
+					[k, N]() { return mpfr::log(2 * mpfr::abs(mpfr::sin(mpfr::const_pi() * mpreal(k) / N))); }));
+		for (int k = 1; k < N; ++k)
+			if (std::gcd(k, N) == 1)
+				gammasOf[N].push_back(addCol("Gamma(" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
+					[k, N]() { return mpfr::lngamma(mpreal(k) / N); }));
+	}
+	std::cout << "candidate columns: base " << nBase << ", units+Gammas " << cols.size() - nBase << " (gcd(k,N)>1 skipped: they repeat lower levels)" << std::endl;
+
+	// ---------------- greedy independence ----------------
+	std::cout << "\n=== greedy independence (m2l PSLQ at " << gd << " digits) ===" << std::endl;
+	std::vector<int> kept;
+	std::mutex gm;
+	auto reportDrop = [&](int c, const GTestOut& o, const char* how)
+	{
+		std::cout << "DROP " << cols[c].name << " [" << how << ", " << o.secs << " s]: log " << cols[c].name << " = " << gExprStr(cols, o.expr) << std::endl;
+	};
+	auto processBlock = [&](const std::vector<int>& block, const std::vector<int>& reflOrder)
+	{
+		// block: candidates in order (units, then Gamma with k < N/2); reflOrder: Gamma(k/N) with k > N/2 (dropped by reflection with a small PSLQ)
+		std::vector<GTestOut> out(block.size());
+		const std::vector<int> pre = kept; // pre-block kept set
+		gParallel(block.size(), nThreads, gd, [&](size_t i) { out[i] = gTest(cols, pre, block[i], gd); });
+		std::vector<int> surv;
+		for (size_t i = 0; i < block.size(); ++i)
+		{
+			const int c = block[i];
+			// zero column
+			mpreal::set_default_prec(mpfr::digits2bits(gd));
+			if (mpfr::abs(cols[c].val()) < mpfr::pow(mpreal(10), -0.5 * gd)) { cols[c].zero = true; std::cout << "DROP " << cols[c].name << " [zero column, log 1 = 0]" << std::endl; continue; }
+			if (out[i].kind == 1) { cols[c].expr = out[i].expr; reportDrop(c, out[i], "vs earlier blocks"); }
+			else if (out[i].kind == 2) { std::cout << "WARNING " << cols[c].name << ": " << out[i].text << std::endl; surv.push_back(c); }
+			else surv.push_back(c);
+		}
+		// rounds: surv[j] is tested against kept U surv[<j] (all assumed kept); the first dependent one is dropped.
+		// The first element of the list is known to be independent only before the first drop; after a drop every later test must be redone.
+		bool known = true;
+		while (!surv.empty())
+		{
+			size_t off = 0;
+			if (known) { kept.push_back(surv[0]); cols[surv[0]].kept = true; off = 1; }
+			std::vector<GTestOut> o2(surv.size());
+			const std::vector<int> base = kept;
+			gParallel(surv.size() - off, nThreads, gd, [&](size_t j0)
+				{
+					const size_t j = j0 + off;
+					std::vector<int> b = base;
+					for (size_t q = off; q < j; ++q) b.push_back(surv[q]);
+					o2[j] = gTest(cols, b, surv[j], gd);
+				});
+			size_t jstar = surv.size();
+			for (size_t j = off; j < surv.size(); ++j) if (o2[j].kind != 0) { jstar = j; break; }
+			for (size_t j = off; j < jstar; ++j) { kept.push_back(surv[j]); cols[surv[j]].kept = true; }
+			if (jstar < surv.size())
+			{
+				if (o2[jstar].kind == 1) { cols[surv[jstar]].expr = o2[jstar].expr; reportDrop(surv[jstar], o2[jstar], "within block"); }
+				else { std::cout << "WARNING " << cols[surv[jstar]].name << ": " << o2[jstar].text << " (kept anyway)" << std::endl; kept.push_back(surv[jstar]); cols[surv[jstar]].kept = true; }
+				surv.erase(surv.begin(), surv.begin() + jstar + 1);
+				known = false;
+			}
+			else surv.clear();
+		}
+		(void)reflOrder;
+	};
+	// base block
+	{
+		std::vector<int> block;
+		for (int i = 0; i < nBase; ++i) block.push_back(i);
+		processBlock(block, {});
+	}
+	for (int N = 2; N <= maxN; ++N)
+	{
+		std::vector<int> block = unitsOf[N];
+		std::vector<int> refl;
+		for (int c : gammasOf[N])
+		{
+			int k = 0, NN = 0;
+			std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
+			if (2 * k < N || N == 2) block.push_back(c); else refl.push_back(c);
+		}
+		// reflection shortcut: Gamma(k/N) Gamma(1-k/N) = pi / sin(pi k/N); verified by a small PSLQ on (Gamma(k/N), Gamma((N-k)/N), pi, 2sin, 2)
+		for (int c : refl)
+		{
+			int k = 0, NN = 0;
+			std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
+			const int partner = byName["Gamma(" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
+			const int unit = byName["2sin(pi*" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
+			mpreal::set_default_prec(mpfr::digits2bits(gd));
+			const bool unitZero = mpfr::abs(cols[unit].val()) < mpfr::pow(mpreal(10), -0.5 * gd);
+			GTestOut o;
+			if (!unitZero) o = gTest(cols, { partner, byName["pi"], unit, byName["p2"] }, c, gd);
+			if (unitZero || o.kind != 1) o = gTest(cols, { partner, byName["pi"], byName["p2"] }, c, gd); // unit is a power of 2 / 1: not an independent column
+			if (o.kind == 1) { cols[c].expr = o.expr; reportDrop(c, o, "reflection (small PSLQ)"); }
+			else { std::cout << "WARNING reflection test failed for " << cols[c].name << ", treated as ordinary candidate" << std::endl; block.push_back(c); }
+		}
+		processBlock(block, refl);
+		std::cout << "-- N=" << N << " done: kept so far " << kept.size() << ", elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
+	}
+	std::map<int, GExpr> memo;
+	for (int N : maxNs)
+	{
+		std::cout << "\nKEPT columns for maxN=" << N << ":";
+		int nG = 0, nU = 0, nB = 0;
+		for (int c : kept) if (cols[c].level <= N) { std::cout << " " << cols[c].name; (cols[c].level == 0 ? nB : cols[c].name[0] == 'G' ? nG : nU)++; }
+		std::cout << "\n  counts: base " << nB << ", units " << nU << ", Gamma " << nG << "; total " << nB + nU + nG << std::endl;
+	}
+	std::cout << "\nDROPPED columns, expanded in the kept basis:" << std::endl;
+	for (size_t c = 0; c < cols.size(); ++c)
+		if (!cols[c].kept && cols[c].level <= maxN)
+			std::cout << "  " << cols[c].name << (cols[c].zero ? " = 0 (log 1)" : " = " + gExprStr(cols, gExpand(cols, (int)c, memo))) << std::endl;
+
+	if (skipJobs) { std::cout << "ZETA_GAMMA_NOJOBS set: stop after the greedy stage. elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl; return; }
+
+	// ---------------- jobs ----------------
+	struct Target { std::string name; std::function<mpreal()> val; bool synth = false; GExpr expected; int minN = 0; };
+	std::vector<Target> targets;
+	{
+		auto zl = [](int s) { return [s]() { return mpfr::log(mpfr::zeta(mpreal(s))); }; };
+		targets.push_back({ "log zeta(3)", zl(3) });
+		targets.push_back({ "log zeta(5)", zl(5) });
+		targets.push_back({ "log zeta(7)", zl(7) });
+		targets.push_back({ "log(zeta(3)zeta(7)/zeta(5)^2)", []() { return mpfr::log(mpfr::zeta(mpreal(3))) + mpfr::log(mpfr::zeta(mpreal(7))) - 2 * mpfr::log(mpfr::zeta(mpreal(5))); } });
+	}
+	// synthetic validation targets: exponent lists over named columns
+	struct Synth { std::string name; std::vector<std::pair<std::string, GRat>> items; int minN; };
+	std::vector<Synth> synths = {
+		{ "[VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))", { { "Gamma(1/4)", GRat(2) }, { "p2", GRat(-3, 2) }, { "pi", GRat(-1, 2) } }, 4 },
+		{ "[VALIDATION] 3^(1/5) pi^(2/3) Gamma(1/5)^(1/2) / Gamma(2/7) e^(1/3) (2 sin(pi/7))^(1/4)",
+			{ { "p3", GRat(1, 5) }, { "pi", GRat(2, 3) }, { "Gamma(1/5)", GRat(1, 2) }, { "Gamma(2/7)", GRat(-1) }, { "1(e)", GRat(1, 3) }, { "2sin(pi*1/7)", GRat(1, 4) } }, 7 },
+		{ "[VALIDATION] Gamma(1/6)^(1/3) gamma^2 (Gamma(1/6) is dropped by the greedy step)", { { "Gamma(1/6)", GRat(1, 3) }, { "gamma", GRat(2) } }, 6 },
+	};
+	struct Job { std::string name; int N; bool withE; int targetIdx; int synthIdx; int n; };
+	std::vector<Job> jobs;
+	std::map<int, int> sizeOfN;
+	for (int N : maxNs)
+	{
+		int cnt = 0; for (int c : kept) if (cols[c].level <= N) ++cnt;
+		sizeOfN[N] = cnt;
+		for (int t = 0; t < (int)targets.size(); ++t)
+			for (int e = 1; e >= 0; --e)
+				jobs.push_back({ targets[t].name, N, e == 1, t, -1, cnt + (e ? 0 : -1) + 1 });
+		for (int s = 0; s < (int)synths.size(); ++s)
+			if (N >= synths[s].minN) jobs.push_back({ synths[s].name, N, true, -1, s, cnt + 1 });
+	}
+	std::cout << "\n=== jobs: " << jobs.size() << " ===" << std::endl;
+	for (const auto& j : jobs)
+		std::cout << "  maxN=" << j.N << (j.withE ? " +e " : " -e ") << "n=" << j.n << " power 10^" << 0.8 * digits / j.n << " : " << j.name << std::endl;
+	std::vector<int> order(jobs.size());
+	for (size_t i = 0; i < order.size(); ++i) order[i] = (int)i;
+	std::stable_sort(order.begin(), order.end(), [&](int a, int b) { return jobs[a].n > jobs[b].n; });
+	std::atomic<int> nValFail{ 0 }, nValRun{ 0 }, nRel{ 0 };
+	std::mutex outMtx;
+	std::atomic<size_t> next{ 0 };
+	std::vector<std::thread> th;
+	for (unsigned t = 0; t < nThreads; ++t)
+		th.emplace_back([&]()
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(digits));
+				for (size_t q; (q = next++) < order.size();)
+				{
+					const Job& jb = jobs[order[q]];
+					std::vector<int> bcols;
+					for (int c : kept) if (cols[c].level <= jb.N && (jb.withE || c != 0)) bcols.push_back(c);
+					// target value at a given precision
+					std::function<mpreal()> tv;
+					GExpr expected;
+					if (jb.synthIdx < 0) tv = targets[jb.targetIdx].val;
+					else
+					{
+						const Synth& sy = synths[jb.synthIdx];
+						std::vector<std::pair<int, GRat>> its;
+						std::map<int, GExpr> memo2;
+						for (const auto& it : sy.items)
+						{
+							its.push_back({ byName.at(it.first), it.second });
+							for (const auto& kv : gExpand(cols, byName.at(it.first), memo2))
+							{ auto& sl = expected[kv.first]; sl = sl + kv.second * it.second; }
+						}
+						tv = [&cols, its]() { mpreal s = 0; for (const auto& it : its) s += it.second.val() * cols[it.first].val(); return s; };
+					}
+					const auto t0 = std::chrono::steady_clock::now();
+					std::vector<mpreal> v;
+					v.push_back(tv());
+					for (int c : bcols) v.push_back(cols[c].val());
+					const PslqResult r = pslq(v);
+					const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+					std::ostringstream os;
+					os << "JOB maxN=" << jb.N << (jb.withE ? " +e" : " -e") << " n=" << v.size() << " power10^" << 0.8 * digits / v.size() << " " << jb.name << " : " << toString(r.status) << ", iter " << r.iterations << ", " << secs << " s";
+					bool pass = false;
+					if (r.status != PslqResult::Status::Found)
+						os << "\n    no relation with |m|_2 < " << r.normBound.toString("%.3Re");
+					else
+					{
+						// verify at 2x precision
+						mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+						mpreal sum = r.relation[0] * tv();
+						for (size_t i = 0; i < bcols.size(); ++i) sum += r.relation[i + 1] * cols[bcols[i]].val();
+						const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * digits);
+						mpreal::set_default_prec(mpfr::digits2bits(digits));
+						const long m0 = r.relation[0].toLong();
+						os << "\n    " << (ok ? "VERIFIED" : "SPURIOUS (not verified at 2x precision)") << " relation, residual@2D " << sum.toString("%.2Re") << ", target coefficient " << m0 << ":";
+						GExpr found;
+						for (size_t i = 0; i < bcols.size(); ++i)
+						{ const long m = r.relation[i + 1].toLong(); if (m && m0) found[bcols[i]] = GRat(-m, m0); }
+						if (m0 != 0) os << "\n    log T = " << gExprStr(cols, found);
+						else { os << " relation among BASIS columns only:"; for (size_t i = 0; i < bcols.size(); ++i) if (r.relation[i + 1] != 0) os << " " << r.relation[i + 1].toString("%.0Rf") << "*" << cols[bcols[i]].name; }
+						if (jb.synthIdx >= 0)
+						{
+							// expected coefficients (expressed through the kept basis) must match exactly
+							GExpr ex;
+							for (const auto& kv : expected) if (!kv.second.zero() && (jb.withE || kv.first != 0)) ex[kv.first] = kv.second;
+							bool same = ok && m0 != 0 && found.size() == ex.size();
+							if (same) for (const auto& kv : ex) { auto it = found.find(kv.first); if (it == found.end() || it->second.n != kv.second.n || it->second.d != kv.second.d) same = false; }
+							pass = same;
+							os << "\n    expected: " << gExprStr(cols, ex) << "\n    => " << (same ? "PASS (exact expected coefficients)" : "FAIL");
+						}
+						else if (ok && m0 != 0) ++nRel;
+					}
+					if (jb.synthIdx >= 0) { ++nValRun; if (!pass) ++nValFail; }
+					std::lock_guard<std::mutex> lk(outMtx);
+					std::cout << os.str() << std::endl;
+				}
+			});
+	for (auto& t : th) t.join();
+	std::cout << "\n===== SUMMARY: validation " << nValRun - nValFail << "/" << nValRun << " PASS; verified relations with target (real hits): " << nRel << "; total elapsed "
+		<< std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
+}

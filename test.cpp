@@ -2739,61 +2739,82 @@ namespace
 		mpreal val() const { return mpreal(n) / d; }
 	};
 
-	struct TepSpec { int f, a, x, w, b; }; // indices into the lists below
+	struct TepGrid
+	{
+		std::vector<TepQ> A, B;
+		std::vector<std::string> X, W, XAtom, WAtom;
+		std::vector<std::function<mpreal()>> xv, wv;
+	};
+	struct TepSpec { int f, a, x, w, b; const TepGrid* g; }; // indices into the grid g
 
 	const char* const kTepF[] = { "identity", "log", "exp", "sin", "cos", "tan", "sinh", "cosh", "tanh", "arctan", "arcsinh", "arccosh",
 		"arcsin(1/t)", "arccos(1/t)", "log(t-1)", "t^t", "Gamma", "exp(1/t)" };
 	const int kTepNF = 18;
-	const TepQ kTepA[] = { TepQ(1), TepQ(2), TepQ(3), TepQ(5), TepQ(1, 2), TepQ(1, 3), TepQ(2, 3), TepQ(3, 2) };
-	const int kTepNA = 8;
-	const char* const kTepX[] = { "e", "pi", "gamma", "G", "log2", "log3" };
-	const int kTepNX = 6;
-	const char* const kTepW[] = { "1", "pi", "e", "gamma", "G", "log2", "log3", "log5", "pi^2", "pi^3", "sqrt2*pi", "sqrt3*pi", "log(pi)" };
-	const int kTepNW = 13;
-	const TepQ kTepB[] = { TepQ(1), TepQ(-1), TepQ(2), TepQ(-2), TepQ(3), TepQ(-3), TepQ(1, 2), TepQ(-1, 2), TepQ(1, 3), TepQ(-1, 3),
-		TepQ(2, 3), TepQ(-2, 3), TepQ(3, 2), TepQ(-3, 2) };
-	const int kTepNB = 14;
+	const long kTepPrimes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 }; // primes expanded in the symbolic key (all grids)
+	const int kTepNPrimes = 12;
 
-	// atom names used in the symbolic key (w atoms and log atoms share one namespace so that equal products collide)
-	const char* const kTepWAtom[] = { "1", "pi", "e", "gamma", "G", "log2", "log3", "log5", "pi2", "pi3", "sqrt2pi", "sqrt3pi", "logpi" };
-	const char* const kTepXAtom[] = { "1", "logpi", "loggamma", "logG", "loglog2", "loglog3" };
+	// W atom names / X atom names share one namespace so that equal products collide
+	void tepAddLogX(TepGrid& g, long p) { g.X.push_back("log" + std::to_string(p)); g.XAtom.push_back("loglog" + std::to_string(p)); g.xv.push_back([p]() { return mpfr::log(mpreal(p)); }); }
+	void tepAddLogW(TepGrid& g, long p) { g.W.push_back("log" + std::to_string(p)); g.WAtom.push_back("log" + std::to_string(p)); g.wv.push_back([p]() { return mpfr::log(mpreal(p)); }); }
+	void tepAddCommonX(TepGrid& g)
+	{
+		g.X = { "e", "pi", "gamma", "G" }; g.XAtom = { "1", "logpi", "loggamma", "logG" };
+		g.xv = { []() { return mpfr::exp(mpreal(1)); }, []() { return mpfr::const_pi(); }, []() { return mpfr::const_euler(); }, []() { return mpfr::const_catalan(); } };
+	}
+	void tepAddCommonW(TepGrid& g, bool withG)
+	{
+		(void)withG;
+		g.W = { "1", "pi", "e", "gamma", "G" }; g.WAtom = { "1", "pi", "e", "gamma", "G" };
+		g.wv = { []() { return mpreal(1); }, []() { return mpfr::const_pi(); }, []() { return mpfr::exp(mpreal(1)); }, []() { return mpfr::const_euler(); }, []() { return mpfr::const_catalan(); } };
+	}
+	void tepAddTailW(TepGrid& g)
+	{
+		g.W.push_back("pi^2"); g.WAtom.push_back("pi2"); g.wv.push_back([]() { const mpreal p = mpfr::const_pi(); return p * p; });
+		g.W.push_back("pi^3"); g.WAtom.push_back("pi3"); g.wv.push_back([]() { const mpreal p = mpfr::const_pi(); return p * p * p; });
+		g.W.push_back("sqrt2*pi"); g.WAtom.push_back("sqrt2pi"); g.wv.push_back([]() { return mpfr::sqrt(mpreal(2)) * mpfr::const_pi(); });
+		g.W.push_back("sqrt3*pi"); g.WAtom.push_back("sqrt3pi"); g.wv.push_back([]() { return mpfr::sqrt(mpreal(3)) * mpfr::const_pi(); });
+		g.W.push_back("log(pi)"); g.WAtom.push_back("logpi"); g.wv.push_back([]() { return mpfr::log(mpfr::const_pi()); });
+	}
+	// previous production grid (600 digits, degree 12)
+	const TepGrid& tepOldGrid()
+	{
+		static TepGrid g;
+		if (g.A.empty())
+		{
+			g.A = { TepQ(1), TepQ(2), TepQ(3), TepQ(5), TepQ(1, 2), TepQ(1, 3), TepQ(2, 3), TepQ(3, 2) };
+			g.B = { TepQ(1), TepQ(-1), TepQ(2), TepQ(-2), TepQ(3), TepQ(-3), TepQ(1, 2), TepQ(-1, 2), TepQ(1, 3), TepQ(-1, 3),
+				TepQ(2, 3), TepQ(-2, 3), TepQ(3, 2), TepQ(-3, 2) };
+			tepAddCommonX(g); tepAddLogX(g, 2); tepAddLogX(g, 3);
+			tepAddCommonW(g, true); tepAddLogW(g, 2); tepAddLogW(g, 3); tepAddLogW(g, 5);
+			// old order: 1 pi e gamma G log2 log3 log5 pi^2 pi^3 sqrt2*pi sqrt3*pi log(pi)
+			tepAddTailW(g);
+		}
+		return g;
+	}
+	// new grid: primes up to 37
+	const TepGrid& tepP37Grid()
+	{
+		static TepGrid g;
+		if (g.A.empty())
+		{
+			g.A.push_back(TepQ(1));
+			for (int i = 0; i < kTepNPrimes; ++i) g.A.push_back(TepQ(kTepPrimes[i]));
+			g.B = { TepQ(1), TepQ(-1), TepQ(2), TepQ(-2), TepQ(1, 2), TepQ(-1, 2), TepQ(1, 3), TepQ(-1, 3) };
+			tepAddCommonX(g);
+			for (int i = 0; i < kTepNPrimes; ++i) tepAddLogX(g, kTepPrimes[i]);
+			tepAddCommonW(g, true);
+			tepAddTailW(g);
+			for (int i = 0; i < kTepNPrimes; ++i) tepAddLogW(g, kTepPrimes[i]);
+		}
+		return g;
+	}
 
-	mpreal tepXVal(int i)
-	{
-		switch (i)
-		{
-		case 0: return mpfr::exp(mpreal(1));
-		case 1: return mpfr::const_pi();
-		case 2: return mpfr::const_euler();
-		case 3: return mpfr::const_catalan();
-		case 4: return mpfr::log(mpreal(2));
-		default: return mpfr::log(mpreal(3));
-		}
-	}
-	mpreal tepWVal(int i)
-	{
-		const mpreal pi = mpfr::const_pi();
-		switch (i)
-		{
-		case 0: return mpreal(1);
-		case 1: return pi;
-		case 2: return mpfr::exp(mpreal(1));
-		case 3: return mpfr::const_euler();
-		case 4: return mpfr::const_catalan();
-		case 5: return mpfr::log(mpreal(2));
-		case 6: return mpfr::log(mpreal(3));
-		case 7: return mpfr::log(mpreal(5));
-		case 8: return pi * pi;
-		case 9: return pi * pi * pi;
-		case 10: return mpfr::sqrt(mpreal(2)) * pi;
-		case 11: return mpfr::sqrt(mpreal(3)) * pi;
-		default: return mpfr::log(pi);
-		}
-	}
+	mpreal tepXVal(const TepSpec& s) { return s.g->xv[s.x](); }
+	mpreal tepWVal(const TepSpec& s) { return s.g->wv[s.w](); }
 
 	std::string tepName(const TepSpec& s)
 	{
-		return std::string("f=") + kTepF[s.f] + " a=" + kTepA[s.a].str() + " x=" + kTepX[s.x] + " w=" + kTepW[s.w] + " b=" + kTepB[s.b].str();
+		return std::string("f=") + kTepF[s.f] + " a=" + s.g->A[s.a].str() + " x=" + s.g->X[s.x] + " w=" + s.g->W[s.w] + " b=" + s.g->B[s.b].str();
 	}
 
 	// ---- symbolic key of log u - log zeta3 = b w (log a + log x) ----
@@ -2807,22 +2828,26 @@ namespace
 			auto it = k.find({ p, q });
 			if (it == k.end()) k[{p, q}] = c; else it->second = it->second + c;
 		};
-		const std::string wa = kTepWAtom[s.w];
-		const TepQ& b = kTepB[s.b];
-		const long primes[3] = { 2, 3, 5 };
-		for (long p : primes)
+		const std::string wa = s.g->WAtom[s.w];
+		const TepQ& b = s.g->B[s.b];
+		for (int pi = 0; pi < kTepNPrimes; ++pi)
 		{
-			long e = 0, nn = kTepA[s.a].n, dd = kTepA[s.a].d;
+			const long p = kTepPrimes[pi];
+			long e = 0, nn = s.g->A[s.a].n, dd = s.g->A[s.a].d;
 			while (nn % p == 0) { nn /= p; ++e; }
 			while (dd % p == 0) { dd /= p; --e; }
 			if (e) add(wa, "log" + std::to_string(p), b * TepQ(e));
 		}
-		add(wa, kTepXAtom[s.x], b);
+		add(wa, s.g->XAtom[s.x], b);
 		for (auto it = k.begin(); it != k.end();)
 			if (it->second.n == 0) it = k.erase(it); else ++it;
 		return k;
 	}
-	bool tepIsLogPrime(const std::string& a) { return a == "log2" || a == "log3" || a == "log5"; }
+	bool tepIsLogPrime(const std::string& a)
+	{
+		for (int i = 0; i < kTepNPrimes; ++i) if (a == "log" + std::to_string(kTepPrimes[i])) return true;
+		return false;
+	}
 	bool tepAlgebraicPair(const std::pair<std::string, std::string>& p)
 	{
 		return (p.first == "1" && tepIsLogPrime(p.second)) || (p.second == "1" && tepIsLogPrime(p.first));
@@ -2863,8 +2888,8 @@ namespace
 		auto uAt = [&](int dg)
 		{
 			mpreal::set_default_prec(mpfr::digits2bits(dg));
-			const mpreal ax = kTepA[s.a].val() * tepXVal(s.x);
-			return cFn() * mpfr::pow(ax, kTepB[s.b].val() * tepWVal(s.w));
+			const mpreal ax = s.g->A[s.a].val() * tepXVal(s);
+			return cFn() * mpfr::pow(ax, s.g->B[s.b].val() * tepWVal(s));
 		};
 		const mpreal u0 = uAt(60);
 		mpreal::set_default_prec(mpfr::digits2bits(60));
@@ -2993,17 +3018,21 @@ namespace
 	}
 }
 
-void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
+static void tepImpl(int digits, int degree, bool p37)
 {
+	const std::string PF = p37 ? "ZETA3_TEP37_" : "ZETA3_TEP_";
+	const TepGrid& G = p37 ? tepP37Grid() : tepOldGrid();
+	const TepGrid& OG = tepOldGrid();
+	const int NA = (int)G.A.size(), NX = (int)G.X.size(), NW = (int)G.W.size(), NB = (int)G.B.size();
 	std::cout.precision(30);
 	const auto tStart = std::chrono::steady_clock::now();
 	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
-	const unsigned nThreads = (unsigned)std::max(1, envInt("ZETA3_TEP_THREADS", 10));
-	const int countOnly = envInt("ZETA3_TEP_COUNT_ONLY", 0), sampleJobs = envInt("ZETA3_TEP_JOBS", 0);
-	const int checkOnly = envInt("ZETA3_TEP_CHECK_ONLY", 0), noCheck = envInt("ZETA3_TEP_NOCHECK", 0);
+	const unsigned nThreads = (unsigned)std::max(1, envInt((PF + "THREADS").c_str(), 10));
+	const int countOnly = envInt((PF + "COUNT_ONLY").c_str(), 0), sampleJobs = envInt((PF + "JOBS").c_str(), 0);
+	const int checkOnly = envInt((PF + "CHECK_ONLY").c_str(), 0), noCheck = envInt((PF + "NOCHECK").c_str(), 0);
 	const auto savedPrec = mpreal::get_default_prec();
 	mpreal::set_default_prec(mpfr::digits2bits(digits));
-	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_" << digits << "digits_deg" << degree << ".txt" << std::endl;
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_transcendental_exponent_polynomial_" << (p37 ? "p37_" : "") << digits << "digits_deg" << degree << ".txt" << std::endl;
 	std::cout << "digits " << digits << ", degree " << degree << " (only max degree, covers all lower), threads " << nThreads << std::endl;
 	tepZ3(digits); // warm the cache
 	auto z3 = [digits]() { return tepRound(tepZ3(digits), mpreal::get_default_prec()); };
@@ -3011,18 +3040,20 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 	// ---------------- validation ----------------
 	struct Check { std::string name; TepSpec s; std::function<mpreal()> uTarget; std::vector<long> poly; bool pass = false; std::string msg; };
 	auto findFn = [](const char* n) { for (int i = 0; i < kTepNF; ++i) if (std::string(n) == kTepF[i]) return i; return -1; };
-	auto idxA = [](TepQ q) { for (int i = 0; i < kTepNA; ++i) if (kTepA[i].n == q.n && kTepA[i].d == q.d) return i; return -1; };
-	auto idxB = [](TepQ q) { for (int i = 0; i < kTepNB; ++i) if (kTepB[i].n == q.n && kTepB[i].d == q.d) return i; return -1; };
-	auto idxS = [](const char* const* L, int n, const char* nm) { for (int i = 0; i < n; ++i) if (std::string(nm) == L[i]) return i; return -1; };
+	auto idxA = [](const TepGrid& g, TepQ q) { for (int i = 0; i < (int)g.A.size(); ++i) if (g.A[i].n == q.n && g.A[i].d == q.d) return i; return -1; };
+	auto idxB = [](const TepGrid& g, TepQ q) { for (int i = 0; i < (int)g.B.size(); ++i) if (g.B[i].n == q.n && g.B[i].d == q.d) return i; return -1; };
+	auto idxS = [](const std::vector<std::string>& L, const char* nm) { for (int i = 0; i < (int)L.size(); ++i) if (std::string(nm) == L[i]) return i; return -1; };
 	std::vector<Check> checks;
 	{
 		// alpha = root of poly near x0;  u = g(alpha);  c = u / (a x)^(b w);  the spec's (a,x,w,b) is used in the generic pipeline.
+		const TepGrid* curG = &OG;
 		auto add = [&](const char* nm, const char* f, TepQ a, const char* x, const char* w, TepQ b, std::vector<long> poly, double x0,
 			std::function<mpreal(const mpreal&)> g)
 		{
 			Check c;
 			c.name = nm;
-			c.s = { findFn(f), idxA(a), idxS(kTepX, kTepNX, x), idxS(kTepW, kTepNW, w), idxB(b) };
+			c.s = { findFn(f), idxA(*curG, a), idxS(curG->X, x), idxS(curG->W, w), idxB(*curG, b), curG };
+			if (c.s.f < 0 || c.s.a < 0 || c.s.x < 0 || c.s.w < 0 || c.s.b < 0) { std::cout << "BAD CHECK SPEC " << nm << std::endl; std::exit(1); }
 			c.poly = poly;
 			c.uTarget = [poly, x0, g]() { return g(tepPolyRoot(poly, mpreal(x0))); };
 			checks.push_back(c);
@@ -3053,15 +3084,31 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 			[](const mpreal& a) { return mpfr::exp(a); });
 		add("exp: y = root of t^7-t-1, u = log(y)", "exp", TepQ(1, 2), "G", "pi^3", TepQ(-1, 3), { -1, -1, 0, 0, 0, 0, 0, 1 }, 1.1,
 			[](const mpreal& a) { return mpfr::log(a); });
+		if (p37)
+		{
+			curG = &G;
+			add("p37 identity: y = root of t^9-2t-2, a=37 x=log29 w=log31", "identity", TepQ(37), "log29", "log31", TepQ(1, 2),
+				{ -2, -2, 0, 0, 0, 0, 0, 0, 0, 1 }, 1.3, [](const mpreal& a) { return a; });
+			add("p37 sin: y = root of t^9-3t+1 in (0,1), sin(u)", "sin", TepQ(1), "log17", "G", TepQ(-1, 2), { 1, -3, 0, 0, 0, 0, 0, 0, 0, 1 }, 0.33,
+				[](const mpreal& a) { return mpfr::asin(a); });
+			add("p37 Gamma: y = root of t^10-t-3, Gamma(u) = y, a=11 x=e w=log23", "Gamma", TepQ(11), "e", "log23", TepQ(-1, 3), { -3, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, 1.3,
+				[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+					return newtonU([&](const mpreal& c) { return mpfr::lngamma(c) - la; }, [](const mpreal& c) { return mpfr::digamma(c); }, mpreal(2.5)); });
+			add("p37 t^t: y = root of t^8-2t-2, u^u = y, a=19 x=pi w=log37", "t^t", TepQ(19), "pi", "log37", TepQ(-1, 2), { -2, -2, 0, 0, 0, 0, 0, 0, 1 }, 1.3,
+				[newtonU](const mpreal& a) { const mpreal la = mpfr::log(a);
+					return newtonU([&](const mpreal& c) { return c * mpfr::log(c) - la; }, [](const mpreal& c) { return mpfr::log(c) + 1; }, mpreal(1.2)); });
+			add("p37 log: y = root of t^12-2t-2, u = exp(y), a=7 x=log37 w=log13", "log", TepQ(7), "log37", "log13", TepQ(2), { -2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }, 1.1,
+				[](const mpreal& a) { return mpfr::exp(a); });
+		}
 	}
 	// c(prec) = u / (a x)^(b w) is computed per call at the working precision
 	auto checkC = [](const Check& ch) -> std::function<mpreal()>
 	{
 		const TepSpec s = ch.s;
 		auto uT = ch.uTarget;
-		return [s, uT]() { return uT() / mpfr::pow(kTepA[s.a].val() * tepXVal(s.x), kTepB[s.b].val() * tepWVal(s.w)); };
+		return [s, uT]() { return uT() / mpfr::pow(s.g->A[s.a].val() * tepXVal(s), s.g->B[s.b].val() * tepWVal(s)); };
 	};
-	if (!countOnly && !noCheck && !std::getenv("ZETA3_TEP_ONLY"))
+	if (!countOnly && !noCheck && !std::getenv((PF + "ONLY").c_str()))
 	{
 		std::cout << "--- validation (synthetic c replaces zeta(3); y is a known algebraic number) ---" << std::endl;
 		tepParallelFor(checks.size(), nThreads, digits, [&](size_t i)
@@ -3106,22 +3153,37 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 
 	// ---------------- enumeration and dedup ----------------
 	std::vector<long> cTotal(kTepNF), cRule4(kTepNF), cSym(kTepNF), cDom(kTepNF), cRng(kTepNF), cNear(kTepNF), cIll(kTepNF), cNum(kTepNF);
-	std::vector<long> dSymTriv(kTepNF), dSymDup(kTepNF), dSymPi(kTepNF);
+	std::vector<long> dSymTriv(kTepNF), dSymDup(kTepNF), dSymPi(kTepNF), dOld(kTepNF);
+	// keys of every target of the previous grid (same canonical form, identity-only erasure of algebraic pairs)
+	std::set<std::pair<int, std::string>> oldKeys;
+	if (p37)
+		for (int f = 0; f < kTepNF; ++f)
+			for (int a = 0; a < (int)OG.A.size(); ++a)
+				for (int x = 0; x < (int)OG.X.size(); ++x)
+					for (int w = 0; w < (int)OG.W.size(); ++w)
+						for (int b = 0; b < (int)OG.B.size(); ++b)
+						{
+							TepKey key = tepKey(TepSpec{ f, a, x, w, b, &OG });
+							if (f == 0)
+								for (auto it = key.begin(); it != key.end();)
+									if (tepAlgebraicPair(it->first)) it = key.erase(it); else ++it;
+							oldKeys.insert({ f, tepKeyStr(key) });
+						}
+	if (p37) std::cout << "old-grid distinct (f,key) pairs: " << oldKeys.size() << std::endl;
 	std::vector<TepSpec> cand;
-	const int bPlain[] = { 0, 1, 2, 3, 4, 5 }; // integer b indices (|b| <= 3)
 	for (int f = 0; f < kTepNF; ++f)
 	{
 		std::set<std::string> seen;
-		for (int a = 0; a < kTepNA; ++a)
-			for (int x = 0; x < kTepNX; ++x)
-				for (int w = 0; w < kTepNW; ++w)
-					for (int b = 0; b < kTepNB; ++b)
+		for (int a = 0; a < NA; ++a)
+			for (int x = 0; x < NX; ++x)
+				for (int w = 0; w < NW; ++w)
+					for (int b = 0; b < NB; ++b)
 					{
 						++cTotal[f];
-						const TepSpec s{ f, a, x, w, b };
+						const TepSpec s{ f, a, x, w, b, &G };
 						// rule 4: w=1, x=pi, a=1, b integer, |b|<=3: f(zeta3 pi^b), already tested
 						bool isInt = false;
-						for (int bi : bPlain) if (bi == b) isInt = true;
+						isInt = G.B[b].d == 1 && std::labs(G.B[b].n) <= 3;
 						if (w == 0 && x == 1 && a == 0 && isInt) continue;
 						++cRule4[f];
 						TepKey key = tepKey(s);
@@ -3137,6 +3199,7 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 							{ ++dSymPi[f]; continue; } // zeta3 * pi^k * algebraic, integer |k| <= 3
 						}
 						if (!seen.insert(tepKeyStr(key)).second) { ++dSymDup[f]; continue; }
+						if (p37 && oldKeys.count({ f, tepKeyStr(key) })) { ++dOld[f]; continue; } // already tested in the previous run
 						++cSym[f];
 						cand.push_back(s);
 					}
@@ -3207,13 +3270,20 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 			<< " | " << v[8] << " | " << v[9] << " | " << v[10] << " | " << cFinal[f] << std::endl;
 		for (int k = 0; k < 11; ++k) tot[k] += v[k];
 	}
+	if (p37)
+	{
+		long to = 0; for (int f = 0; f < kTepNF; ++f) to += dOld[f];
+		std::cout << "already tested in previous run (removed after symbolic dedup), per f:";
+		for (int f = 0; f < kTepNF; ++f) std::cout << " " << kTepF[f] << "=" << dOld[f];
+		std::cout << "\nTOTAL already tested (removed): " << to << std::endl;
+	}
 	std::cout << "TOTAL | " << tot[0] << " | " << tot[1] << " | " << tot[2] << ", " << tot[3] << ", " << tot[4] << " | " << tot[5] << " | " << tot[6] << " | " << tot[7]
 		<< " | " << tot[8] << " | " << tot[9] << " | " << tot[10] << " | " << targets.size() << std::endl;
 	std::cout << "JOB COUNT after dedup: " << targets.size() << std::endl;
 	if (countOnly) { std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl; mpreal::set_default_prec(savedPrec); return; }
 
 	// ---------------- selection, resume ----------------
-	if (const char* only = std::getenv("ZETA3_TEP_ONLY"))
+	if (const char* only = std::getenv((PF + "ONLY").c_str()))
 	{
 		const size_t k = std::min((size_t)std::atol(only), targets.size() - 1);
 		const TepTarget t = targets[k];
@@ -3225,7 +3295,7 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 		for (int i = 0; i < sampleJobs; ++i) sel.push_back(targets[(size_t)((double)i * targets.size() / sampleJobs)]);
 		targets = sel;
 	}
-	if (const char* sk = std::getenv("ZETA3_TEP_SKIP_DONE"))
+	if (const char* sk = std::getenv((PF + "SKIP_DONE").c_str()))
 	{
 		std::ifstream in(sk);
 		std::set<std::string> done;
@@ -3240,7 +3310,7 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 		}
 		std::vector<TepTarget> rest;
 		for (auto& t : targets) if (!done.count(t.name)) rest.push_back(t);
-		std::cout << "RESUME: ZETA3_TEP_SKIP_DONE=" << sk << ": skipped " << targets.size() - rest.size() << " done jobs, " << rest.size() << " remain" << std::endl;
+		std::cout << "RESUME: " << PF << "SKIP_DONE=" << sk << ": skipped " << targets.size() - rest.size() << " done jobs, " << rest.size() << " remain" << std::endl;
 		targets = rest;
 	}
 
@@ -3280,3 +3350,10 @@ void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree)
 	std::cout << "total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
 	mpreal::set_default_prec(savedPrec);
 }
+
+void test_pslq_zeta3_transcendental_exponent_polynomial(int digits, int degree) { tepImpl(digits, degree, false); }
+
+// Same search on the extended grid (primes up to 37), skipping every target already tested by the previous grid.
+// a in {1} u {p<=37}, x in {e,pi,gamma,G} u {log p}, w in {1,pi,e,gamma,G,pi^2,pi^3,sqrt2 pi,sqrt3 pi,log pi} u {log p}, b in {+-1,+-2,+-1/2,+-1/3}.
+// Env vars as for the old function with prefix ZETA3_TEP37_. Output: results/zeta3_transcendental_exponent_polynomial_p37_<digits>digits_deg<degree>.txt
+void test_pslq_zeta3_transcendental_exponent_polynomial_p37(int digits, int degree) { tepImpl(digits, degree, true); }

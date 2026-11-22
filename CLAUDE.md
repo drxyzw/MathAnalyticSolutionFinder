@@ -32,6 +32,7 @@ g++ -O2 -std=c++17 main.cpp test.cpp check_recurring_decimal.cpp pslq.cpp -o mai
   - 戻り値の `status` は Found / PrecisionExhausted / NormBoundReached / MaxIterReached のいずれか。
   - `normBound` は「これより小さいノルムの整数関係は存在しない」ことを意味する。
   - 信頼する桁は精度の80%まで。偽の関係はガードで除外される。
+  - **高速版：** 2段階 multipair PSLQ（Bailey 2025、`pslqMultipair2L`）。環境変数 `PSLQ_ALGO=m2l` か `setPslqAlgorithm(PslqAlgo::Multipair2L)` で、`pslq()`・`findIntegerPolynomial` などすべての呼び出しが切り替わる。標準版と比べて15〜55倍速く、検証では関係・normBound・判定力とも同等以上。本番では原則こちらを使う。単体テストは `pslq_m2l_check.cpp`（ビルド行はファイル先頭）。
 - [test.cpp](test.cpp) のヘルパー関数：
   - `reportPolynomialSearch(name, x, maxDegree)`：次数 1..maxDegree を順に調べる。
   - `reportPolynomialSearchParallel(targets, digits, maxDegree)`：(ターゲット, 次数) の組を並列に調べる。見つかった関係は2倍の精度で検算する。

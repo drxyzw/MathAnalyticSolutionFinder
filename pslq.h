@@ -35,6 +35,21 @@ struct PslqResult
 // - maxIter:      iteration limit.
 PslqResult pslq(const std::vector<mpreal>& x, const mpreal& maxNormBound = 0, int maxIter = 1000000);
 
+// Algorithm selection for pslq() / findIntegerPolynomial().
+//   Standard    : original single-level PSLQ (default).
+//   Multipair2L : Bailey's two-level multipair PSLQ (double-precision inner iterations).
+// The initial value is taken once from the env var PSLQ_ALGO ("m2l" -> Multipair2L, anything else -> Standard);
+// setPslqAlgorithm() overrides it. The setting is process-global and thread-safe (atomic).
+enum class PslqAlgo { Standard, Multipair2L };
+void setPslqAlgorithm(PslqAlgo a);
+PslqAlgo getPslqAlgorithm();
+
+// Explicit entry points (independent of the global switch).
+PslqResult pslqStandard(const std::vector<mpreal>& x, const mpreal& maxNormBound = 0, int maxIter = 1000000);
+PslqResult pslqMultipair2L(const std::vector<mpreal>& x, const mpreal& maxNormBound = 0, int maxIter = 1000000);
+// Number of times the debug invariant check (env PSLQ_M2L_VERIFY) failed in this process.
+long pslqMultipair2LInvariantViolations();
+
 // Searches for an integer polynomial p of degree <= degree with p(x) = 0,
 // by running PSLQ on (1, x, x^2, ..., x^degree).
 // relation[k] is the coefficient of x^k.

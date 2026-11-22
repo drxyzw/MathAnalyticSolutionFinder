@@ -3895,3 +3895,245 @@ void test_pslq_zeta_gamma_rational_multiplicative(int digits, int maxPrime, std:
 	std::cout << "\n===== SUMMARY: validation " << nValRun - nValFail << "/" << nValRun << " PASS; verified relations with target (real hits): " << nRel << "; total elapsed "
 		<< std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
 }
+
+// ============================================================================
+// Mixed-exponent multiplicative search for zeta(3):
+//   c0 log zeta3 + sum_{w in S} sum_y c_{w,y} w*y + sum_q d_q sqrt(q) = 0,  S = {1} + k-subset of 21 nontrivial w.
+// ============================================================================
+namespace
+{
+	typedef std::vector<std::string> MixKey; // sorted atoms, "1" removed
+
+	std::string mixKeyStr(const MixKey& k) { std::string s; for (const auto& a : k) s += (s.empty() ? "" : "*") + a; return s.empty() ? "1" : s; }
+	MixKey mixMakeKey(std::vector<std::string> atoms)
+	{
+		atoms.erase(std::remove(atoms.begin(), atoms.end(), std::string("1")), atoms.end());
+		std::sort(atoms.begin(), atoms.end());
+		return atoms;
+	}
+
+	struct MixAtoms { std::map<std::string, mpreal> v; };
+	MixAtoms mixAtomValues(int digits)
+	{
+		const mpfr_prec_t saved = mpreal::get_default_prec();
+		mpreal::set_default_prec(mpfr::digits2bits(digits));
+		const TepGrid& G = tepWideGrid();
+		MixAtoms A;
+		A.v["1"] = 1;
+		for (size_t i = 0; i < G.W.size(); ++i) A.v[G.WAtom[i]] = G.wv[i]();
+		for (int i = 0; i < 6; ++i) A.v[G.XAtom[i]] = mpfr::log(G.xv[i]());
+		for (int i = 0; i < 4; ++i) A.v["log" + std::to_string(kTepPrimes[i])] = mpfr::log(mpreal(kTepPrimes[i]));
+		A.v["sqrt2"] = mpfr::sqrt(mpreal(2)); A.v["sqrt3"] = mpfr::sqrt(mpreal(3)); A.v["sqrt5"] = mpfr::sqrt(mpreal(5));
+		A.v["logzeta3"] = mpfr::log(mpfr::zeta(mpreal(3)));
+		mpreal::set_default_prec(saved);
+		return A;
+	}
+
+	struct MixCol { MixKey key; };
+	// columns for S = {1} + wIdx (indices into the wide grid W, W[0]="1"), after dedup; sqrt columns last
+	std::vector<MixKey> mixColumns(const std::vector<int>& wIdx)
+	{
+		const TepGrid& G = tepWideGrid();
+		std::vector<int> ws = { 0 };
+		for (int w : wIdx) ws.push_back(w);
+		std::vector<MixKey> cols;
+		std::set<MixKey> seen;
+		auto add = [&](const MixKey& k) { if (seen.insert(k).second) cols.push_back(k); };
+		for (int w : ws)
+		{
+			for (int x = 0; x < 6; ++x) add(mixMakeKey({ G.WAtom[w], G.XAtom[x] }));
+			for (int p = 0; p < 4; ++p) add(mixMakeKey({ G.WAtom[w], "log" + std::to_string(kTepPrimes[p]) }));
+		}
+		add(mixMakeKey({ "sqrt2" })); add(mixMakeKey({ "sqrt3" })); add(mixMakeKey({ "sqrt5" }));
+		return cols;
+	}
+
+	mpreal mixColValue(const MixAtoms& A, const MixKey& k)
+	{
+		mpreal v = 1;
+		for (const auto& a : k) v *= A.v.at(a);
+		return v;
+	}
+
+	struct MixVTerm { TepQ c; std::vector<std::string> atoms; };
+	struct MixValidation { std::string name; std::vector<std::string> W; std::vector<MixVTerm> terms; };
+
+	std::vector<MixValidation> mixValidations(int k)
+	{
+		std::vector<MixValidation> v;
+		if (k == 2)
+		{
+			v.push_back({ "V1 T=pi^pi*e^e*2^(1/3), S={1,pi,e}", { "pi", "e" },
+				{ { TepQ(1), { "pi", "logpi" } }, { TepQ(1), { "e" } }, { TepQ(1, 3), { "log2" } } } });
+			v.push_back({ "V2 T=gamma^(G/2)*3^(pi^2/3)*5^(1/7)*G, S={1,G,pi^2}", { "G", "pi^2" },
+				{ { TepQ(1, 2), { "G", "loggamma" } }, { TepQ(1, 3), { "pi2", "log3" } }, { TepQ(1, 7), { "log5" } }, { TepQ(1), { "logG" } } } });
+			v.push_back({ "V3 T=exp(sqrt3/2)*(log2)^(2log3/5)*pi^(3sqrt3*pi)*7^(-1/2), S={1,log3,sqrt3*pi}", { "log3", "sqrt3*pi" },
+				{ { TepQ(1, 2), { "sqrt3" } }, { TepQ(2, 5), { "log3", "loglog2" } }, { TepQ(3), { "sqrt3pi", "logpi" } }, { TepQ(-1, 2), { "log7" } } } });
+		}
+		else if (k == 3)
+		{
+			v.push_back({ "V4 T=(log3)^(log37)*2^(gamma/4)*G^(2log(pi))*3^(1/5), S={1,log37,gamma,log(pi)}", { "log37", "gamma", "log(pi)" },
+				{ { TepQ(1), { "log37", "loglog3" } }, { TepQ(1, 4), { "gamma", "log2" } }, { TepQ(2), { "logpi", "logG" } }, { TepQ(1, 5), { "log3" } } } });
+		}
+		return v;
+	}
+
+	struct MixJob { std::vector<int> w; int val = -1; };
+
+	void mixRunStages(const std::vector<std::pair<int, int>>& stages)
+	{
+		const TepGrid& G = tepWideGrid();
+		const int NW = (int)G.W.size() - 1; // 21 nontrivial, indices 1..21
+		setPslqAlgorithm(PslqAlgo::Multipair2L);
+		std::cout << "# mixed-exponent search for zeta(3); PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+		std::cout << "# nontrivial w list (" << NW << "):";
+		for (int i = 1; i <= NW; ++i) std::cout << " " << G.W[i];
+		std::cout << std::endl;
+		const char* e1 = std::getenv("ZETA3_MIX_THREADS"); const char* e2 = std::getenv("ZETA3_MIX_COUNT_ONLY"); const char* e3 = std::getenv("ZETA3_MIX_MAXJOBS");
+		const int nThreads = e1 ? std::max(1, std::atoi(e1)) : 10;
+		const bool countOnly = e2 && std::atoi(e2) != 0;
+		const long maxJobs = e3 ? std::atol(e3) : -1;
+		std::cout << "# threads " << nThreads << (countOnly ? " COUNT_ONLY" : "") << " maxjobs " << maxJobs << std::endl;
+		const auto tAll = std::chrono::steady_clock::now();
+		long totJobs = 0, totReal = 0, totBasis = 0, totSpur = 0, totValFail = 0;
+		bool anyNo = false; mpreal gMinNb;
+
+		for (const auto& st : stages)
+		{
+			const int k = st.first, digits = st.second;
+			std::vector<MixJob> jobs;
+			{
+				std::vector<int> c(k);
+				std::function<void(int, int)> rec = [&](int pos, int start)
+				{
+					if (pos == k) { MixJob j; j.w = c; jobs.push_back(j); return; }
+					for (int i = start; i <= NW; ++i) { c[pos] = i; rec(pos + 1, i + 1); }
+				};
+				rec(0, 1);
+			}
+			const long nAllJobs = (long)jobs.size();
+			if (maxJobs >= 0 && (long)jobs.size() > maxJobs) jobs.resize(maxJobs);
+			size_t nmin = 1000000, nmax = 0;
+			for (const auto& j : jobs) { const size_t n = mixColumns(j.w).size() + 1; nmin = std::min(nmin, n); nmax = std::max(nmax, n); }
+			std::cout << "\n===== STAGE k=" << k << " digits=" << digits << ": " << nAllJobs << " jobs total (running " << jobs.size() << "), n = " << nmin << ".." << nmax << " after dedup =====" << std::endl;
+			if (countOnly) continue;
+
+			// validation jobs first
+			const auto vals = mixValidations(k);
+			std::vector<MixJob> all;
+			for (size_t vi = 0; vi < vals.size(); ++vi)
+			{
+				MixJob j; j.val = (int)vi;
+				for (const auto& wn : vals[vi].W) { int idx = -1; for (int i = 1; i <= NW; ++i) if (G.W[i] == wn) idx = i; if (idx < 0) { std::cout << "bad validation W " << wn << std::endl; return; } j.w.push_back(idx); }
+				std::sort(j.w.begin(), j.w.end());
+				all.push_back(j);
+			}
+			for (const auto& j : jobs) all.push_back(j);
+
+			const MixAtoms A1 = mixAtomValues(digits), A2 = mixAtomValues(2 * digits);
+			std::mutex outMtx;
+			std::atomic<size_t> next{ 0 };
+			long nReal = 0, nBasis = 0, nSpur = 0, nNone = 0, nValRun = 0, nValFail = 0, done = 0;
+			bool anyNoS = false; mpreal minNb;
+			const auto tStage = std::chrono::steady_clock::now();
+			std::vector<std::thread> th;
+			for (int t = 0; t < nThreads; ++t)
+				th.emplace_back([&]()
+					{
+						for (size_t i; (i = next++) < all.size();)
+						{
+							const MixJob& jb = all[i];
+							mpreal::set_default_prec(mpfr::digits2bits(digits));
+							const std::vector<MixKey> cols = mixColumns(jb.w);
+							std::vector<mpreal> x;
+							mpreal target;
+							if (jb.val < 0) target = A1.v.at("logzeta3");
+							else { target = 0; for (const auto& tm : vals[jb.val].terms) target += tm.c.val() * mixColValue(A1, mixMakeKey(tm.atoms)); }
+							x.push_back(target);
+							for (const auto& c : cols) x.push_back(mixColValue(A1, c));
+							const auto t0 = std::chrono::steady_clock::now();
+							const PslqResult r = pslq(x);
+							const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+							std::string wn;
+							for (int w : jb.w) wn += (wn.empty() ? "" : ",") + G.W[w];
+							const char* cls = "none";
+							bool pass = false, isReal = false, isBasis = false, isSpur = false;
+							std::string detail;
+							if (r.status == PslqResult::Status::Found)
+							{
+								mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+								mpreal t2;
+								if (jb.val < 0) t2 = A2.v.at("logzeta3");
+								else { t2 = 0; for (const auto& tm : vals[jb.val].terms) t2 += tm.c.val() * mixColValue(A2, mixMakeKey(tm.atoms)); }
+								mpreal sum = r.relation[0] * t2;
+								for (size_t c = 0; c < cols.size(); ++c) sum += r.relation[c + 1] * mixColValue(A2, cols[c]);
+								const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * digits);
+								mpreal::set_default_prec(mpfr::digits2bits(digits));
+								const bool c0 = r.relation[0] != 0;
+								if (ok && c0) { cls = "real"; isReal = true; }
+								else if (ok) { cls = "BASIS-ONLY(dedup bug?)"; isBasis = true; }
+								else { cls = "spurious"; isSpur = true; }
+								std::string rel;
+								for (size_t c = 0; c < r.relation.size(); ++c)
+									if (r.relation[c] != 0) rel += " " + r.relation[c].toString("%.0Rf") + "*" + (c == 0 ? std::string(jb.val >= 0 ? "logT" : "log zeta3") : mixKeyStr(cols[c - 1]));
+								detail = "\n    relation:" + rel + "\n    residual@2D " + mpfr::abs(sum).toString("%.2Re");
+								if (jb.val >= 0)
+								{
+									// expected integer vector
+									std::map<std::string, TepQ> ex;
+									for (const auto& tm : vals[jb.val].terms) { const std::string ks = mixKeyStr(mixMakeKey(tm.atoms)); auto it = ex.find(ks); ex[ks] = it == ex.end() ? tm.c : it->second + tm.c; }
+									long L = 1; for (const auto& kv : ex) L = std::lcm(L, kv.second.d);
+									bool same = ok && c0;
+									const long m0 = r.relation[0].toLong();
+									same = same && (m0 == L || m0 == -L);
+									const long sg = m0 < 0 ? -1 : 1;
+									for (size_t c = 0; same && c < cols.size(); ++c)
+									{
+										const std::string ks = mixKeyStr(cols[c]);
+										auto it = ex.find(ks);
+										const long want = it == ex.end() ? 0 : -(it->second.n * (L / it->second.d));
+										if (r.relation[c + 1].toLong() * sg != want) same = false;
+									}
+									pass = same;
+									detail += std::string("\n    expected coefficients (c0=") + std::to_string(L) + "): ";
+									for (const auto& kv : ex) detail += kv.first + ":" + std::to_string(-(kv.second.n * (L / kv.second.d))) + " ";
+									detail += std::string("\n    => ") + (same ? "PASS" : "FAIL");
+								}
+							}
+							std::ostringstream line;
+							if (jb.val >= 0) line << "VALIDATION " << vals[jb.val].name << " n=" << x.size();
+							else line << "JOB " << (i - vals.size() + 1) << "/" << jobs.size() << " k=" << k << " digits=" << digits << " W={" << wn << "} n=" << x.size();
+							line << " | " << cls << " | " << toString(r.status) << ", normBound " << r.normBound.toString("%.3Re") << " | " << secs << " s" << detail;
+							std::lock_guard<std::mutex> lk(outMtx);
+							std::cout << line.str() << std::endl;
+							if (jb.val >= 0) { ++nValRun; if (!pass) ++nValFail; }
+							else
+							{
+								++done;
+								if (isReal) ++nReal; else if (isBasis) ++nBasis; else if (isSpur) ++nSpur; else
+								{
+									++nNone;
+									if (!anyNoS || r.normBound < minNb) minNb = r.normBound;
+									anyNoS = true;
+								}
+							}
+						}
+					});
+			for (auto& t : th) t.join();
+			mpreal::set_default_prec(mpfr::digits2bits(digits));
+			std::cout << "\n----- STAGE SUMMARY k=" << k << " digits=" << digits << ": jobs " << done << ", validation " << nValRun - nValFail << "/" << nValRun << " PASS, real hits " << nReal
+				<< ", basis-only " << nBasis << ", spurious " << nSpur << ", min normBound among no-relation jobs " << (anyNoS ? minNb.toString("%.3Re") : std::string("n/a"))
+				<< ", elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStage).count() << " s -----" << std::endl;
+			totJobs += done; totReal += nReal; totBasis += nBasis; totSpur += nSpur; totValFail += nValFail;
+			if (anyNoS && (!anyNo || minNb < gMinNb)) { gMinNb = minNb; anyNo = true; }
+		}
+		std::cout << "\n===== SUMMARY: jobs " << totJobs << ", real hits " << totReal << ", basis-only " << totBasis << ", spurious " << totSpur << ", validation failures " << totValFail
+			<< ", min normBound among no-relation jobs " << (anyNo ? gMinNb.toString("%.3Re") : std::string("n/a")) << ", total elapsed "
+			<< std::chrono::duration<double>(std::chrono::steady_clock::now() - tAll).count() << " s =====" << std::endl;
+	}
+}
+
+void test_pslq_zeta3_mixed_exponent(std::vector<std::pair<int, int>> stages)
+{
+	mixRunStages(stages);
+}

@@ -62,7 +62,9 @@ int main()
 	// test_pslq_zeta3_transcendental_exponent_polynomial(600, 12);
 	//test_pslq_zeta3_transcendental_exponent_polynomial_p37(400, 12);
 	//test_pslq_zeta3_transcendental_exponent_polynomial_p37w(600, 12); // Task 2 production: ~1.0M jobs, est. 1.7 h on 10 threads; output results/zeta3_transcendental_exponent_polynomial_p37w_600digits_deg12.txt
-	test_pslq_zeta_gamma_rational_multiplicative(3000, 23, { 6, 12, 24 });
+	//test_pslq_zeta_gamma_rational_multiplicative(3000, 23, { 6, 12, 24 });
+
+	test_pslq_zeta3_mixed_exponent({ {2, 3000}, {3, 1800} });
 	//test_pslq_zeta3_transcendental_exponent_absorbed_ext(3000, 31, 31);
 
 	//test_mpreal();

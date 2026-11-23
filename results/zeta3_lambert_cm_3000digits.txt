@@ -1,0 +1,324 @@
+OUTPUT FILE (redirect stdout): results/zeta3_lambert_cm_3000digits.txt
+PSLQ algorithm: Multipair2L (m2l)
+digits 3000, maxD 30, gammaMaxN 12, maxPrime 29, greedy digits 800, threads 10
+candidate columns: base 14, units+Gammas 67 (gcd(k,N)>1 skipped: they repeat lower levels)
+
+=== greedy independence (m2l PSLQ at 800 digits) ===
+DROP Gamma(1/2) [vs earlier blocks, 0.000784060000000000052039483833255 s]: log Gamma(1/2) = 1/2*pi
+-- N=2 done: kept so far 14, elapsed 0.255422421000000010593566912576 s
+DROP Gamma(2/3) [reflection (small PSLQ), 0.000262379999999999991705523783025 s]: log Gamma(2/3) = 1*pi + 1*p2 + -1*2sin(pi*1/3) + -1*Gamma(1/3)
+DROP 2sin(pi*1/3) [vs earlier blocks, 0.00225674600000000001240318958651 s]: log 2sin(pi*1/3) = 1/2*p3
+-- N=3 done: kept so far 15, elapsed 0.49150666599999998096492959121 s
+DROP Gamma(3/4) [reflection (small PSLQ), 0.000155117999999999987663368283819 s]: log Gamma(3/4) = 1*pi + 1/2*p2 + -1*Gamma(1/4)
+DROP 2sin(pi*1/4) [vs earlier blocks, 0.00152402599999999993976573797738 s]: log 2sin(pi*1/4) = 1/2*p2
+-- N=4 done: kept so far 16, elapsed 0.734901087000000008409017482336 s
+DROP Gamma(3/5) [reflection (small PSLQ), 0.000213684000000000009350520357998 s]: log Gamma(3/5) = 1*pi + 1*p2 + -1*2sin(pi*2/5) + -1*Gamma(2/5)
+DROP Gamma(4/5) [reflection (small PSLQ), 0.000229062000000000010177178544346 s]: log Gamma(4/5) = 1*pi + 1*p2 + -1*2sin(pi*1/5) + -1*Gamma(1/5)
+DROP 2sin(pi*2/5) [within block, 0.00365928599999999987560372893824 s]: log 2sin(pi*2/5) = 1/2*p5 + -1*2sin(pi*1/5)
+-- N=5 done: kept so far 19, elapsed 1.37926127799999997947111296526 s
+DROP Gamma(5/6) [reflection (small PSLQ), 0.000329106000000000016580958828172 s]: log Gamma(5/6) = 1*pi + 1*p2 + -1*Gamma(1/6)
+DROP 2sin(pi*1/6) [zero column, log 1 = 0]
+DROP Gamma(1/6) [vs earlier blocks, 0.01309252999999999979297005126 s]: log Gamma(1/6) = -1/2*pi + -1/3*p2 + 1/2*p3 + 2*Gamma(1/3)
+-- N=6 done: kept so far 19, elapsed 1.54513322599999991524555298383 s
+DROP Gamma(4/7) [reflection (small PSLQ), 0.000683112999999999949418683087288 s]: log Gamma(4/7) = 1*pi + 1*p2 + -1*2sin(pi*3/7) + -1*Gamma(3/7)
+DROP Gamma(5/7) [reflection (small PSLQ), 0.000213383000000000013418252620134 s]: log Gamma(5/7) = 1*pi + 1*p2 + -1*2sin(pi*2/7) + -1*Gamma(2/7)
+DROP Gamma(6/7) [reflection (small PSLQ), 0.000215254000000000009565348513263 s]: log Gamma(6/7) = 1*pi + 1*p2 + -1*2sin(pi*1/7) + -1*Gamma(1/7)
+DROP 2sin(pi*3/7) [within block, 0.00817014700000000086699269985502 s]: log 2sin(pi*3/7) = 1/2*p7 + -1*2sin(pi*1/7) + -1*2sin(pi*2/7)
+-- N=7 done: kept so far 24, elapsed 2.89495474099999983152997629077 s
+DROP Gamma(5/8) [reflection (small PSLQ), 0.00078555800000000000279931633429 s]: log Gamma(5/8) = 1*pi + 1*p2 + -1*2sin(pi*3/8) + -1*Gamma(3/8)
+DROP Gamma(7/8) [reflection (small PSLQ), 0.000113757000000000001995945075883 s]: log Gamma(7/8) = 1*pi + 1*p2 + -1*2sin(pi*1/8) + -1*Gamma(1/8)
+DROP 2sin(pi*3/8) [within block, 0.00505284599999999972652631186065 s]: log 2sin(pi*3/8) = 1/2*p2 + -1*2sin(pi*1/8)
+DROP Gamma(3/8) [within block, 0.0395559409999999972429307604216 s]: log Gamma(3/8) = 1/2*pi + -1/4*p2 + -1*Gamma(1/4) + 1*2sin(pi*1/8) + 1*Gamma(1/8)
+-- N=8 done: kept so far 26, elapsed 4.46016835999999994299969330314 s
+DROP Gamma(5/9) [reflection (small PSLQ), 0.000634434000000000017892298753708 s]: log Gamma(5/9) = 1*pi + 1*p2 + -1*2sin(pi*4/9) + -1*Gamma(4/9)
+DROP Gamma(7/9) [reflection (small PSLQ), 0.00022322699999999999573990772106 s]: log Gamma(7/9) = 1*pi + 1*p2 + -1*2sin(pi*2/9) + -1*Gamma(2/9)
+DROP Gamma(8/9) [reflection (small PSLQ), 0.00010197200000000000556267532037 s]: log Gamma(8/9) = 1*pi + 1*p2 + -1*2sin(pi*1/9) + -1*Gamma(1/9)
+DROP 2sin(pi*4/9) [within block, 0.0186652890000000015735537317596 s]: log 2sin(pi*4/9) = 1/2*p3 + -1*2sin(pi*1/9) + -1*2sin(pi*2/9)
+DROP Gamma(4/9) [within block, 0.0722196130000000019455441702121 s]: log Gamma(4/9) = 1/6*p3 + 1*Gamma(1/3) + 1*2sin(pi*2/9) + -1*Gamma(1/9) + 1*Gamma(2/9)
+-- N=9 done: kept so far 30, elapsed 7.27246376100000002651313479873 s
+DROP Gamma(7/10) [reflection (small PSLQ), 0.000956017999999999993666899289479 s]: log Gamma(7/10) = 1*pi + 1*p2 + -1*2sin(pi*3/10) + -1*Gamma(3/10)
+DROP Gamma(9/10) [reflection (small PSLQ), 0.000107830000000000002669670040589 s]: log Gamma(9/10) = 1*pi + 1*p2 + -1*2sin(pi*1/10) + -1*Gamma(1/10)
+DROP 2sin(pi*1/10) [vs earlier blocks, 0.0245255490000000006545199937591 s]: log 2sin(pi*1/10) = -1/2*p5 + 2*2sin(pi*1/5)
+DROP 2sin(pi*3/10) [vs earlier blocks, 0.0249052269999999985328198448542 s]: log 2sin(pi*3/10) = 1/2*p5 + -2*2sin(pi*1/5)
+DROP Gamma(1/10) [vs earlier blocks, 0.0843876519999999935572887466151 s]: log Gamma(1/10) = -1/2*pi + -1/5*p2 + 1/2*p5 + -1*2sin(pi*1/5) + 1*Gamma(1/5) + 1*Gamma(2/5)
+DROP Gamma(3/10) [vs earlier blocks, 0.104636875000000004187761248886 s]: log Gamma(3/10) = 1/2*pi + 2/5*p2 + -1/2*p5 + 2*2sin(pi*1/5) + 1*Gamma(1/5) + -1*Gamma(2/5)
+-- N=10 done: kept so far 30, elapsed 7.59063267299999999693227437092 s
+DROP Gamma(6/11) [reflection (small PSLQ), 0.000372810000000000003363143097346 s]: log Gamma(6/11) = 1*pi + 1*p2 + -1*2sin(pi*5/11) + -1*Gamma(5/11)
+DROP Gamma(7/11) [reflection (small PSLQ), 0.000271219000000000006519312867326 s]: log Gamma(7/11) = 1*pi + 1*p2 + -1*2sin(pi*4/11) + -1*Gamma(4/11)
+DROP Gamma(8/11) [reflection (small PSLQ), 0.000204651000000000002831609946519 s]: log Gamma(8/11) = 1*pi + 1*p2 + -1*2sin(pi*3/11) + -1*Gamma(3/11)
+DROP Gamma(9/11) [reflection (small PSLQ), 0.000191707999999999988008717033416 s]: log Gamma(9/11) = 1*pi + 1*p2 + -1*2sin(pi*2/11) + -1*Gamma(2/11)
+DROP Gamma(10/11) [reflection (small PSLQ), 0.000105842999999999996113553279997 s]: log Gamma(10/11) = 1*pi + 1*p2 + -1*2sin(pi*1/11) + -1*Gamma(1/11)
+DROP 2sin(pi*5/11) [within block, 0.0652559590000000022680382016915 s]: log 2sin(pi*5/11) = 1/2*p11 + -1*2sin(pi*1/11) + -1*2sin(pi*2/11) + -1*2sin(pi*3/11) + -1*2sin(pi*4/11)
+-- N=11 done: kept so far 39, elapsed 13.4028385009999997379281921894 s
+DROP Gamma(7/12) [reflection (small PSLQ), 0.000665356999999999992705113083247 s]: log Gamma(7/12) = 1*pi + 1*p2 + -1*2sin(pi*5/12) + -1*Gamma(5/12)
+DROP Gamma(11/12) [reflection (small PSLQ), 0.000110292999999999995859242818419 s]: log Gamma(11/12) = 1*pi + 1*p2 + -1*2sin(pi*1/12) + -1*Gamma(1/12)
+DROP 2sin(pi*5/12) [within block, 0.00413951800000000001700239948832 s]: log 2sin(pi*5/12) = -1*2sin(pi*1/12)
+DROP Gamma(1/12) [within block, 0.26928526000000002627032813507 s]: log Gamma(1/12) = -1/2*pi + 3/8*p3 + 1*Gamma(1/3) + 1*Gamma(1/4) + -1/2*2sin(pi*1/12)
+DROP Gamma(5/12) [within block, 0.224721197000000011412268463573 s]: log Gamma(5/12) = 1/2*pi + 1/2*p2 + -1/8*p3 + -1*Gamma(1/3) + 1*Gamma(1/4) + 1/2*2sin(pi*1/12)
+-- N=12 done: kept so far 40, elapsed 17.0511095899999993719120539026 s
+
+KEPT columns (40): 1(e) pi gamma G p2 p3 p5 p7 p11 p13 p17 p19 p23 p29 Gamma(1/3) Gamma(1/4) 2sin(pi*1/5) Gamma(1/5) Gamma(2/5) 2sin(pi*1/7) 2sin(pi*2/7) Gamma(1/7) Gamma(2/7) Gamma(3/7) 2sin(pi*1/8) Gamma(1/8) 2sin(pi*1/9) 2sin(pi*2/9) Gamma(1/9) Gamma(2/9) 2sin(pi*1/11) 2sin(pi*2/11) 2sin(pi*3/11) 2sin(pi*4/11) Gamma(1/11) Gamma(2/11) Gamma(3/11) Gamma(4/11) Gamma(5/11) 2sin(pi*1/12)
+
+=== jobs: 117 ===
+  P1: 75 jobs, n up to 42
+  P2a: 2 jobs, n up to 8
+  P2b: 37 jobs, n up to 6
+  P2c: 3 jobs, n up to 39
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(1)| [VALIDATION: = 7 pi^3/180] (sign of T: +) : Found, iter 245, 14.1316 s
+    residual of the expected relation at 3000 digits: 1.72e-3000
+    VERIFIED relation, residual@2D 0.00e+00, coefficient of first column -1:
+     -1*logT 3*pi -2*p2 -2*p3 -1*p5 1*p7
+    => PASS (exact expected coefficients)
+JOB P1 n=42 power10^57.1429 log|S(4)| (sign of T: +) : PrecisionExhausted, iter 13650, 92.9064 s
+    no relation with |m|_2 < 1.508e+57
+JOB P1 n=42 power10^57.1429 log|S(2)| (sign of T: +) : PrecisionExhausted, iter 13555, 96.8519 s
+    no relation with |m|_2 < 1.439e+57
+JOB P1 n=42 power10^57.1429 log|S(3)| (sign of T: +) : PrecisionExhausted, iter 13549, 99.6706 s
+    no relation with |m|_2 < 1.559e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(5)| (sign of T: +) : PrecisionExhausted, iter 13555, 99.9117 s
+    no relation with |m|_2 < 1.415e+57
+JOB P1 n=42 power10^57.1429 log|S(5)| (sign of T: +) : PrecisionExhausted, iter 13638, 100.002 s
+    no relation with |m|_2 < 1.596e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(3)| (sign of T: +) : PrecisionExhausted, iter 13579, 105.672 s
+    no relation with |m|_2 < 1.428e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(2)| (sign of T: +) : PrecisionExhausted, iter 13553, 109.203 s
+    no relation with |m|_2 < 1.392e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(4)| (sign of T: +) : PrecisionExhausted, iter 13521, 113.202 s
+    no relation with |m|_2 < 1.403e+57
+JOB P1 n=42 power10^57.1429 log|S(1)| (sign of T: +) : PrecisionExhausted, iter 13548, 127.635 s
+    no relation with |m|_2 < 1.396e+57
+JOB P1 n=42 power10^57.1429 log|S(7)| (sign of T: +) : PrecisionExhausted, iter 13613, 96.9504 s
+    no relation with |m|_2 < 1.477e+57
+JOB P1 n=42 power10^57.1429 log|S(6)| (sign of T: +) : PrecisionExhausted, iter 13548, 102.711 s
+    no relation with |m|_2 < 1.430e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(6)| (sign of T: +) : PrecisionExhausted, iter 13666, 108.807 s
+    no relation with |m|_2 < 1.558e+57
+JOB P1 n=42 power10^57.1429 log|S(8)| (sign of T: +) : PrecisionExhausted, iter 13529, 107.109 s
+    no relation with |m|_2 < 1.434e+57
+JOB P1 n=42 power10^57.1429 log|S(9)| (sign of T: +) : PrecisionExhausted, iter 13569, 101.884 s
+    no relation with |m|_2 < 1.413e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(8)| (sign of T: +) : PrecisionExhausted, iter 13583, 116.634 s
+    no relation with |m|_2 < 1.430e+57
+JOB P1 n=42 power10^57.1429 log|S(10)| (sign of T: +) : PrecisionExhausted, iter 13544, 105.024 s
+    no relation with |m|_2 < 1.408e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(7)| (sign of T: +) : PrecisionExhausted, iter 13579, 122.3 s
+    no relation with |m|_2 < 1.464e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(9)| (sign of T: +) : PrecisionExhausted, iter 13600, 112.892 s
+    no relation with |m|_2 < 1.424e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(10)| (sign of T: +) : PrecisionExhausted, iter 13547, 105.559 s
+    no relation with |m|_2 < 1.443e+57
+JOB P1 n=42 power10^57.1429 log|S(12)| (sign of T: +) : PrecisionExhausted, iter 13573, 95.3077 s
+    no relation with |m|_2 < 1.395e+57
+JOB P1 n=42 power10^57.1429 log|S(11)| (sign of T: +) : PrecisionExhausted, iter 13539, 110.461 s
+    no relation with |m|_2 < 1.438e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(11)| (sign of T: +) : PrecisionExhausted, iter 13626, 111.231 s
+    no relation with |m|_2 < 1.392e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(12)| (sign of T: +) : PrecisionExhausted, iter 13579, 105.009 s
+    no relation with |m|_2 < 1.495e+57
+JOB P1 n=42 power10^57.1429 log|S(13)| (sign of T: +) : PrecisionExhausted, iter 13600, 108.753 s
+    no relation with |m|_2 < 1.406e+57
+JOB P1 n=42 power10^57.1429 log|S(14)| (sign of T: +) : PrecisionExhausted, iter 13584, 101.338 s
+    no relation with |m|_2 < 1.481e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(14)| (sign of T: +) : PrecisionExhausted, iter 13593, 102.292 s
+    no relation with |m|_2 < 1.610e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(13)| (sign of T: +) : PrecisionExhausted, iter 13589, 114.419 s
+    no relation with |m|_2 < 1.490e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(15)| (sign of T: +) : PrecisionExhausted, iter 13594, 115.539 s
+    no relation with |m|_2 < 1.577e+57
+JOB P1 n=42 power10^57.1429 log|S(15)| (sign of T: +) : PrecisionExhausted, iter 13559, 133.421 s
+    no relation with |m|_2 < 1.499e+57
+JOB P1 n=42 power10^57.1429 log|S(17)| (sign of T: +) : PrecisionExhausted, iter 13542, 94.6653 s
+    no relation with |m|_2 < 1.441e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(16)| (sign of T: +) : PrecisionExhausted, iter 13603, 107.035 s
+    no relation with |m|_2 < 1.501e+57
+JOB P1 n=42 power10^57.1429 log|S(18)| (sign of T: +) : PrecisionExhausted, iter 13571, 95.2187 s
+    no relation with |m|_2 < 1.406e+57
+JOB P1 n=42 power10^57.1429 log|S(16)| (sign of T: +) : PrecisionExhausted, iter 13507, 115.998 s
+    no relation with |m|_2 < 1.445e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(18)| (sign of T: +) : PrecisionExhausted, iter 13589, 111.718 s
+    no relation with |m|_2 < 1.462e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(17)| (sign of T: +) : PrecisionExhausted, iter 13574, 121.537 s
+    no relation with |m|_2 < 1.506e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(19)| (sign of T: +) : PrecisionExhausted, iter 13523, 106.404 s
+    no relation with |m|_2 < 1.493e+57
+JOB P1 n=42 power10^57.1429 log|S(19)| (sign of T: +) : PrecisionExhausted, iter 13599, 123.31 s
+    no relation with |m|_2 < 1.416e+57
+JOB P1 n=42 power10^57.1429 log|S(20)| (sign of T: +) : PrecisionExhausted, iter 13589, 101.801 s
+    no relation with |m|_2 < 1.500e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(20)| (sign of T: +) : PrecisionExhausted, iter 13588, 122.965 s
+    no relation with |m|_2 < 1.475e+57
+JOB P1 n=42 power10^57.1429 log|S(22)| (sign of T: +) : PrecisionExhausted, iter 13538, 94.0663 s
+    no relation with |m|_2 < 1.397e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(22)| (sign of T: +) : PrecisionExhausted, iter 13582, 103.646 s
+    no relation with |m|_2 < 1.504e+57
+JOB P1 n=42 power10^57.1429 log|S(21)| (sign of T: +) : PrecisionExhausted, iter 13608, 116.208 s
+    no relation with |m|_2 < 1.425e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(21)| (sign of T: +) : PrecisionExhausted, iter 13586, 111.939 s
+    no relation with |m|_2 < 1.396e+57
+JOB P1 n=42 power10^57.1429 log|S(23)| (sign of T: +) : PrecisionExhausted, iter 13575, 95.0716 s
+    no relation with |m|_2 < 1.421e+57
+JOB P1 n=42 power10^57.1429 log|S(24)| (sign of T: +) : PrecisionExhausted, iter 13526, 96.8999 s
+    no relation with |m|_2 < 1.503e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(23)| (sign of T: +) : PrecisionExhausted, iter 13549, 109.417 s
+    no relation with |m|_2 < 1.462e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(24)| (sign of T: +) : PrecisionExhausted, iter 13574, 112.99 s
+    no relation with |m|_2 < 1.410e+57
+JOB P1 n=42 power10^57.1429 log|S(25)| (sign of T: +) : PrecisionExhausted, iter 13539, 121.566 s
+    no relation with |m|_2 < 1.556e+57
+JOB P1 n=42 power10^57.1429 log|S(26)| (sign of T: +) : PrecisionExhausted, iter 13566, 96.1122 s
+    no relation with |m|_2 < 1.463e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(25)| (sign of T: +) : PrecisionExhausted, iter 13564, 129.341 s
+    no relation with |m|_2 < 1.526e+57
+JOB P1 n=42 power10^57.1429 log|S(27)| (sign of T: +) : PrecisionExhausted, iter 13564, 102.841 s
+    no relation with |m|_2 < 1.418e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(27)| (sign of T: +) : PrecisionExhausted, iter 13549, 101.675 s
+    no relation with |m|_2 < 1.440e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(26)| (sign of T: +) : PrecisionExhausted, iter 13541, 111.127 s
+    no relation with |m|_2 < 1.505e+57
+JOB P1 n=42 power10^57.1429 log|S(28)| (sign of T: +) : PrecisionExhausted, iter 13563, 110.046 s
+    no relation with |m|_2 < 1.397e+57
+JOB P1 n=42 power10^57.1429 log|S(29)| (sign of T: +) : PrecisionExhausted, iter 13576, 107.437 s
+    no relation with |m|_2 < 1.425e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(28)| (sign of T: +) : PrecisionExhausted, iter 13574, 116.262 s
+    no relation with |m|_2 < 1.652e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(29)| (sign of T: +) : PrecisionExhausted, iter 13577, 114.561 s
+    no relation with |m|_2 < 1.490e+57
+JOB P1 n=42 power10^57.1429 log|S(30)| (sign of T: +) : PrecisionExhausted, iter 13521, 115.139 s
+    no relation with |m|_2 < 1.399e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(3)| (sign of T: +) : Found, iter 318, 10.1093 s
+    VERIFIED relation, residual@2D 2.97e-6000, coefficient of first column 2:
+     2*logT -6*pi 3*p3 2*p5
+    *** REAL RELATION (zeta3 coefficient nonzero) ***
+JOB P1 n=42 power10^57.1429 log|S^-(3)| (sign of T: -) : PrecisionExhausted, iter 13568, 99.2001 s
+    no relation with |m|_2 < 1.466e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S(30)| (sign of T: +) : PrecisionExhausted, iter 13601, 107.17 s
+    no relation with |m|_2 < 1.447e+57
+JOB P1 n=42 power10^57.1429 log|S^-(7)| (sign of T: -) : PrecisionExhausted, iter 13586, 103.355 s
+    no relation with |m|_2 < 1.448e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(7)| (sign of T: +) : PrecisionExhausted, iter 13593, 108.329 s
+    no relation with |m|_2 < 1.479e+57
+JOB P1 n=42 power10^57.1429 log|S^-(15)| (sign of T: -) : PrecisionExhausted, iter 13552, 98.6416 s
+    no relation with |m|_2 < 1.446e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(11)| (sign of T: +) : PrecisionExhausted, iter 13579, 100.842 s
+    no relation with |m|_2 < 1.406e+57
+JOB P1 n=42 power10^57.1429 log|S^-(11)| (sign of T: -) : PrecisionExhausted, iter 13578, 120.478 s
+    no relation with |m|_2 < 1.408e+57
+JOB P1 n=42 power10^57.1429 [VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi)) (sign of T: +) : Found, iter 238, 2.02486 s
+    residual of the expected relation at 3000 digits: 0.00e+00
+    VERIFIED relation, residual@2D 0.00e+00, coefficient of first column -2:
+     -2*logT -1*pi -3*p2 4*Gamma(1/4)
+    => PASS (exact expected coefficients)
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(15)| (sign of T: +) : PrecisionExhausted, iter 13584, 110.388 s
+    no relation with |m|_2 < 1.393e+57
+JOB P1 n=42 power10^57.1429 log|S^-(19)| (sign of T: -) : PrecisionExhausted, iter 13589, 102.637 s
+    no relation with |m|_2 < 1.432e+57
+JOB P1 n=42 power10^57.1429 log|S^-(23)| (sign of T: -) : PrecisionExhausted, iter 13565, 98.279 s
+    no relation with |m|_2 < 1.407e+57
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(23)| (sign of T: +) : PrecisionExhausted, iter 13588, 101.037 s
+    no relation with |m|_2 < 1.592e+57
+JOB P2b n=6 power10^400 zeta3 vs S(2), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8771, 9.19614 s
+    no relation with |m|_2 < 1.005e+400
+JOB P2b n=6 power10^400 zeta3 vs S(3), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8618, 11.3093 s
+    no relation with |m|_2 < 1.084e+400
+JOB P1 n=42 power10^57.1429 log|S^-(27)| (sign of T: -) : PrecisionExhausted, iter 13578, 93.9116 s
+    no relation with |m|_2 < 1.448e+57
+JOB P2b n=6 power10^400 zeta3 vs S(5), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8542, 8.85426 s
+    no relation with |m|_2 < 1.008e+400
+JOB P2b n=6 power10^400 zeta3 vs S(7), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8591, 9.30051 s
+    no relation with |m|_2 < 1.039e+400
+JOB P2b n=6 power10^400 zeta3 vs S(8), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8412, 9.42059 s
+    no relation with |m|_2 < 1.082e+400
+JOB P2b n=6 power10^400 zeta3 vs S(6), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8455, 12.1726 s
+    no relation with |m|_2 < 1.003e+400
+JOB P2b n=6 power10^400 zeta3 vs S(10), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8383, 9.33652 s
+    no relation with |m|_2 < 1.001e+400
+JOB P2b n=6 power10^400 zeta3 vs S(11), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8546, 9.63691 s
+    no relation with |m|_2 < 1.064e+400
+JOB P2b n=6 power10^400 zeta3 vs S(13), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8529, 8.6779 s
+    no relation with |m|_2 < 1.343e+400
+JOB P2b n=6 power10^400 zeta3 vs S(12), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8350, 16.7142 s
+    no relation with |m|_2 < 1.241e+400
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(27)| (sign of T: +) : PrecisionExhausted, iter 13573, 116.57 s
+    no relation with |m|_2 < 1.668e+57
+JOB P2b n=6 power10^400 zeta3 vs S(14), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8470, 10.5188 s
+    no relation with |m|_2 < 1.011e+400
+JOB P1 n=42 power10^57.1429 log|zeta3+2S^-(19)| (sign of T: +) : PrecisionExhausted, iter 13633, 149.228 s
+    no relation with |m|_2 < 1.556e+57
+JOB P2c n=38 power10^63.1579 [zeta3, pi^3, S(2..maxD), S^-(odd)] : PrecisionExhausted, iter 12992, 98.0495 s
+    no relation with |m|_2 < 1.586e+63
+JOB P2c n=38 power10^63.1579 [pi^3, S(1..maxD), S^-(odd)] (no zeta3) : PrecisionExhausted, iter 13052, 92.4126 s
+    no relation with |m|_2 < 1.508e+63
+JOB P2b n=6 power10^400 zeta3 vs S(15), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8370, 8.50131 s
+    no relation with |m|_2 < 1.305e+400
+JOB P2b n=6 power10^400 zeta3 vs S(19), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8327, 9.04658 s
+    no relation with |m|_2 < 1.082e+400
+JOB P2b n=6 power10^400 zeta3 vs S(20), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8388, 10.7363 s
+    no relation with |m|_2 < 1.144e+400
+JOB P2b n=6 power10^400 zeta3 vs S(21), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8402, 9.2682 s
+    no relation with |m|_2 < 1.143e+400
+JOB P2b n=6 power10^400 zeta3 vs S(22), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8361, 8.78082 s
+    no relation with |m|_2 < 1.118e+400
+JOB P2b n=6 power10^400 zeta3 vs S(18), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8292, 12.8818 s
+    no relation with |m|_2 < 1.143e+400
+JOB P2b n=6 power10^400 zeta3 vs S(17), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8383, 16.2402 s
+    no relation with |m|_2 < 1.220e+400
+JOB P2b n=6 power10^400 zeta3 vs S(23), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8391, 8.79056 s
+    no relation with |m|_2 < 1.163e+400
+JOB P2a n=8 power10^300 [VALIDATION] Ramanujan transformation d=2 (S(d) <-> S(1/d)) : Found, iter 34, 8.89644 s
+    residual of the expected relation at 3000 digits: 0.00e+00
+    VERIFIED relation, residual@2D 0.00e+00, coefficient of first column 0:
+     18*zeta3*sqrt(d) 12*S(d)*sqrt(d) 24*S(1/d)*sqrt(d) -1*pi^3
+    => PASS (exact expected coefficients)
+JOB P2a n=8 power10^300 [VALIDATION] Ramanujan transformation d=3 (S(d) <-> S(1/d)) : Found, iter 46, 10.2316 s
+    residual of the expected relation at 3000 digits: 0.00e+00
+    VERIFIED relation, residual@2D 0.00e+00, coefficient of first column 0:
+     72*zeta3*sqrt(d) 36*S(d)*sqrt(d) 108*S(1/d)*sqrt(d) -5*pi^3
+    => PASS (exact expected coefficients)
+JOB P2b n=6 power10^400 zeta3 vs S(24), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8246, 8.74405 s
+    no relation with |m|_2 < 1.235e+400
+JOB P2b n=6 power10^400 zeta3 vs S(28), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8428, 8.64786 s
+    no relation with |m|_2 < 1.222e+400
+JOB P2b n=6 power10^400 zeta3 vs S(29), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8408, 8.80929 s
+    no relation with |m|_2 < 1.122e+400
+JOB P2b n=6 power10^400 zeta3 vs S(30), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8417, 8.68621 s
+    no relation with |m|_2 < 1.008e+400
+JOB P2b n=6 power10^400 zeta3 vs S(27), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8485, 12.371 s
+    no relation with |m|_2 < 1.014e+400
+JOB P2b n=6 power10^400 zeta3 vs S^-(7), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8480, 10.0652 s
+    no relation with |m|_2 < 2.133e+400
+JOB P2b n=6 power10^400 zeta3 vs S^-(11), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8404, 9.61534 s
+    no relation with |m|_2 < 1.180e+400
+JOB P2b n=6 power10^400 zeta3 vs S(26), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8369, 14.8246 s
+    no relation with |m|_2 < 1.035e+400
+JOB P2b n=6 power10^400 zeta3 vs S^-(15), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8465, 13.1536 s
+    no relation with |m|_2 < 1.319e+400
+JOB P2b n=6 power10^400 zeta3 vs S^-(23), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8456, 9.82093 s
+    no relation with |m|_2 < 1.170e+400
+JOB P2b n=3 power10^800 zeta3 vs S(4), pi^3 over Q : PrecisionExhausted, iter 5548, 7.07057 s
+    no relation with |m|_2 < 1.152e+800
+JOB P2b n=6 power10^400 zeta3 vs S^-(27), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8451, 9.67925 s
+    no relation with |m|_2 < 1.079e+400
+JOB P2b n=6 power10^400 zeta3 vs S^-(19), pi^3 over Q(sqrt d) : PrecisionExhausted, iter 8479, 11.2802 s
+    no relation with |m|_2 < 1.082e+400
+JOB P2b n=3 power10^800 zeta3 vs S(9), pi^3 over Q : PrecisionExhausted, iter 5496, 6.97549 s
+    no relation with |m|_2 < 1.159e+800
+JOB P2b n=3 power10^800 zeta3 vs S(16), pi^3 over Q : PrecisionExhausted, iter 5589, 6.8847 s
+    no relation with |m|_2 < 1.289e+800
+JOB P2b n=3 power10^800 zeta3 vs S(25), pi^3 over Q : PrecisionExhausted, iter 5562, 6.0808 s
+    no relation with |m|_2 < 1.026e+800
+JOB P2c n=39 power10^61.5385 [zeta3, pi^3, S(1..maxD), S^-(odd)] [VALIDATION: zeta3 + 2 S(1) = 7 pi^3/180] : Found, iter 551, 23.336 s
+    residual of the expected relation at 3000 digits: 1.55e-3001
+    VERIFIED relation, residual@2D -7.71e-5999, coefficient of first column -180:
+     -180*zeta3 7*pi^3 -360*S(1)
+    => PASS (exact expected coefficients)
+JOB P2b n=6 power10^400 zeta3 vs S^-(3), pi^3 over Q(sqrt d) : Found, iter 26, 7.13211 s
+    VERIFIED relation, residual@2D 2.37e-5999, coefficient of first column 0:
+     15*zeta3*sqrt(d) 30*S*sqrt(d) -1*pi^3
+    *** REAL RELATION (zeta3 coefficient nonzero) ***
+JOB P2b n=3 power10^800 zeta3 vs S(1), pi^3 over Q [VALIDATION: zeta3 + 2 S(1) = 7 pi^3/180] : Found, iter 6, 10.0059 s
+    residual of the expected relation at 3000 digits: 0.00e+00
+    VERIFIED relation, residual@2D 0.00e+00, coefficient of first column -180:
+     -180*zeta3 -360*S 7*pi^3
+    => PASS (exact expected coefficients)
+
+===== SUMMARY: validation 6/6 PASS; real hits 2, basis-only 0, spurious 0, no-relation jobs 109; min normBound per part: P1=1.392e+57 P2b=1.001e+400 P2c=1.508e+63; total elapsed 949.883384752999972988618537784 s =====

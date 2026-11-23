@@ -4461,3 +4461,503 @@ void test_pslq_zeta3_lambert_cm(int digits, int maxD, int gammaMaxN)
 	for (const auto& kv : minNb) std::cout << " " << kv.first << "=" << kv.second.toString("%.3Re");
 	std::cout << "; total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
 }
+
+
+// ============================================================================================================
+// Three-level compositions with constants between the levels:
+//   u1 = h(zeta3 * a),  u2 = g(u1 * b),  u3 = f(u2 * c),  y = u3 * k   (k not enumerated; absorbed by the tests)
+//   T1: polynomial PSLQ on u3 (degree `degree`, max degree only) -> k algebraic
+//   T2: PSLQ on (log|u3|, 1, log pi, log gamma, log G, log2, log3, log5, log7) -> k = pi^r e^s gamma^t G^v 2^.. 3^.. 5^.. 7^..
+// Env prefix ZETA3_ML3C_: THREADS, COUNT_ONLY, MAXJOBS, SKIP_DONE, DIGITS, PROGRESS, IDENT (1: do not exclude adjacent identical functions), NOVAL
+// ============================================================================================================
+namespace
+{
+	const int ML_NF = 12, ML_NA = 5, ML_NC = 19;
+	const char* const kMlName[ML_NF] = { "exp", "log", "sin", "cos", "tan", "sinh", "cosh", "tanh", "arctan", "arcsinh", "arcsin", "arccos" };
+	const int kMlInv[ML_NF] = { 1, 0, 10, 11, 8, 9, -1, -1, 4, 5, 2, 3 }; // inverse partner within the set (or -1)
+	const char* const kMlA[ML_NA] = { "1", "pi", "1/pi", "1/pi^2", "1/pi^3" };
+	const char* const kMlC[ML_NC] = { "1", "pi", "1/pi", "pi^2", "1/pi^2", "e", "1/e", "gamma", "G", "log2", "log3", "sqrt2", "sqrt3", "2", "3", "1/2", "1/3", "2/3", "3/2" };
+	bool mlCRational(int c) { return c == 0 || c >= 13; }
+	bool mlRedundantF(int f) { return f == 0 || (f >= 2 && f <= 7); } // exp, sin, cos, tan, sinh, cosh, tanh
+
+	struct MlSpec { int h, a, g, b, f, c; };
+	MlSpec mlDecode(uint32_t id)
+	{
+		MlSpec s;
+		s.c = id % ML_NC; id /= ML_NC;
+		s.f = id % ML_NF; id /= ML_NF;
+		s.b = id % ML_NC; id /= ML_NC;
+		s.g = id % ML_NF; id /= ML_NF;
+		s.a = id % ML_NA; id /= ML_NA;
+		s.h = id;
+		return s;
+	}
+	uint32_t mlEncode(const MlSpec& s) { return ((((uint32_t)s.h * ML_NA + s.a) * ML_NF + s.g) * ML_NC + s.b) * ML_NF * ML_NC + s.f * ML_NC + s.c; }
+	std::string mlName(const MlSpec& s)
+	{
+		std::string r = std::string(kMlName[s.f]) + "(" + kMlName[s.g] + "(" + kMlName[s.h] + "(zeta3*" + kMlA[s.a] + ")*" + kMlC[s.b] + ")*" + kMlC[s.c] + ")";
+		return r;
+	}
+	// exclusion by the adjacency rules; ident = also exclude adjacent identical functions
+	bool mlRuleExcluded(int outer, int inner, int constBetween, bool ident)
+	{
+		if (ident && outer == inner) return true;
+		if (constBetween == 0 && kMlInv[outer] == inner) return true;
+		return false;
+	}
+
+	struct MlConsts
+	{
+		mpreal pi, e, gam, G, l2, l3, l5, l7, z3, lpi, lgam, lG;
+		mpreal cv[ML_NC], av[ML_NA];
+	};
+	std::map<int, std::shared_ptr<MlConsts>>& mlConstsMap() { static std::map<int, std::shared_ptr<MlConsts>> m; return m; }
+	void mlPrepare(int dg)
+	{
+		auto& m = mlConstsMap();
+		if (m.count(dg)) return;
+		const auto saved = mpreal::get_default_prec();
+		mpreal::set_default_prec(mpfr::digits2bits(dg));
+		auto K = std::make_shared<MlConsts>();
+		K->pi = mpfr::const_pi();
+		K->e = mpfr::exp(mpreal(1));
+		K->gam = mpfr::const_euler();
+		K->G = mpfr::const_catalan();
+		K->l2 = mpfr::log(mpreal(2)); K->l3 = mpfr::log(mpreal(3)); K->l5 = mpfr::log(mpreal(5)); K->l7 = mpfr::log(mpreal(7));
+		K->z3 = mpfr::zeta(mpreal(3));
+		K->lpi = mpfr::log(K->pi); K->lgam = mpfr::log(K->gam); K->lG = mpfr::log(K->G);
+		const mpreal s2 = mpfr::sqrt(mpreal(2)), s3 = mpfr::sqrt(mpreal(3));
+		const mpreal one = 1;
+		mpreal cv[ML_NC] = { one, K->pi, one / K->pi, K->pi * K->pi, one / (K->pi * K->pi), K->e, one / K->e, K->gam, K->G, K->l2, K->l3, s2, s3,
+			mpreal(2), mpreal(3), one / 2, one / 3, mpreal(2) / 3, mpreal(3) / 2 };
+		for (int i = 0; i < ML_NC; ++i) K->cv[i] = cv[i];
+		K->av[0] = one; K->av[1] = K->pi; K->av[2] = one / K->pi; K->av[3] = one / (K->pi * K->pi); K->av[4] = one / (K->pi * K->pi * K->pi);
+		m[dg] = K;
+		mpreal::set_default_prec(saved);
+	}
+	const MlConsts& mlK(int dg) { return *mlConstsMap().at(dg); }
+
+	enum { MLR_OK = 0, MLR_DOM = 1, MLR_RNG = 2, MLR_HUGE = 3 };
+	// applies function i at the current default precision
+	int mlApply(int i, const mpreal& x, mpreal& out)
+	{
+		static const double hugeArg = 1e6;
+		if (i == 1 && !(x > 0)) return MLR_DOM;                                   // log
+		if ((i == 10 || i == 11) && mpfr::abs(x) > 1) return MLR_DOM;             // arcsin, arccos
+		if (i == 4 && mpfr::abs(mpfr::cos(x)) < mpreal("1e-10")) return MLR_DOM; // tan pole
+		if ((i == 0 || (i >= 2 && i <= 6)) && mpfr::abs(x) > hugeArg) return MLR_HUGE;
+		switch (i)
+		{
+		case 0: out = mpfr::exp(x); break;
+		case 1: out = mpfr::log(x); break;
+		case 2: out = mpfr::sin(x); break;
+		case 3: out = mpfr::cos(x); break;
+		case 4: out = mpfr::tan(x); break;
+		case 5: out = mpfr::sinh(x); break;
+		case 6: out = mpfr::cosh(x); break;
+		case 7: out = mpfr::tanh(x); break;
+		case 8: out = mpfr::atan(x); break;
+		case 9: out = mpfr::asinh(x); break;
+		case 10: out = mpfr::asin(x); break;
+		default: out = mpfr::acos(x); break;
+		}
+		if (!mpfr::isfinite(out)) return MLR_DOM;
+		const mpreal a = mpfr::abs(out);
+		if (a > mpreal("1e30") || a < mpreal("1e-30")) return MLR_RNG;
+		return MLR_OK;
+	}
+	typedef std::function<mpreal(const MlConsts&)> MlZ0;
+	// y = u3 at precision dg (default precision is set to it). st = MLR_*
+	mpreal mlEval(const MlSpec& s, const MlZ0& z0, int dg, int& st)
+	{
+		mpreal::set_default_prec(mpfr::digits2bits(dg));
+		const MlConsts& K = mlK(dg);
+		mpreal u1, u2, u3;
+		st = mlApply(s.h, z0(K) * K.av[s.a], u1);
+		if (st) return mpreal(0);
+		st = mlApply(s.g, u1 * K.cv[s.b], u2);
+		if (st) return mpreal(0);
+		st = mlApply(s.f, u2 * K.cv[s.c], u3);
+		if (st) return mpreal(0);
+		return u3;
+	}
+
+	struct MlJob
+	{
+		bool evalFail = false;
+		PslqResult r1, r2;
+		bool ver1 = false, ver2 = false, basisOnly = false;
+		int trueDeg = 0;
+		std::string rel1, rel2;
+		std::vector<long long> rel2ints;
+		double secs1 = 0, secs2 = 0;
+	};
+	std::vector<mpreal> mlT2Basis(const mpreal& ly, const MlConsts& K)
+	{
+		return { ly, mpreal(1), K.lpi, K.lgam, K.lG, K.l2, K.l3, K.l5, K.l7 };
+	}
+	MlJob mlRun(const MlSpec& s, const MlZ0& z0, int digits, int degree)
+	{
+		MlJob jb;
+		const auto saved = mpreal::get_default_prec();
+		int st;
+		const int dg = digits + 60;
+		mpreal yw = mlEval(s, z0, dg, st);
+		if (st) { jb.evalFail = true; mpreal::set_default_prec(saved); return jb; }
+		const mpreal y = tepRound(yw, mpfr::digits2bits(digits));
+		mpreal ly = mpfr::log(mpfr::abs(yw));
+		const mpreal lyr = tepRound(ly, mpfr::digits2bits(digits));
+		std::vector<mpreal> x2;
+		{
+			const MlConsts& K = mlK(dg);
+			auto b = mlT2Basis(lyr, K);
+			for (auto& v : b) x2.push_back(tepRound(v, mpfr::digits2bits(digits)));
+		}
+		// T1
+		auto yAt = [&](int d) { int s2; mpreal r = mlEval(s, z0, d + 60, s2); return tepRound(r, mpfr::digits2bits(d)); };
+		const TepJobRes jr = tepRunJob(y, yAt, digits, degree);
+		jb.r1 = jr.r; jb.ver1 = jr.verified; jb.trueDeg = jr.trueDeg; jb.rel1 = jr.poly; jb.secs1 = jr.secs;
+		// T2
+		mpreal::set_default_prec(mpfr::digits2bits(digits));
+		const auto t0 = std::chrono::steady_clock::now();
+		jb.r2 = pslq(x2);
+		jb.secs2 = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+		if (jb.r2.status == PslqResult::Status::Found)
+		{
+			const auto& rel = jb.r2.relation;
+			std::string out;
+			const char* nm[9] = { "log|u3|", "1", "log(pi)", "log(gamma)", "log(G)", "log2", "log3", "log5", "log7" };
+			for (size_t i = 0; i < rel.size(); ++i)
+			{
+				const std::string c = rel[i].toString("%.0Rf");
+				if (c != "0" && c != "-0") out += (out.empty() ? "" : " + ") + c + "*" + nm[i];
+				try { jb.rel2ints.push_back(rel[i].toLong()); } catch (...) { jb.rel2ints.push_back(0); }
+			}
+			jb.rel2 = out;
+			jb.basisOnly = rel[0] == 0;
+			// verify at 2*digits
+			const int d2 = 2 * digits + 60;
+			int s3;
+			mpreal y2 = mlEval(s, z0, d2, s3);
+			if (!s3)
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(d2));
+				const auto b = mlT2Basis(mpfr::log(mpfr::abs(y2)), mlK(d2));
+				mpreal v = 0;
+				for (size_t i = 0; i < b.size(); ++i) v += rel[i] * b[i];
+				jb.ver2 = mpfr::abs(v) < mpfr::pow(mpreal(10), -1.5 * digits);
+			}
+		}
+		mpreal::set_default_prec(saved);
+		return jb;
+	}
+	// integer polynomial division check: monic p divides r exactly
+	bool mlDivisible(const std::vector<mpreal>& relation, const std::vector<long>& p)
+	{
+		std::vector<long long> r;
+		for (const auto& v : relation) r.push_back(v.toLong());
+		const int dp = (int)p.size() - 1;
+		for (int k = (int)r.size() - 1; k >= dp; --k)
+		{
+			const long long q = r[k];
+			for (int j = 0; j <= dp; ++j) r[k - dp + j] -= q * p[j];
+		}
+		for (int k = 0; k < dp; ++k) if (r[k] != 0) return false;
+		return true;
+	}
+}
+
+void test_pslq_zeta3_multilevel_const_L3(int digits, int degree)
+{
+	std::cout.precision(30);
+	const auto tStart = std::chrono::steady_clock::now();
+	auto elapsed = [&]() { return std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count(); };
+	auto envInt = [](const char* n, long d) { const char* e = std::getenv(n); return e ? std::atol(e) : d; };
+	const unsigned nThreads = (unsigned)std::max(1L, envInt("ZETA3_ML3C_THREADS", 10));
+	digits = (int)envInt("ZETA3_ML3C_DIGITS", digits);
+	const bool countOnly = envInt("ZETA3_ML3C_COUNT_ONLY", 0) != 0, ident = envInt("ZETA3_ML3C_IDENT", 0) != 0, noVal = envInt("ZETA3_ML3C_NOVAL", 0) != 0;
+	const long maxJobs = envInt("ZETA3_ML3C_MAXJOBS", -1), skipDone = envInt("ZETA3_ML3C_SKIP_DONE", 0), progEvery = envInt("ZETA3_ML3C_PROGRESS", 50000);
+	const auto savedPrec = mpreal::get_default_prec();
+	setPslqAlgorithm(PslqAlgo::Multipair2L);
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_multilevel_const_L3_" << digits << "digits.txt" << std::endl;
+	std::cout << "u1 = h(zeta3*a), u2 = g(u1*b), u3 = f(u2*c); T1: polynomial PSLQ degree " << degree << " (n=" << degree + 1 << "), T2: log-basis n=9; digits " << digits
+		<< ", threads " << nThreads << ", identical-adjacent " << (ident ? "kept" : "excluded") << " (ZETA3_ML3C_IDENT)" << std::endl;
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+	const int P1 = 80;
+	for (int dg : { P1, digits + 60, digits + 120, 2 * digits + 60 }) mlPrepare(dg);
+	mpreal::set_default_prec(savedPrec);
+
+	// ---------------- enumeration + phase 1 (80 digits): rules, domain, range ----------------
+	enum { C_RAW, C_BC1, C_RULE, C_REDUND, C_DOM, C_HUGE, C_RNG, C_DUP, C_UNSTABLE, C_NEAR, C_ILL, C_N };
+	std::atomic<long long> cnt[C_N];
+	for (auto& c : cnt) c = 0;
+	std::atomic<long long> invHG{ 0 }, invGF{ 0 };
+	const size_t nTasks = (size_t)ML_NF * ML_NA * ML_NF * ML_NC;
+	struct TaskRes { std::vector<uint32_t> ids; std::vector<mpreal> fold; };
+	std::vector<TaskRes> tres(nTasks);
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t task; (task = next++) < nTasks;)
+					{
+						size_t q = task;
+						MlSpec s;
+						s.b = q % ML_NC; q /= ML_NC;
+						s.g = q % ML_NF; q /= ML_NF;
+						s.a = q % ML_NA; q /= ML_NA;
+						s.h = (int)q;
+						mpreal::set_default_prec(mpfr::digits2bits(P1));
+						const MlConsts& K = mlK(P1);
+						mpreal u1, u2;
+						int st1 = mlApply(s.h, K.z3 * K.av[s.a], u1), st2 = 0;
+						if (!st1) st2 = mlApply(s.g, u1 * K.cv[s.b], u2);
+						const bool hgRule = mlRuleExcluded(s.g, s.h, s.b, !ident);
+						if (!hgRule && s.b != 0 && kMlInv[s.g] == s.h) ++invHG;
+						TaskRes& tr = tres[task];
+						for (int f = 0; f < ML_NF; ++f)
+							for (int c = 0; c < ML_NC; ++c)
+							{
+								++cnt[C_RAW];
+								if (s.b == 0 && c == 0) { ++cnt[C_BC1]; continue; }
+								if (hgRule || mlRuleExcluded(f, s.g, c, !ident)) { ++cnt[C_RULE]; continue; }
+								if (mlRedundantF(f) && mlCRational(c) && c != 0) { ++cnt[C_REDUND]; continue; }
+								if (c != 0 && kMlInv[f] == s.g) ++invGF;
+								int st = st1 ? st1 : st2;
+								mpreal u3;
+								if (!st) st = mlApply(f, u2 * K.cv[c], u3);
+								if (st) { ++cnt[st == MLR_DOM ? C_DOM : st == MLR_HUGE ? C_HUGE : C_RNG]; continue; }
+								mpreal a = mpfr::abs(u3);
+								tr.ids.push_back(mlEncode({ s.h, s.a, s.g, s.b, f, c }));
+								tr.fold.push_back(a > 1 ? 1 / a : a);
+							}
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::vector<uint32_t> ids;
+	std::vector<mpreal> fold;
+	for (auto& tr : tres) { ids.insert(ids.end(), tr.ids.begin(), tr.ids.end()); fold.insert(fold.end(), tr.fold.begin(), tr.fold.end()); }
+	{ std::vector<TaskRes>().swap(tres); }
+	const size_t nPhase1 = ids.size();
+	// ---------------- numerical dedup (|u3| or 1/|u3| equal to 60 digits; keeps the lowest index) ----------------
+	std::vector<char> alive(ids.size(), 1);
+	{
+		mpreal::set_default_prec(mpfr::digits2bits(P1));
+		std::vector<size_t> ord(ids.size());
+		std::iota(ord.begin(), ord.end(), 0);
+		std::sort(ord.begin(), ord.end(), [&](size_t p, size_t q) { return fold[p] < fold[q] || (fold[p] == fold[q] && p < q); });
+		const mpreal tol = mpfr::pow(mpreal(10), -60);
+		size_t g = 0;
+		while (g < ord.size())
+		{
+			size_t e = g + 1;
+			while (e < ord.size() && mpfr::abs(fold[ord[e]] - fold[ord[e - 1]]) < tol * fold[ord[e]]) ++e;
+			if (e - g > 1)
+			{
+				size_t keep = ord[g];
+				for (size_t k = g; k < e; ++k) keep = std::min(keep, ord[k]);
+				for (size_t k = g; k < e; ++k) if (ord[k] != keep) { alive[ord[k]] = 0; ++cnt[C_DUP]; }
+			}
+			g = e;
+		}
+		std::vector<mpreal>().swap(fold);
+	}
+	std::vector<uint32_t> cand;
+	for (size_t i = 0; i < ids.size(); ++i) if (alive[i]) cand.push_back(ids[i]);
+	std::sort(cand.begin(), cand.end());
+	// ---------------- phase 2: stability at digits+60 / digits+120, near-integer / ill-conditioned ----------------
+	std::vector<char> keep(cand.size(), 0);
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		const MlZ0 zz = [](const MlConsts& K) { return K.z3; };
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < cand.size();)
+					{
+						const MlSpec s = mlDecode(cand[i]);
+						int sa, sb;
+						mpreal ya = mlEval(s, zz, digits + 60, sa);
+						mpreal yb = mlEval(s, zz, digits + 120, sb);
+						if (sa || sb) { ++cnt[C_UNSTABLE]; continue; }
+						mpreal::set_default_prec(mpfr::digits2bits(digits + 120));
+						if (!(mpfr::abs(ya - yb) < mpfr::abs(yb) * mpfr::pow(mpreal(10), -digits))) { ++cnt[C_UNSTABLE]; continue; }
+						mpreal y = tepRound(yb, mpfr::digits2bits(digits));
+						const double ld = tepLogDistInt(y);
+						if (ld < -0.5 * digits) { ++cnt[C_NEAR]; continue; }
+						if (ld < -0.4 * digits / degree) { ++cnt[C_ILL]; continue; }
+						keep[i] = 1;
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::vector<uint32_t> finalIds;
+	for (size_t i = 0; i < cand.size(); ++i) if (keep[i]) finalIds.push_back(cand[i]);
+	{ std::vector<uint32_t>().swap(ids); }
+	std::cout << "FILTER COUNTS (raw = 12*5*12*19*12*19): raw " << cnt[C_RAW] << "; b=c=1 skipped " << cnt[C_BC1] << "; adjacency rule (identical, or inverse with const 1) " << cnt[C_RULE]
+		<< "; redundant rational c for exp/trig/hyp f " << cnt[C_REDUND] << "; domain/nan " << cnt[C_DOM] << "; huge argument (|arg|>1e6 for exp/sin/cos/tan/sinh/cosh) " << cnt[C_HUGE]
+		<< "; range (|stage value| >1e30 or <1e-30) " << cnt[C_RNG] << "; numeric duplicates (60 digits, +-u3, 1/u3) " << cnt[C_DUP]
+		<< "; unstable (digits+60 vs digits+120 disagree) " << cnt[C_UNSTABLE] << "; near-integer " << cnt[C_NEAR] << "; ill-conditioned (dist to integer < 10^(-0.4 digits/degree)) " << cnt[C_ILL]
+		<< "; after phase 1 " << nPhase1 << std::endl;
+	std::cout << "ENUMERATION CHECK: inverse-adjacent pairs enumerated with constant != 1: (h,g,b) triples " << invHG << " (each x 12*19 leaves), (f,g) " << invGF
+		<< "; rule check: f=sin,g=arcsin,c=pi excluded? " << (mlRuleExcluded(2, 10, 1, !ident) ? "YES (BUG)" : "no (enumerated)") << ", f=sin,g=arcsin,c=1 excluded? " << (mlRuleExcluded(2, 10, 0, !ident) ? "yes" : "NO (BUG)") << std::endl;
+	std::cout << "TOTAL TARGET COUNT = " << finalIds.size() << "  (elapsed " << elapsed() << " s)" << std::endl;
+
+	// ---------------- validation ----------------
+	if (!countOnly && !noVal)
+	{
+		struct Val { std::string name; MlSpec s; MlZ0 z0; bool t1; std::vector<long> poly; std::vector<long long> expect2; bool pass = false; std::string msg; };
+		std::vector<Val> vals;
+		auto fidx = [](const char* n) { for (int i = 0; i < ML_NF; ++i) if (std::string(n) == kMlName[i]) return i; return -1; };
+		auto cidx = [](const char* n) { for (int i = 0; i < ML_NC; ++i) if (std::string(n) == kMlC[i]) return i; return -1; };
+		auto aidx = [](const char* n) { for (int i = 0; i < ML_NA; ++i) if (std::string(n) == kMlA[i]) return i; return -1; };
+		auto mk = [&](const char* h, const char* a, const char* g, const char* b, const char* f, const char* c) { return MlSpec{ fidx(h), aidx(a), fidx(g), cidx(b), fidx(f), cidx(c) }; };
+		// V1: sin / log / arctan, alpha = 2^(1/5)-1 (root of (t+1)^5-2)
+		{
+			Val v; v.name = "V1 (T1) f=sin c=gamma, g=log b=pi^2, h=arctan a=1/pi, u3 = 2^(1/5)-1 (deg 5)"; v.t1 = true;
+			v.s = mk("arctan", "1/pi", "log", "pi^2", "sin", "gamma");
+			v.poly = { -1, 5, 10, 10, 5, 1 };
+			const MlSpec s = v.s;
+			v.z0 = [s](const MlConsts& K) { mpreal al = tepPolyRoot({ -1, 5, 10, 10, 5, 1 }, mpreal("0.15"));
+				mpreal u1 = mpfr::exp(mpfr::asin(al) / K.cv[s.c]) / K.cv[s.b]; return mpfr::tan(u1) / K.av[s.a]; };
+			vals.push_back(v);
+		}
+		// V2: inverse-adjacent pair with c != 1: f=arcsinh c=2/3 after g=sinh; alpha = 2^(1/7) (t^7-2)
+		{
+			Val v; v.name = "V2 (T1) f=arcsinh c=2/3, g=sinh b=e (inverse-adjacent, c!=1), h=tanh a=1/pi, u3 = 2^(1/7) (deg 7)"; v.t1 = true;
+			v.s = mk("tanh", "1/pi", "sinh", "e", "arcsinh", "2/3");
+			v.poly = { -2, 0, 0, 0, 0, 0, 0, 1 };
+			const MlSpec s = v.s;
+			v.z0 = [s](const MlConsts& K) { mpreal al = tepPolyRoot({ -2, 0, 0, 0, 0, 0, 0, 1 }, mpreal("1.1"));
+				mpreal u2 = mpfr::sinh(al) / K.cv[s.c]; mpreal w = mpfr::asinh(u2); return mpfr::atanh(w / K.cv[s.b]) / K.av[s.a]; };
+			vals.push_back(v);
+		}
+		// V3: T2, u3 = sqrt5 pi^-1 e^(2/3) gamma ; f=arctan c=pi, g=sinh b=G, h=cos a=1
+		{
+			Val v; v.name = "V3 (T2) f=arctan c=pi, g=sinh b=G, h=cos a=1, u3 = 5^(1/2) pi^-1 e^(2/3) gamma"; v.t1 = false;
+			v.s = mk("cos", "1", "sinh", "G", "arctan", "pi");
+			v.expect2 = { 6, -4, 6, -6, 0, 0, 0, -3, 0 };
+			const MlSpec s = v.s;
+			v.z0 = [s](const MlConsts& K) { mpreal u3 = mpfr::sqrt(mpreal(5)) / K.pi * mpfr::exp(mpreal(2) / 3) * K.gam;
+				mpreal u2 = mpfr::tan(u3) / K.cv[s.c]; mpreal u1 = mpfr::asinh(u2) / K.cv[s.b]; return mpfr::acos(u1) / K.av[s.a]; };
+			vals.push_back(v);
+		}
+		// V4: T2, u3 = 7 G^2/pi ; f=cosh c=log3, g=sinh b=G, h=exp a=1/pi
+		{
+			Val v; v.name = "V4 (T2) f=cosh c=log3, g=sinh b=G, h=exp a=1/pi, u3 = 7 G^2 / pi"; v.t1 = false;
+			v.s = mk("exp", "1/pi", "sinh", "G", "cosh", "log3");
+			v.expect2 = { 1, 0, 1, 0, -2, 0, 0, 0, -1 };
+			const MlSpec s = v.s;
+			v.z0 = [s](const MlConsts& K) { mpreal u3 = 7 * K.G * K.G / K.pi;
+				mpreal u2 = mpfr::acosh(u3) / K.cv[s.c]; mpreal u1 = mpfr::asinh(u2) / K.cv[s.b]; return mpfr::log(u1) / K.av[s.a]; };
+			vals.push_back(v);
+		}
+		std::cout << "--- validation (planted z0 replaces zeta3; same pipeline at " << digits << " digits) ---" << std::endl;
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < std::min<unsigned>(nThreads, (unsigned)vals.size()); ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < vals.size();)
+					{
+						Val& v = vals[i];
+						const MlJob jb = mlRun(v.s, v.z0, digits, degree);
+						bool ok = false;
+						std::ostringstream os;
+						if (jb.evalFail) os << "evaluation failed (domain/range)";
+						else if (v.t1)
+						{
+							ok = jb.r1.status == PslqResult::Status::Found && jb.ver1 && mlDivisible(jb.r1.relation, v.poly);
+							os << toString(jb.r1.status) << ", verified " << jb.ver1 << ", true degree " << jb.trueDeg << ", " << jb.secs1 << " s; relation: " << jb.rel1;
+						}
+						else
+						{
+							bool match = jb.r2.status == PslqResult::Status::Found && jb.rel2ints.size() == v.expect2.size();
+							if (match)
+							{
+								long long sgn = 0;
+								for (size_t k = 0; k < v.expect2.size() && match; ++k)
+								{
+									if (v.expect2[k] == 0) { match = jb.rel2ints[k] == 0; continue; }
+									const long long q = jb.rel2ints[k] * (v.expect2[k] > 0 ? 1 : -1);
+									const long long sg = (jb.rel2ints[k] > 0) == (v.expect2[k] > 0) ? 1 : -1;
+									(void)q;
+									if (jb.rel2ints[k] != sg * v.expect2[k] || (sgn != 0 && sgn != sg)) match = false;
+									sgn = sg;
+								}
+							}
+							ok = match && jb.ver2;
+							os << toString(jb.r2.status) << ", verified " << jb.ver2 << ", " << jb.secs2 << " s; relation: " << jb.rel2;
+						}
+						v.pass = ok;
+						v.msg = std::string(ok ? "PASS " : "FAIL ") + v.name + " : " + os.str();
+					}
+				});
+		for (auto& t : th) t.join();
+		int nfail = 0;
+		for (auto& v : vals) { std::cout << v.msg << std::endl; nfail += !v.pass; }
+		std::cout << "validation: " << (nfail == 0 ? "all PASS" : "SOME FAIL") << std::endl;
+		if (nfail) { std::cout << "ABORT: validation failed" << std::endl; mpreal::set_default_prec(savedPrec); return; }
+	}
+	if (countOnly) { std::cout << "COUNT_ONLY: done, elapsed " << elapsed() << " s" << std::endl; mpreal::set_default_prec(savedPrec); return; }
+
+	// ---------------- main run ----------------
+	size_t lo = (size_t)std::min<long>(skipDone, (long)finalIds.size());
+	size_t hi = finalIds.size();
+	if (maxJobs >= 0) hi = std::min(hi, lo + (size_t)maxJobs);
+	std::cout << "RUN: targets " << lo << ".." << hi << " of " << finalIds.size() << " (SKIP_DONE=" << skipDone << ", MAXJOBS=" << maxJobs << ")" << std::endl;
+	std::mutex mtx;
+	long long nReal = 0, nSpur = 0, nBasis = 0, nHit = 0, nFail = 0, nFound1 = 0, nFound2 = 0;
+	mpreal minNb1, minNb2;
+	bool have1 = false, have2 = false;
+	std::atomic<long long> done{ 0 };
+	const MlZ0 zz = [](const MlConsts& K) { return K.z3; };
+	{
+		std::atomic<size_t> next{ lo };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < hi;)
+					{
+						const MlSpec s = mlDecode(finalIds[i]);
+						const MlJob jb = mlRun(s, zz, digits, degree);
+						mpreal::set_default_prec(mpfr::digits2bits(digits));
+						std::lock_guard<std::mutex> lk(mtx);
+						if (jb.evalFail) { ++nFail; }
+						else
+						{
+							if (jb.r1.status == PslqResult::Status::Found)
+							{
+								++nFound1; ++nHit;
+								(jb.ver1 ? nReal : nSpur) += 1;
+								std::cout << "HIT T1 [" << (jb.ver1 ? "REAL" : "SPURIOUS") << "] target #" << i << " " << mlName(s) << " (f=" << kMlName[s.f] << ", g=" << kMlName[s.g] << ", h=" << kMlName[s.h]
+									<< ", a=" << kMlA[s.a] << ", b=" << kMlC[s.b] << ", c=" << kMlC[s.c] << "): polynomial in u3 (true degree " << jb.trueDeg << "): " << jb.rel1 << std::endl;
+							}
+							else if (!have1 || jb.r1.normBound < minNb1) { minNb1 = jb.r1.normBound; have1 = true; }
+							if (jb.r2.status == PslqResult::Status::Found)
+							{
+								++nFound2; ++nHit;
+								if (jb.basisOnly) ++nBasis; else (jb.ver2 ? nReal : nSpur) += 1;
+								std::cout << "HIT T2 [" << (jb.basisOnly ? "BASIS-ONLY" : jb.ver2 ? "REAL" : "SPURIOUS") << (jb.ver2 ? ", verified" : ", not verified") << "] target #" << i << " " << mlName(s)
+									<< " (f=" << kMlName[s.f] << ", g=" << kMlName[s.g] << ", h=" << kMlName[s.h] << ", a=" << kMlA[s.a] << ", b=" << kMlC[s.b] << ", c=" << kMlC[s.c] << "): " << jb.rel2 << " = 0" << std::endl;
+							}
+							else if (!have2 || jb.r2.normBound < minNb2) { minNb2 = jb.r2.normBound; have2 = true; }
+						}
+						const long long d = ++done;
+						if (progEvery > 0 && d % progEvery == 0)
+							std::cout << "PROGRESS " << d << "/" << (hi - lo) << " done, hits " << nHit << ", min normBound T1 " << (have1 ? minNb1.toString("%.3Re") : "-") << " T2 " << (have2 ? minNb2.toString("%.3Re") : "-")
+								<< ", elapsed " << elapsed() << " s" << std::endl;
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::cout << "\n===== SUMMARY: targets run " << done << " of " << finalIds.size() << ", T1 found " << nFound1 << ", T2 found " << nFound2 << ", REAL hits " << nReal << ", spurious " << nSpur << ", basis-only " << nBasis
+		<< ", eval failures " << nFail << "; min normBound T1 " << (have1 ? minNb1.toString("%.3Re") : "-") << " T2 " << (have2 ? minNb2.toString("%.3Re") : "-")
+		<< "; total elapsed " << elapsed() << " s =====" << std::endl;
+	mpreal::set_default_prec(savedPrec);
+}

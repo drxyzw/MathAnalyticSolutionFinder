@@ -36,3 +36,4 @@ void test_pslq_zeta_gamma_rational_multiplicative(int digits, int maxPrime, std:
 
 void test_pslq_zeta3_mixed_exponent(std::vector<std::pair<int, int>> stages); // stages: (k = #nontrivial w, digits); log zeta3 vs mixed-w blocks; output: results/zeta3_mixed_exponent_w2_3000digits_w3_1800digits.txt; env ZETA3_MIX_THREADS, ZETA3_MIX_COUNT_ONLY, ZETA3_MIX_MAXJOBS
 void test_pslq_zeta3_lambert_cm(int digits, int maxD, int gammaMaxN); // Ramanujan Lambert series S(d) at CM points: multiplicative test against Gamma(k/N) basis + pi sqrt(d), and linear relations with zeta3, pi^3; output: results/zeta3_lambert_cm_<digits>digits.txt; env ZETA3_LCM_THREADS, ZETA3_LCM_DIGITS
+void test_pslq_zeta3_multilevel_const_L3(int digits, int degree); // y = k*f(g(h(zeta3*a)*b)*c), constants a (pi^-3..pi), b, c (19 values) between levels; T1 polynomial PSLQ on u3, T2 log-basis PSLQ; output: results/zeta3_multilevel_const_L3_<digits>digits.txt; env ZETA3_ML3C_*

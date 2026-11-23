@@ -65,7 +65,8 @@ int main()
 	//test_pslq_zeta_gamma_rational_multiplicative(3000, 23, { 6, 12, 24 });
 
 	//test_pslq_zeta3_mixed_exponent({ {2, 3000}, {3, 1800} });
-	test_pslq_zeta3_lambert_cm(3000, 30, 12);
+	//test_pslq_zeta3_lambert_cm(3000, 30, 12);
+	test_pslq_zeta3_multilevel_const_L3(400, 10);
 	//test_pslq_zeta3_transcendental_exponent_absorbed_ext(3000, 31, 31);
 
 	//test_mpreal();

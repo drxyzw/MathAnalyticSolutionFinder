@@ -3623,6 +3623,138 @@ namespace
 	}
 }
 
+namespace
+{
+	struct GammaBasisCtx { std::vector<GCol> cols; std::map<std::string, int> byName; std::vector<int> kept; int nBase = 0; };
+	void gBuildBasis(GammaBasisCtx& ctx, int maxPrime, int maxN, int gd, unsigned nThreads, std::chrono::steady_clock::time_point tStart)
+	{
+		std::vector<GCol>& cols = ctx.cols; std::map<std::string, int>& byName = ctx.byName; std::vector<int>& kept = ctx.kept;
+		// ---------------- columns ----------------
+		auto addCol = [&](const std::string& nm, int level, std::function<mpreal()> v)
+		{
+			GCol c; c.name = nm; c.level = level; c.val = v;
+			byName[nm] = (int)cols.size();
+			cols.push_back(c);
+			return (int)cols.size() - 1;
+		};
+		addCol("1(e)", 0, []() { return mpreal(1); });
+		addCol("pi", 0, []() { return mpfr::log(mpfr::const_pi()); });
+		addCol("gamma", 0, []() { return mpfr::log(mpfr::const_euler()); });
+		addCol("G", 0, []() { return mpfr::log(mpfr::const_catalan()); });
+		for (int p = 2; p <= maxPrime; ++p)
+		{
+			bool isPrime = true;
+			for (int d = 2; d * d <= p && isPrime; ++d) isPrime = p % d != 0;
+			if (isPrime) addCol("p" + std::to_string(p), 0, [p]() { return mpfr::log(mpreal(p)); });
+		}
+		const int nBase = (int)cols.size();
+		// per level N: units 2 sin(pi k/N) (1 <= k < N/2, gcd(k,N) = 1; other k repeat lower levels) then Gamma(k/N) (gcd(k,N) = 1)
+		std::vector<std::vector<int>> unitsOf(maxN + 1), gammasOf(maxN + 1);
+		for (int N = 2; N <= maxN; ++N)
+		{
+			for (int k = 1; 2 * k < N; ++k)
+				if (std::gcd(k, N) == 1)
+					unitsOf[N].push_back(addCol("2sin(pi*" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
+						[k, N]() { return mpfr::log(2 * mpfr::abs(mpfr::sin(mpfr::const_pi() * mpreal(k) / N))); }));
+			for (int k = 1; k < N; ++k)
+				if (std::gcd(k, N) == 1)
+					gammasOf[N].push_back(addCol("Gamma(" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
+						[k, N]() { return mpfr::lngamma(mpreal(k) / N); }));
+		}
+		std::cout << "candidate columns: base " << nBase << ", units+Gammas " << cols.size() - nBase << " (gcd(k,N)>1 skipped: they repeat lower levels)" << std::endl;
+
+		// ---------------- greedy independence ----------------
+		std::cout << "\n=== greedy independence (m2l PSLQ at " << gd << " digits) ===" << std::endl;
+		std::mutex gm;
+		auto reportDrop = [&](int c, const GTestOut& o, const char* how)
+		{
+			std::cout << "DROP " << cols[c].name << " [" << how << ", " << o.secs << " s]: log " << cols[c].name << " = " << gExprStr(cols, o.expr) << std::endl;
+		};
+		auto processBlock = [&](const std::vector<int>& block, const std::vector<int>& reflOrder)
+		{
+			// block: candidates in order (units, then Gamma with k < N/2); reflOrder: Gamma(k/N) with k > N/2 (dropped by reflection with a small PSLQ)
+			std::vector<GTestOut> out(block.size());
+			const std::vector<int> pre = kept; // pre-block kept set
+			gParallel(block.size(), nThreads, gd, [&](size_t i) { out[i] = gTest(cols, pre, block[i], gd); });
+			std::vector<int> surv;
+			for (size_t i = 0; i < block.size(); ++i)
+			{
+				const int c = block[i];
+				// zero column
+				mpreal::set_default_prec(mpfr::digits2bits(gd));
+				if (mpfr::abs(cols[c].val()) < mpfr::pow(mpreal(10), -0.5 * gd)) { cols[c].zero = true; std::cout << "DROP " << cols[c].name << " [zero column, log 1 = 0]" << std::endl; continue; }
+				if (out[i].kind == 1) { cols[c].expr = out[i].expr; reportDrop(c, out[i], "vs earlier blocks"); }
+				else if (out[i].kind == 2) { std::cout << "WARNING " << cols[c].name << ": " << out[i].text << std::endl; surv.push_back(c); }
+				else surv.push_back(c);
+			}
+			// rounds: surv[j] is tested against kept U surv[<j] (all assumed kept); the first dependent one is dropped.
+			// The first element of the list is known to be independent only before the first drop; after a drop every later test must be redone.
+			bool known = true;
+			while (!surv.empty())
+			{
+				size_t off = 0;
+				if (known) { kept.push_back(surv[0]); cols[surv[0]].kept = true; off = 1; }
+				std::vector<GTestOut> o2(surv.size());
+				const std::vector<int> base = kept;
+				gParallel(surv.size() - off, nThreads, gd, [&](size_t j0)
+					{
+						const size_t j = j0 + off;
+						std::vector<int> b = base;
+						for (size_t q = off; q < j; ++q) b.push_back(surv[q]);
+						o2[j] = gTest(cols, b, surv[j], gd);
+					});
+				size_t jstar = surv.size();
+				for (size_t j = off; j < surv.size(); ++j) if (o2[j].kind != 0) { jstar = j; break; }
+				for (size_t j = off; j < jstar; ++j) { kept.push_back(surv[j]); cols[surv[j]].kept = true; }
+				if (jstar < surv.size())
+				{
+					if (o2[jstar].kind == 1) { cols[surv[jstar]].expr = o2[jstar].expr; reportDrop(surv[jstar], o2[jstar], "within block"); }
+					else { std::cout << "WARNING " << cols[surv[jstar]].name << ": " << o2[jstar].text << " (kept anyway)" << std::endl; kept.push_back(surv[jstar]); cols[surv[jstar]].kept = true; }
+					surv.erase(surv.begin(), surv.begin() + jstar + 1);
+					known = false;
+				}
+				else surv.clear();
+			}
+			(void)reflOrder;
+		};
+		// base block
+		{
+			std::vector<int> block;
+			for (int i = 0; i < nBase; ++i) block.push_back(i);
+			processBlock(block, {});
+		}
+		for (int N = 2; N <= maxN; ++N)
+		{
+			std::vector<int> block = unitsOf[N];
+			std::vector<int> refl;
+			for (int c : gammasOf[N])
+			{
+				int k = 0, NN = 0;
+				std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
+				if (2 * k < N || N == 2) block.push_back(c); else refl.push_back(c);
+			}
+			// reflection shortcut: Gamma(k/N) Gamma(1-k/N) = pi / sin(pi k/N); verified by a small PSLQ on (Gamma(k/N), Gamma((N-k)/N), pi, 2sin, 2)
+			for (int c : refl)
+			{
+				int k = 0, NN = 0;
+				std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
+				const int partner = byName["Gamma(" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
+				const int unit = byName["2sin(pi*" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
+				mpreal::set_default_prec(mpfr::digits2bits(gd));
+				const bool unitZero = mpfr::abs(cols[unit].val()) < mpfr::pow(mpreal(10), -0.5 * gd);
+				GTestOut o;
+				if (!unitZero) o = gTest(cols, { partner, byName["pi"], unit, byName["p2"] }, c, gd);
+				if (unitZero || o.kind != 1) o = gTest(cols, { partner, byName["pi"], byName["p2"] }, c, gd); // unit is a power of 2 / 1: not an independent column
+				if (o.kind == 1) { cols[c].expr = o.expr; reportDrop(c, o, "reflection (small PSLQ)"); }
+				else { std::cout << "WARNING reflection test failed for " << cols[c].name << ", treated as ordinary candidate" << std::endl; block.push_back(c); }
+			}
+			processBlock(block, refl);
+			std::cout << "-- N=" << N << " done: kept so far " << kept.size() << ", elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
+		}
+		ctx.nBase = nBase;
+	}
+}
+
 void test_pslq_zeta_gamma_rational_multiplicative(int digits, int maxPrime, std::vector<int> maxNs)
 {
 	setPslqAlgorithm(PslqAlgo::Multipair2L);
@@ -3641,131 +3773,9 @@ void test_pslq_zeta_gamma_rational_multiplicative(int digits, int maxPrime, std:
 	for (int m : maxNs) std::cout << " " << m;
 	std::cout << ", threads " << nThreads << std::endl;
 
-	// ---------------- columns ----------------
-	std::vector<GCol> cols;
-	std::map<std::string, int> byName;
-	auto addCol = [&](const std::string& nm, int level, std::function<mpreal()> v)
-	{
-		GCol c; c.name = nm; c.level = level; c.val = v;
-		byName[nm] = (int)cols.size();
-		cols.push_back(c);
-		return (int)cols.size() - 1;
-	};
-	addCol("1(e)", 0, []() { return mpreal(1); });
-	addCol("pi", 0, []() { return mpfr::log(mpfr::const_pi()); });
-	addCol("gamma", 0, []() { return mpfr::log(mpfr::const_euler()); });
-	addCol("G", 0, []() { return mpfr::log(mpfr::const_catalan()); });
-	for (int p = 2; p <= maxPrime; ++p)
-	{
-		bool isPrime = true;
-		for (int d = 2; d * d <= p && isPrime; ++d) isPrime = p % d != 0;
-		if (isPrime) addCol("p" + std::to_string(p), 0, [p]() { return mpfr::log(mpreal(p)); });
-	}
-	const int nBase = (int)cols.size();
-	// per level N: units 2 sin(pi k/N) (1 <= k < N/2, gcd(k,N) = 1; other k repeat lower levels) then Gamma(k/N) (gcd(k,N) = 1)
-	std::vector<std::vector<int>> unitsOf(maxN + 1), gammasOf(maxN + 1);
-	for (int N = 2; N <= maxN; ++N)
-	{
-		for (int k = 1; 2 * k < N; ++k)
-			if (std::gcd(k, N) == 1)
-				unitsOf[N].push_back(addCol("2sin(pi*" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
-					[k, N]() { return mpfr::log(2 * mpfr::abs(mpfr::sin(mpfr::const_pi() * mpreal(k) / N))); }));
-		for (int k = 1; k < N; ++k)
-			if (std::gcd(k, N) == 1)
-				gammasOf[N].push_back(addCol("Gamma(" + std::to_string(k) + "/" + std::to_string(N) + ")", N,
-					[k, N]() { return mpfr::lngamma(mpreal(k) / N); }));
-	}
-	std::cout << "candidate columns: base " << nBase << ", units+Gammas " << cols.size() - nBase << " (gcd(k,N)>1 skipped: they repeat lower levels)" << std::endl;
-
-	// ---------------- greedy independence ----------------
-	std::cout << "\n=== greedy independence (m2l PSLQ at " << gd << " digits) ===" << std::endl;
-	std::vector<int> kept;
-	std::mutex gm;
-	auto reportDrop = [&](int c, const GTestOut& o, const char* how)
-	{
-		std::cout << "DROP " << cols[c].name << " [" << how << ", " << o.secs << " s]: log " << cols[c].name << " = " << gExprStr(cols, o.expr) << std::endl;
-	};
-	auto processBlock = [&](const std::vector<int>& block, const std::vector<int>& reflOrder)
-	{
-		// block: candidates in order (units, then Gamma with k < N/2); reflOrder: Gamma(k/N) with k > N/2 (dropped by reflection with a small PSLQ)
-		std::vector<GTestOut> out(block.size());
-		const std::vector<int> pre = kept; // pre-block kept set
-		gParallel(block.size(), nThreads, gd, [&](size_t i) { out[i] = gTest(cols, pre, block[i], gd); });
-		std::vector<int> surv;
-		for (size_t i = 0; i < block.size(); ++i)
-		{
-			const int c = block[i];
-			// zero column
-			mpreal::set_default_prec(mpfr::digits2bits(gd));
-			if (mpfr::abs(cols[c].val()) < mpfr::pow(mpreal(10), -0.5 * gd)) { cols[c].zero = true; std::cout << "DROP " << cols[c].name << " [zero column, log 1 = 0]" << std::endl; continue; }
-			if (out[i].kind == 1) { cols[c].expr = out[i].expr; reportDrop(c, out[i], "vs earlier blocks"); }
-			else if (out[i].kind == 2) { std::cout << "WARNING " << cols[c].name << ": " << out[i].text << std::endl; surv.push_back(c); }
-			else surv.push_back(c);
-		}
-		// rounds: surv[j] is tested against kept U surv[<j] (all assumed kept); the first dependent one is dropped.
-		// The first element of the list is known to be independent only before the first drop; after a drop every later test must be redone.
-		bool known = true;
-		while (!surv.empty())
-		{
-			size_t off = 0;
-			if (known) { kept.push_back(surv[0]); cols[surv[0]].kept = true; off = 1; }
-			std::vector<GTestOut> o2(surv.size());
-			const std::vector<int> base = kept;
-			gParallel(surv.size() - off, nThreads, gd, [&](size_t j0)
-				{
-					const size_t j = j0 + off;
-					std::vector<int> b = base;
-					for (size_t q = off; q < j; ++q) b.push_back(surv[q]);
-					o2[j] = gTest(cols, b, surv[j], gd);
-				});
-			size_t jstar = surv.size();
-			for (size_t j = off; j < surv.size(); ++j) if (o2[j].kind != 0) { jstar = j; break; }
-			for (size_t j = off; j < jstar; ++j) { kept.push_back(surv[j]); cols[surv[j]].kept = true; }
-			if (jstar < surv.size())
-			{
-				if (o2[jstar].kind == 1) { cols[surv[jstar]].expr = o2[jstar].expr; reportDrop(surv[jstar], o2[jstar], "within block"); }
-				else { std::cout << "WARNING " << cols[surv[jstar]].name << ": " << o2[jstar].text << " (kept anyway)" << std::endl; kept.push_back(surv[jstar]); cols[surv[jstar]].kept = true; }
-				surv.erase(surv.begin(), surv.begin() + jstar + 1);
-				known = false;
-			}
-			else surv.clear();
-		}
-		(void)reflOrder;
-	};
-	// base block
-	{
-		std::vector<int> block;
-		for (int i = 0; i < nBase; ++i) block.push_back(i);
-		processBlock(block, {});
-	}
-	for (int N = 2; N <= maxN; ++N)
-	{
-		std::vector<int> block = unitsOf[N];
-		std::vector<int> refl;
-		for (int c : gammasOf[N])
-		{
-			int k = 0, NN = 0;
-			std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
-			if (2 * k < N || N == 2) block.push_back(c); else refl.push_back(c);
-		}
-		// reflection shortcut: Gamma(k/N) Gamma(1-k/N) = pi / sin(pi k/N); verified by a small PSLQ on (Gamma(k/N), Gamma((N-k)/N), pi, 2sin, 2)
-		for (int c : refl)
-		{
-			int k = 0, NN = 0;
-			std::sscanf(cols[c].name.c_str(), "Gamma(%d/%d)", &k, &NN);
-			const int partner = byName["Gamma(" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
-			const int unit = byName["2sin(pi*" + std::to_string(N - k) + "/" + std::to_string(N) + ")"];
-			mpreal::set_default_prec(mpfr::digits2bits(gd));
-			const bool unitZero = mpfr::abs(cols[unit].val()) < mpfr::pow(mpreal(10), -0.5 * gd);
-			GTestOut o;
-			if (!unitZero) o = gTest(cols, { partner, byName["pi"], unit, byName["p2"] }, c, gd);
-			if (unitZero || o.kind != 1) o = gTest(cols, { partner, byName["pi"], byName["p2"] }, c, gd); // unit is a power of 2 / 1: not an independent column
-			if (o.kind == 1) { cols[c].expr = o.expr; reportDrop(c, o, "reflection (small PSLQ)"); }
-			else { std::cout << "WARNING reflection test failed for " << cols[c].name << ", treated as ordinary candidate" << std::endl; block.push_back(c); }
-		}
-		processBlock(block, refl);
-		std::cout << "-- N=" << N << " done: kept so far " << kept.size() << ", elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s" << std::endl;
-	}
+	GammaBasisCtx ctx;
+	gBuildBasis(ctx, maxPrime, maxN, gd, nThreads, tStart);
+	std::vector<GCol>& cols = ctx.cols; std::map<std::string, int>& byName = ctx.byName; std::vector<int>& kept = ctx.kept; const int nBase = ctx.nBase; (void)nBase;
 	std::map<int, GExpr> memo;
 	for (int N : maxNs)
 	{
@@ -4136,4 +4146,318 @@ namespace
 void test_pslq_zeta3_mixed_exponent(std::vector<std::pair<int, int>> stages)
 {
 	mixRunStages(stages);
+}
+
+// ============================================================================
+// Lambert series at CM points (Ramanujan): S(d) = sum 1/(n^3 (exp(2 pi sqrt(d) n) - 1)),
+// S^-(d) = sum 1/(n^3 ((-1)^n exp(pi sqrt(d) n) - 1))  (tau = (1+i sqrt d)/2, d = 3 mod 4).
+// Part 1: log|S|, log|zeta3 + 2 S| against the Gamma-rational multiplicative basis + pi sqrt(d).
+// Part 2: linear relations (2a Ramanujan transformation validation, 2b zeta3 vs S(d), pi^3 over Q(sqrt d), 2c all S values together).
+// ============================================================================
+namespace
+{
+	mpreal lcmSum(const mpreal& c, bool alt)
+	{
+		const long bits = (long)mpreal::get_default_prec();
+		const long N = (long)((bits + 20) * 0.6931471805599453 / c.toDouble()) + 2;
+		mpreal sum = 0;
+		for (long n = N; n >= 1; --n)
+		{
+			mpreal e = mpfr::exp(c * n);
+			if (alt && (n & 1)) e = -e;
+			sum += 1 / (mpreal(n) * n * n * (e - 1));
+		}
+		return sum;
+	}
+	mpreal lcmS(const mpreal& s) { return lcmSum(2 * mpfr::const_pi() * s, false); }             // even point, tau = i s
+	mpreal lcmSm(int d) { return lcmSum(mpfr::const_pi() * mpfr::sqrt(mpreal(d)), true); }       // odd point
+
+	GRat gRatio(const GRat& a, const GRat& b) { return GRat(a.n * b.d, a.d * b.n); }
+
+	struct LcmJob
+	{
+		std::string part, name;
+		std::vector<std::string> colNames;
+		std::function<std::vector<mpreal>(int&)> gen; // returns the PSLQ vector; int& = sign of the target (0 if n/a)
+		std::vector<GRat> expected;                   // validation: expected relation (up to scale), empty if not a validation
+		std::vector<GRat> expectedAlt;                // optional equivalent form of the expected relation (e.g. divided by sqrt d)
+		int nTarget = 1; // number of leading columns that are zeta3 columns (relation is 'real' if one of them has a nonzero coefficient)
+	};
+}
+
+void test_pslq_zeta3_lambert_cm(int digits, int maxD, int gammaMaxN)
+{
+	setPslqAlgorithm(PslqAlgo::Multipair2L);
+	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
+	digits = envInt("ZETA3_LCM_DIGITS", digits);
+	const unsigned nThreads = (unsigned)std::max(1, envInt("ZETA3_LCM_THREADS", 10));
+	const int gd = std::min(digits, envInt("ZETA_GAMMA_GREEDY_DIGITS", 800));
+	const auto tStart = std::chrono::steady_clock::now();
+	mpreal::set_default_prec(mpfr::digits2bits(digits));
+	std::cout.precision(30);
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_lambert_cm_" << digits << "digits.txt" << std::endl;
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+	int maxPrime = 23;
+	for (int p = 2; p <= maxD; ++p) { bool pr = true; for (int q = 2; q * q <= p && pr; ++q) pr = p % q != 0; if (pr) maxPrime = std::max(maxPrime, p); }
+	std::cout << "digits " << digits << ", maxD " << maxD << ", gammaMaxN " << gammaMaxN << ", maxPrime " << maxPrime << ", greedy digits " << gd << ", threads " << nThreads << std::endl;
+
+	GammaBasisCtx ctx;
+	gBuildBasis(ctx, maxPrime, gammaMaxN, gd, nThreads, tStart);
+	std::vector<GCol>& cols = ctx.cols; std::map<std::string, int>& byName = ctx.byName; std::vector<int> kept;
+	for (int c : ctx.kept) if (cols[c].level <= gammaMaxN) kept.push_back(c);
+	std::cout << "\nKEPT columns (" << kept.size() << "):";
+	for (int c : kept) std::cout << " " << cols[c].name;
+	std::cout << std::endl;
+	std::map<int, GExpr> memo;
+
+	std::vector<LcmJob> jobs;
+	std::vector<std::string> baseNames;
+	for (int c : kept) baseNames.push_back(cols[c].name);
+
+	// expected relation (log T - sum e_c col_c = 0) from named items, over [target, kept..., pi sqrt d]
+	auto expectedFromItems = [&](const std::vector<std::pair<std::string, GRat>>& items)
+	{
+		GExpr ex;
+		for (const auto& it : items)
+			for (const auto& kv : gExpand(cols, byName.at(it.first), memo)) { auto& sl = ex[kv.first]; sl = sl + kv.second * it.second; }
+		std::vector<GRat> r(kept.size() + 2);
+		r[0] = GRat(1);
+		for (size_t i = 0; i < kept.size(); ++i) { auto it = ex.find(kept[i]); if (it != ex.end()) r[i + 1] = -it->second; }
+		return r;
+	};
+	auto part1Names = [&](int d)
+	{
+		std::vector<std::string> nm = { "logT" };
+		nm.insert(nm.end(), baseNames.begin(), baseNames.end());
+		nm.push_back("pi*sqrt(" + std::to_string(d) + ")");
+		return nm;
+	};
+	auto part1Gen = [&](int kind, int d, bool odd) // kind 0: T1 = S, 1: T2 = zeta3 + 2S
+	{
+		return [&cols, kept, kind, d, odd](int& sgn)
+		{
+			const mpreal S = odd ? lcmSm(d) : lcmS(mpfr::sqrt(mpreal(d)));
+			const mpreal T = kind == 0 ? S : mpfr::zeta(mpreal(3)) + 2 * S;
+			sgn = T < 0 ? -1 : 1;
+			std::vector<mpreal> v;
+			v.push_back(mpfr::log(mpfr::abs(T)));
+			for (int c : kept) v.push_back(cols[c].val());
+			v.push_back(mpfr::const_pi() * mpfr::sqrt(mpreal(d)));
+			return v;
+		};
+	};
+	// ---- Part 1 ----
+	for (int pass = 0; pass < 2; ++pass)
+		for (int d = 1; d <= maxD; ++d)
+		{
+			const bool odd = pass == 1;
+			if (odd && d % 4 != 3) continue;
+			for (int kind = 0; kind < 2; ++kind)
+			{
+				LcmJob j;
+				j.part = "P1";
+				j.name = std::string(kind == 0 ? "log|S" : "log|zeta3+2S") + (odd ? "^-" : "") + "(" + std::to_string(d) + ")" + (kind == 0 ? "|" : "|");
+				j.colNames = part1Names(d);
+				j.gen = part1Gen(kind, d, odd);
+				if (!odd && d == 1 && kind == 1)
+				{
+					j.name += " [VALIDATION: = 7 pi^3/180]";
+					j.expected = expectedFromItems({ { "pi", GRat(3) }, { "p2", GRat(-2) }, { "p3", GRat(-2) }, { "p5", GRat(-1) }, { "p7", GRat(1) } });
+				}
+				jobs.push_back(j);
+			}
+		}
+	{
+		LcmJob j;
+		j.part = "P1";
+		j.name = "[VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))";
+		j.colNames = part1Names(1);
+		const std::vector<std::pair<std::string, GRat>> items = { { "Gamma(1/4)", GRat(2) }, { "p2", GRat(-3, 2) }, { "pi", GRat(-1, 2) } };
+		j.expected = expectedFromItems(items);
+		j.gen = [&cols, kept, &byName, items](int& sgn)
+		{
+			sgn = 1;
+			mpreal L = 0;
+			for (const auto& it : items) L += it.second.val() * cols[byName.at(it.first)].val();
+			std::vector<mpreal> v;
+			v.push_back(L);
+			for (int c : kept) v.push_back(cols[c].val());
+			v.push_back(mpfr::const_pi());
+			return v;
+		};
+		jobs.push_back(j);
+	}
+	// ---- Part 2a: Ramanujan transformation, d = 2, 3 ----
+	for (int d : { 2, 3 })
+	{
+		LcmJob j;
+		j.part = "P2a";
+		j.name = "[VALIDATION] Ramanujan transformation d=" + std::to_string(d) + " (S(d) <-> S(1/d))";
+		j.colNames = { "zeta3", "zeta3*sqrt(d)", "S(d)", "S(d)*sqrt(d)", "S(1/d)", "S(1/d)*sqrt(d)", "pi^3", "pi^3*sqrt(d)" };
+		j.gen = [d](int& sgn)
+		{
+			sgn = 0;
+			const mpreal sd = mpfr::sqrt(mpreal(d)), z = mpfr::zeta(mpreal(3)), p3 = mpfr::pow(mpfr::const_pi(), 3);
+			const mpreal S1 = lcmS(sd), S2 = lcmS(1 / sd);
+			return std::vector<mpreal>{ z, z * sd, S1, S1 * sd, S2, S2 * sd, p3, p3 * sd };
+		};
+		// (zeta/2 + S(d)) + d (zeta/2 + S(1/d)) = pi^3 sqrt(d) [ (d^2+1)/(180 d) + 1/36 ]
+		j.expected = { GRat(1 + d, 2), GRat(0), GRat(1), GRat(0), GRat(d), GRat(0), GRat(0), -(GRat(d * d + 1, 180 * d) + GRat(1, 36)) };
+		// same relation divided by sqrt(d): zeta3*sqrt(d) (1+d)/(2d) + S(d)*sqrt(d)/d + S(1/d)*sqrt(d) - pi^3 [ ... ] = 0
+		j.expectedAlt = { GRat(0), GRat(1 + d, 2 * d), GRat(0), GRat(1, d), GRat(0), GRat(1), -(GRat(d * d + 1, 180 * d) + GRat(1, 36)), GRat(0) };
+		jobs.push_back(j);
+	}
+	// ---- Part 2b: zeta3 vs S(d), pi^3 over Q(sqrt d) ----
+	for (int pass = 0; pass < 2; ++pass)
+		for (int d = 1; d <= maxD; ++d)
+		{
+			const bool odd = pass == 1;
+			if (odd && d % 4 != 3) continue;
+			int r = 0; while ((r + 1) * (r + 1) <= d) ++r;
+			const bool sq = r * r == d;
+			LcmJob j;
+			j.part = "P2b";
+			j.name = std::string("zeta3 vs S") + (odd ? "^-" : "") + "(" + std::to_string(d) + "), pi^3 over Q" + (sq ? "" : "(sqrt d)");
+			if (sq) j.colNames = { "zeta3", "S", "pi^3" };
+			else j.colNames = { "zeta3", "zeta3*sqrt(d)", "S", "S*sqrt(d)", "pi^3", "pi^3*sqrt(d)" };
+			j.nTarget = sq ? 1 : 2;
+			j.gen = [d, odd, sq](int& sgn)
+			{
+				sgn = 0;
+				const mpreal sd = mpfr::sqrt(mpreal(d)), z = mpfr::zeta(mpreal(3)), p3 = mpfr::pow(mpfr::const_pi(), 3);
+				const mpreal S = odd ? lcmSm(d) : lcmS(sd);
+				if (sq) return std::vector<mpreal>{ z, S, p3 };
+				return std::vector<mpreal>{ z, z * sd, S, S * sd, p3, p3 * sd };
+			};
+			if (!odd && d == 1)
+			{
+				j.name += " [VALIDATION: zeta3 + 2 S(1) = 7 pi^3/180]";
+				j.expected = { GRat(1), GRat(2), GRat(-7, 180) };
+			}
+			jobs.push_back(j);
+		}
+	// ---- Part 2c: all S values together ----
+	// variant 0: [zeta3, pi^3, S(1..), S^-] (validation: finds zeta3 + 2 S(1) = 7 pi^3/180); 1: same without S(1); 2: without zeta3 (relations among S values and pi^3)
+	for (int variant = 0; variant < 3; ++variant)
+	{
+		const bool withZeta = variant != 2, withS1 = variant != 1;
+		LcmJob j;
+		j.part = "P2c";
+		j.name = std::string(withZeta ? "[zeta3, pi^3" : "[pi^3") + (withS1 ? ", S(1..maxD)" : ", S(2..maxD)") + ", S^-(odd)]" + (withZeta ? "" : " (no zeta3)");
+		j.nTarget = withZeta ? 1 : 0;
+		if (withZeta) j.colNames.push_back("zeta3");
+		j.colNames.push_back("pi^3");
+		for (int d = withS1 ? 1 : 2; d <= maxD; ++d) j.colNames.push_back("S(" + std::to_string(d) + ")");
+		for (int d = 3; d <= maxD; d += 4) j.colNames.push_back("S^-(" + std::to_string(d) + ")");
+		j.gen = [withZeta, withS1, maxD](int& sgn)
+		{
+			sgn = 0;
+			std::vector<mpreal> v;
+			if (withZeta) v.push_back(mpfr::zeta(mpreal(3)));
+			v.push_back(mpfr::pow(mpfr::const_pi(), 3));
+			for (int d = withS1 ? 1 : 2; d <= maxD; ++d) v.push_back(lcmS(mpfr::sqrt(mpreal(d))));
+			for (int d = 3; d <= maxD; d += 4) v.push_back(lcmSm(d));
+			return v;
+		};
+		if (variant == 0)
+		{
+			j.name += " [VALIDATION: zeta3 + 2 S(1) = 7 pi^3/180]";
+			j.expected.assign(j.colNames.size(), GRat(0));
+			j.expected[0] = GRat(1); j.expected[1] = GRat(-7, 180); j.expected[2] = GRat(2);
+		}
+		jobs.push_back(j);
+	}
+
+	std::cout << "\n=== jobs: " << jobs.size() << " ===" << std::endl;
+	std::map<std::string, int> cntPart, maxNPart;
+	for (const auto& j : jobs) { ++cntPart[j.part]; maxNPart[j.part] = std::max<int>(maxNPart[j.part], (int)j.colNames.size()); }
+	for (const auto& kv : cntPart) std::cout << "  " << kv.first << ": " << kv.second << " jobs, n up to " << maxNPart[kv.first] << std::endl;
+	std::vector<size_t> order(jobs.size());
+	for (size_t i = 0; i < order.size(); ++i) order[i] = i;
+	std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return jobs[a].colNames.size() > jobs[b].colNames.size(); });
+
+	std::atomic<int> nValRun{ 0 }, nValFail{ 0 }, nReal{ 0 }, nBasis{ 0 }, nSpur{ 0 }, nNone{ 0 };
+	std::map<std::string, mpreal> minNb;
+	std::mutex outMtx;
+	gParallel(order.size(), nThreads, digits, [&](size_t q)
+		{
+			const LcmJob& jb = jobs[order[q]];
+			const auto t0 = std::chrono::steady_clock::now();
+			int sgn = 0;
+			std::vector<mpreal> v = jb.gen(sgn);
+			const PslqResult r = pslq(v);
+			const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+			std::ostringstream os;
+			os << "JOB " << jb.part << " n=" << v.size() << " power10^" << 0.8 * digits / v.size() << " " << jb.name;
+			if (sgn) os << " (sign of T: " << (sgn > 0 ? "+" : "-") << ")";
+			os << " : " << toString(r.status) << ", iter " << r.iterations << ", " << secs << " s";
+			bool pass = false, found = false;
+			const bool isVal = !jb.expected.empty();
+			if (isVal)
+			{
+				mpreal res = 0;
+				for (size_t i = 0; i < v.size(); ++i) res += jb.expected[i].val() * v[i];
+				os << "\n    residual of the expected relation at " << digits << " digits: " << mpfr::abs(res).toString("%.2Re");
+			}
+			if (r.status != PslqResult::Status::Found)
+			{
+				os << "\n    no relation with |m|_2 < " << r.normBound.toString("%.3Re");
+				std::lock_guard<std::mutex> lk(outMtx);
+				auto it = minNb.find(jb.part);
+				if (it == minNb.end() || r.normBound < it->second) minNb[jb.part] = r.normBound;
+			}
+			else
+			{
+				found = true;
+				std::vector<mpreal> v2;
+				{
+					mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+					int s2;
+					v2 = jb.gen(s2);
+				}
+				mpreal sum = 0;
+				for (size_t i = 0; i < v2.size(); ++i) sum += r.relation[i] * v2[i];
+				const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * digits);
+				mpreal::set_default_prec(mpfr::digits2bits(digits));
+				const long m0 = r.relation[0].toLong();
+				os << "\n    " << (ok ? "VERIFIED" : "SPURIOUS (not verified at 2x precision)") << " relation, residual@2D " << sum.toString("%.2Re") << ", coefficient of first column " << m0 << ":\n    ";
+				for (size_t i = 0; i < v.size(); ++i) if (r.relation[i] != 0) os << " " << r.relation[i].toString("%.0Rf") << "*" << jb.colNames[i];
+				if (isVal)
+				{
+					bool same = false;
+					for (const std::vector<GRat>* ex : { &jb.expected, &jb.expectedAlt })
+					{
+						if (ex->empty() || !ok) continue;
+						size_t ref = 0; while (ref < ex->size() && (*ex)[ref].zero()) ++ref;
+						const long mr = r.relation[ref].toLong();
+						if (ref == ex->size() || mr == 0) continue;
+						bool m = true;
+						for (size_t i = 0; i < v.size() && m; ++i)
+						{
+							const GRat a = gRatio((*ex)[i], (*ex)[ref]), b = GRat((gi128)r.relation[i].toLong(), (gi128)mr);
+							if (a.n != b.n || a.d != b.d) m = false;
+						}
+						if (m) same = true;
+					}
+					pass = same;
+					os << "\n    => " << (same ? "PASS (exact expected coefficients)" : "FAIL");
+				}
+				else if (!ok) ++nSpur;
+				else
+				{
+					bool tgt = jb.nTarget == 0;
+					for (int i = 0; i < jb.nTarget; ++i) if (r.relation[i] != 0) tgt = true;
+					if (tgt) { ++nReal; os << "\n    *** REAL RELATION " << (jb.nTarget ? "(zeta3 coefficient nonzero)" : "(among S values / pi^3, no zeta3)") << " ***"; }
+					else { ++nBasis; os << "\n    (relation among basis columns only, zeta3 coefficient 0)"; }
+				}
+			}
+			if (isVal) { ++nValRun; if (!pass) ++nValFail; }
+			else if (!found) ++nNone;
+			std::lock_guard<std::mutex> lk(outMtx);
+			std::cout << os.str() << std::endl;
+		});
+	std::cout << "\n===== SUMMARY: validation " << nValRun - nValFail << "/" << nValRun << " PASS; real hits " << nReal << ", basis-only " << nBasis << ", spurious " << nSpur
+		<< ", no-relation jobs " << nNone << "; min normBound per part:";
+	for (const auto& kv : minNb) std::cout << " " << kv.first << "=" << kv.second.toString("%.3Re");
+	std::cout << "; total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
 }

@@ -4961,3 +4961,490 @@ void test_pslq_zeta3_multilevel_const_L3(int digits, int degree)
 		<< "; total elapsed " << elapsed() << " s =====" << std::endl;
 	mpreal::set_default_prec(savedPrec);
 }
+
+// ============================================================================
+// Lambert series at CM points for odd weights s (3, 5, 7):
+//   S_s(d) = sum 1/(n^s (exp(2 pi sqrt d n) - 1)),  S_s^-(d) = sum 1/(n^s ((-1)^n exp(pi sqrt d n) - 1))  (odd points; d = 1 and d = 3 mod 4).
+// With F(x) = sum_n n^-s x^n/(1-x^n):  S_s(d) = F(e^{-2 pi sqrt d}),  S_s^-(d) = F(-e^{-pi sqrt d}),
+//   F(-x) = -F(x) + (2 + 2^(1-s)) F(x^2) - 2^(1-s) F(x^4)   (derived from 1/(1+y) = 1/(1-y) - 2y/(1-y^2)),
+// i.e. S_s^-(d) = -S_s(d/4) + (2 + 2^(1-s)) S_s(d) - 2^(1-s) S_s(4d).
+// Part 1: multiplicative (Gamma basis + pi sqrt d); Part 2b: zeta(s) vs S_s(d), pi^s over Q(sqrt d);
+// Part 2c: linear PSLQ on [zeta(s), pi^s, S_s(1..maxD), S_s^-] with PEELING (found relation -> remove a pivot S column -> repeat).
+// ============================================================================
+namespace
+{
+	mpreal lcmSumW(const mpreal& c, bool alt, int s)
+	{
+		const long bits = (long)mpreal::get_default_prec();
+		const long N = (long)((bits + 20) * 0.6931471805599453 / c.toDouble()) + 2;
+		mpreal sum = 0;
+		for (long n = N; n >= 1; --n)
+		{
+			mpreal e = mpfr::exp(c * n);
+			if (alt && (n & 1)) e = -e;
+			mpreal ns = 1;
+			for (int i = 0; i < s; ++i) ns *= n;
+			sum += 1 / (ns * (e - 1));
+		}
+		return sum;
+	}
+	mpreal lcmSW(const mpreal& r, int s) { return lcmSumW(2 * mpfr::const_pi() * r, false, s); }
+	mpreal lcmSmW(int d, int s) { return lcmSumW(mpfr::const_pi() * mpfr::sqrt(mpreal(d)), true, s); }
+
+	// rank over F_p (p = 2^61 - 1) of rational row vectors (generic rank = rank over Q with overwhelming probability)
+	int lcmRankModP(const std::vector<std::vector<GRat>>& rows)
+	{
+		typedef unsigned long long u64;
+		const u64 P = 2305843009213693951ULL;
+		auto mulm = [&](u64 a, u64 b) { return (u64)((unsigned __int128)a * b % P); };
+		auto powm = [&](u64 a, u64 e) { u64 r = 1; while (e) { if (e & 1) r = mulm(r, a); a = mulm(a, a); e >>= 1; } return r; };
+		auto red = [&](gi128 x) { x %= (gi128)P; if (x < 0) x += (gi128)P; return (u64)x; };
+		std::vector<std::vector<u64>> m;
+		for (const auto& row : rows)
+		{
+			std::vector<u64> r;
+			for (const auto& g : row) r.push_back(mulm(red(g.n), powm(red(g.d), P - 2)));
+			m.push_back(r);
+		}
+		int rank = 0;
+		const size_t nc = rows.empty() ? 0 : rows[0].size();
+		for (size_t c = 0; c < nc && rank < (int)m.size(); ++c)
+		{
+			int piv = -1;
+			for (int i = rank; i < (int)m.size(); ++i) if (m[i][c]) { piv = i; break; }
+			if (piv < 0) continue;
+			std::swap(m[piv], m[rank]);
+			const u64 inv = powm(m[rank][c], P - 2);
+			for (int i = rank + 1; i < (int)m.size(); ++i)
+				if (m[i][c])
+				{
+					const u64 f = mulm(m[i][c], inv);
+					for (size_t k = c; k < nc; ++k) m[i][k] = (m[i][k] + P - mulm(f, m[rank][k])) % P;
+				}
+			++rank;
+		}
+		return rank;
+	}
+
+	struct LcmWJob
+	{
+		int s = 3;
+		std::string part, name;
+		std::vector<std::string> colNames;
+		std::function<std::vector<mpreal>(int&)> gen;
+		std::vector<GRat> expected;
+		std::string known; // non-empty: a verified relation with nonzero zeta coefficient is a KNOWN relation, with this description
+		int nTarget = 1;
+	};
+	struct LcmWStat
+	{
+		int valRun = 0, valFail = 0, known = 0, fresh = 0, basis = 0, spur = 0, none = 0;
+		std::map<std::string, mpreal> minNb;
+		std::map<std::string, int> relCount;
+	};
+}
+
+void test_pslq_zeta_lambert_cm_weights(int digits, int maxD, int gammaMaxN, std::vector<int> weights)
+{
+	setPslqAlgorithm(PslqAlgo::Multipair2L);
+	auto envInt = [](const char* n, int d) { const char* e = std::getenv(n); return e ? std::atoi(e) : d; };
+	digits = envInt("ZETA3_LCM_DIGITS", digits);
+	const unsigned nThreads = (unsigned)std::max(1, envInt("ZETA3_LCM_THREADS", 10));
+	const int gd = std::min(digits, envInt("ZETA_GAMMA_GREEDY_DIGITS", 800));
+	const int maxPeel = envInt("ZETA3_LCM_MAXPEEL", 15);
+	const auto tStart = std::chrono::steady_clock::now();
+	mpreal::set_default_prec(mpfr::digits2bits(digits));
+	std::cout.precision(30);
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta_lambert_cm_weights_" << digits << "digits.txt" << std::endl;
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+	int maxPrime = 23;
+	for (int p = 2; p <= maxD; ++p) { bool pr = true; for (int q = 2; q * q <= p && pr; ++q) pr = p % q != 0; if (pr) maxPrime = std::max(maxPrime, p); }
+	std::cout << "digits " << digits << ", maxD " << maxD << ", gammaMaxN " << gammaMaxN << ", maxPrime " << maxPrime << ", greedy digits " << gd << ", threads " << nThreads << ", weights:";
+	for (int w : weights) std::cout << " " << w;
+	std::cout << ", max peeled relations per chain " << maxPeel << std::endl;
+
+	GammaBasisCtx ctx;
+	gBuildBasis(ctx, maxPrime, gammaMaxN, gd, nThreads, tStart);
+	std::vector<GCol>& cols = ctx.cols; std::map<std::string, int>& byName = ctx.byName; std::vector<int> kept;
+	for (int c : ctx.kept) if (cols[c].level <= gammaMaxN) kept.push_back(c);
+	std::cout << "\nKEPT columns (" << kept.size() << "):";
+	for (int c : kept) std::cout << " " << cols[c].name;
+	std::cout << std::endl;
+	std::map<int, GExpr> memo;
+	std::vector<std::string> baseNames;
+	for (int c : kept) baseNames.push_back(cols[c].name);
+	std::vector<int> oddDs; // odd points: d = 1 (tau = (1+i)/2) and d = 3 mod 4
+	for (int d = 1; d <= maxD; ++d) if (d == 1 || d % 4 == 3) oddDs.push_back(d);
+
+	auto expectedFromItems = [&](const std::vector<std::pair<std::string, GRat>>& items)
+	{
+		GExpr ex;
+		for (const auto& it : items)
+			for (const auto& kv : gExpand(cols, byName.at(it.first), memo)) { auto& sl = ex[kv.first]; sl = sl + kv.second * it.second; }
+		std::vector<GRat> r(kept.size() + 2);
+		r[0] = GRat(1);
+		for (size_t i = 0; i < kept.size(); ++i) { auto it = ex.find(kept[i]); if (it != ex.end()) r[i + 1] = -it->second; }
+		return r;
+	};
+	auto part1Names = [&](int d)
+	{
+		std::vector<std::string> nm = { "logT" };
+		nm.insert(nm.end(), baseNames.begin(), baseNames.end());
+		nm.push_back("pi*sqrt(" + std::to_string(d) + ")");
+		return nm;
+	};
+	// Ramanujan d=1 constant c_s in zeta(s) + 2 S_s(1) = c_s pi^s (s = 3 mod 4)
+	auto ramCoef = [](int s) { return s == 3 ? GRat(7, 180) : s == 7 ? GRat(19, 56700) : GRat(0); };
+
+	std::vector<LcmWJob> jobs;
+	for (int s : weights)
+	{
+		const std::string ps = "s" + std::to_string(s) + ":";
+		const std::string zs = "zeta" + std::to_string(s), pis = "pi^" + std::to_string(s);
+		// ---- Part 1 ----
+		for (int pass = 0; pass < 2; ++pass)
+			for (int d = 1; d <= maxD; ++d)
+			{
+				const bool odd = pass == 1;
+				if (odd && !(d == 1 || d % 4 == 3)) continue;
+				for (int kind = 0; kind < 2; ++kind)
+				{
+					LcmWJob j;
+					j.s = s; j.part = ps + "P1";
+					j.name = std::string(kind == 0 ? "log|S" : "log|" + zs + "+2S") + std::to_string(s) + (odd ? "^-" : "") + "(" + std::to_string(d) + ")|";
+					if (kind == 0) j.name = "log|S_" + std::to_string(s) + (odd ? "^-" : "") + "(" + std::to_string(d) + ")|";
+					else j.name = "log|" + zs + "+2S_" + std::to_string(s) + (odd ? "^-" : "") + "(" + std::to_string(d) + ")|";
+					j.colNames = part1Names(d);
+					j.gen = [&cols, kept, kind, d, odd, s](int& sgn)
+					{
+						const mpreal S = odd ? lcmSmW(d, s) : lcmSW(mpfr::sqrt(mpreal(d)), s);
+						const mpreal T = kind == 0 ? S : mpfr::zeta(mpreal(s)) + 2 * S;
+						sgn = T < 0 ? -1 : 1;
+						std::vector<mpreal> v;
+						v.push_back(mpfr::log(mpfr::abs(T)));
+						for (int c : kept) v.push_back(cols[c].val());
+						v.push_back(mpfr::const_pi() * mpfr::sqrt(mpreal(d)));
+						return v;
+					};
+					if (!odd && d == 1 && kind == 1 && s == 3)
+					{
+						j.name += " [VALIDATION: = 7 pi^3/180]";
+						j.expected = expectedFromItems({ { "pi", GRat(3) }, { "p2", GRat(-2) }, { "p3", GRat(-2) }, { "p5", GRat(-1) }, { "p7", GRat(1) } });
+					}
+					if (!odd && d == 1 && kind == 1 && s == 7)
+					{
+						j.name += " [VALIDATION: = 19 pi^7/56700]";
+						j.expected = expectedFromItems({ { "pi", GRat(7) }, { "p19", GRat(1) }, { "p2", GRat(-2) }, { "p3", GRat(-4) }, { "p5", GRat(-2) }, { "p7", GRat(-1) } });
+					}
+					if (odd && d == 3 && kind == 1 && s == 3) j.known = "known (rho point): zeta3 + 2S^-(3) = pi^3/(15 sqrt3)";
+					jobs.push_back(j);
+				}
+			}
+		{
+			LcmWJob j;
+			j.s = s; j.part = ps + "P1";
+			j.name = "[VALIDATION] lemniscate constant Gamma(1/4)^2/(2 sqrt(2 pi))";
+			j.colNames = part1Names(1);
+			const std::vector<std::pair<std::string, GRat>> items = { { "Gamma(1/4)", GRat(2) }, { "p2", GRat(-3, 2) }, { "pi", GRat(-1, 2) } };
+			j.expected = expectedFromItems(items);
+			j.gen = [&cols, kept, &byName, items](int& sgn)
+			{
+				sgn = 1;
+				mpreal L = 0;
+				for (const auto& it : items) L += it.second.val() * cols[byName.at(it.first)].val();
+				std::vector<mpreal> v;
+				v.push_back(L);
+				for (int c : kept) v.push_back(cols[c].val());
+				v.push_back(mpfr::const_pi());
+				return v;
+			};
+			jobs.push_back(j);
+		}
+		// ---- Part 2b ----
+		for (int pass = 0; pass < 2; ++pass)
+			for (int d = 1; d <= maxD; ++d)
+			{
+				const bool odd = pass == 1;
+				if (odd && !(d == 1 || d % 4 == 3)) continue;
+				int r = 0; while ((r + 1) * (r + 1) <= d) ++r;
+				const bool sq = r * r == d;
+				LcmWJob j;
+				j.s = s; j.part = ps + "P2b";
+				j.name = zs + " vs S_" + std::to_string(s) + (odd ? "^-" : "") + "(" + std::to_string(d) + "), " + pis + " over Q" + (sq ? "" : "(sqrt d)");
+				if (sq) j.colNames = { zs, "S", pis };
+				else j.colNames = { zs, zs + "*sqrt(d)", "S", "S*sqrt(d)", pis, pis + "*sqrt(d)" };
+				j.nTarget = sq ? 1 : 2;
+				j.gen = [d, odd, sq, s](int& sgn)
+				{
+					sgn = 0;
+					const mpreal sd = mpfr::sqrt(mpreal(d)), z = mpfr::zeta(mpreal(s)), p3 = mpfr::pow(mpfr::const_pi(), mpreal(s));
+					const mpreal S = odd ? lcmSmW(d, s) : lcmSW(sd, s);
+					if (sq) return std::vector<mpreal>{ z, S, p3 };
+					return std::vector<mpreal>{ z, z * sd, S, S * sd, p3, p3 * sd };
+				};
+				if (!odd && d == 1 && s % 4 == 3)
+				{
+					j.name += " [VALIDATION: " + zs + " + 2 S(1) = c pi^s]";
+					j.expected = { GRat(1), GRat(2), -ramCoef(s) };
+				}
+				if (odd && d == 3 && s == 3) j.known = "known (rho point)";
+				jobs.push_back(j);
+			}
+	}
+
+	// ---- Part 2c peeling chains ----
+	std::mutex outMtx;
+	std::map<int, LcmWStat> stats;
+	for (int s : weights) stats[s];
+	struct ChainTask { int s; bool withZeta; };
+	std::vector<ChainTask> chains;
+	for (int s : weights) { chains.push_back({ s, true }); chains.push_back({ s, false }); }
+
+	auto runChain = [&](const ChainTask& ct)
+	{
+		const int s = ct.s;
+		const std::string ps = "s" + std::to_string(s) + ":P2c";
+		struct CI { std::string name; int type; int d; }; // type 0 zeta, 1 pi^s, 2 S, 3 S^-
+		std::vector<CI> ci;
+		if (ct.withZeta) ci.push_back({ "zeta" + std::to_string(s), 0, 0 });
+		ci.push_back({ "pi^" + std::to_string(s), 1, 0 });
+		for (int d = 1; d <= maxD; ++d) ci.push_back({ "S(" + std::to_string(d) + ")", 2, d });
+		for (int d : oddDs) ci.push_back({ "S^-(" + std::to_string(d) + ")", 3, d });
+		const std::string tag = "JOB " + ps + (ct.withZeta ? " [zeta, pi^s, S, S^-] " : " [pi^s, S, S^-] (no zeta) ");
+		auto genAll = [&]()
+		{
+			std::vector<mpreal> v;
+			for (const auto& c : ci)
+				v.push_back(c.type == 0 ? mpfr::zeta(mpreal(s)) : c.type == 1 ? mpfr::pow(mpfr::const_pi(), mpreal(s)) : c.type == 2 ? lcmSW(mpfr::sqrt(mpreal(c.d)), s) : lcmSmW(c.d, s));
+			return v;
+		};
+		auto idxOf = [&](int type, int d) { for (size_t i = 0; i < ci.size(); ++i) if (ci[i].type == type && ci[i].d == d) return (int)i; return -1; };
+		// known relations (full column space)
+		std::vector<std::vector<GRat>> knownRels;
+		std::vector<std::string> knownNames;
+		if (ct.withZeta)
+		{
+			if (s % 4 == 3)
+			{
+				std::vector<GRat> k(ci.size());
+				k[idxOf(0, 0)] = GRat(1); k[idxOf(1, 0)] = -ramCoef(s); k[idxOf(2, 1)] = GRat(2);
+				knownRels.push_back(k); knownNames.push_back("Ramanujan d=1: zeta + 2 S(1) = c pi^s");
+			}
+			if (s == 5)
+			{
+				std::vector<GRat> k(ci.size());
+				k[idxOf(0, 0)] = GRat(1); k[idxOf(1, 0)] = GRat(-1, 294); k[idxOf(2, 1)] = GRat(74, 35); k[idxOf(2, 4)] = GRat(-4, 35);
+				knownRels.push_back(k); knownNames.push_back("Plouffe: zeta5 = pi^5/294 - (74/35) S(1) + (4/35) S(4)");
+			}
+		}
+		std::vector<mpreal> v1 = genAll(), v2;
+		{
+			std::ostringstream os;
+			for (size_t k = 0; k < knownRels.size(); ++k)
+			{
+				mpreal res = 0;
+				for (size_t i = 0; i < ci.size(); ++i) res += knownRels[k][i].val() * v1[i];
+				os << tag << "known relation '" << knownNames[k] << "' residual at " << digits << " digits: " << mpfr::abs(res).toString("%.2Re") << "\n";
+			}
+			std::lock_guard<std::mutex> lk(outMtx);
+			std::cout << os.str() << std::flush;
+		}
+		std::vector<int> active;
+		for (size_t i = 0; i < ci.size(); ++i) active.push_back((int)i);
+		std::vector<std::vector<GRat>> found;
+		mpreal lastNb = 0; std::string endMsg;
+		bool bad = false;
+		while ((int)found.size() < maxPeel)
+		{
+			const auto t0 = std::chrono::steady_clock::now();
+			std::vector<mpreal> v;
+			for (int i : active) v.push_back(v1[i]);
+			const PslqResult r = pslq(v);
+			const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+			std::ostringstream os;
+			os << tag << "step " << found.size() + 1 << " n=" << v.size() << " power10^" << 0.8 * digits / v.size() << " : " << toString(r.status) << ", iter " << r.iterations << ", " << secs << " s";
+			if (r.status != PslqResult::Status::Found)
+			{
+				lastNb = r.normBound;
+				os << "\n    no further relation with |m|_2 < " << r.normBound.toString("%.3Re");
+				endMsg = "ended: no relation";
+				std::lock_guard<std::mutex> lk(outMtx);
+				std::cout << os.str() << std::endl;
+				break;
+			}
+			if (v2.empty())
+			{
+				mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+				v2 = genAll();
+				mpreal::set_default_prec(mpfr::digits2bits(digits));
+			}
+			mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+			mpreal sum = 0;
+			for (size_t k = 0; k < active.size(); ++k) sum += r.relation[k] * v2[active[k]];
+			const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * digits);
+			mpreal::set_default_prec(mpfr::digits2bits(digits));
+			os << "\n    " << (ok ? "VERIFIED" : "SPURIOUS (not verified at 2x precision)") << " relation, residual@2D " << sum.toString("%.2Re") << ":\n    ";
+			std::vector<GRat> full(ci.size());
+			bool big = false;
+			for (size_t k = 0; k < active.size(); ++k)
+				if (r.relation[k] != 0)
+				{
+					os << " " << r.relation[k].toString("%.0Rf") << "*" << ci[active[k]].name;
+					if (mpfr::abs(r.relation[k]) > mpreal(4e18)) big = true; else full[active[k]] = GRat((gi128)r.relation[k].toLong());
+				}
+			if (!ok) { endMsg = "ended: spurious relation"; std::lock_guard<std::mutex> lk(outMtx); std::cout << os.str() << std::endl; bad = true; break; }
+			if (big) { endMsg = "ended: coefficients too large for the rank bookkeeping"; std::lock_guard<std::mutex> lk(outMtx); std::cout << os.str() << std::endl; break; }
+			found.push_back(full);
+			// pivot: an S^- column with nonzero coefficient (largest d), else the S column with largest d
+			int pivot = -1;
+			for (int type : { 3, 2 })
+			{
+				for (size_t k = 0; k < active.size(); ++k)
+					if (ci[active[k]].type == type && r.relation[k] != 0 && (pivot < 0 || ci[active[k]].d >= ci[pivot].d)) pivot = active[k];
+				if (pivot >= 0) break;
+			}
+			if (pivot < 0) { os << "\n    (no S column involved; stop)"; endMsg = "ended: relation without S columns"; std::lock_guard<std::mutex> lk(outMtx); std::cout << os.str() << std::endl; break; }
+			os << "\n    peeling column " << ci[pivot].name;
+			active.erase(std::find(active.begin(), active.end(), pivot));
+			std::lock_guard<std::mutex> lk(outMtx);
+			std::cout << os.str() << std::endl;
+		}
+		if (endMsg.empty()) endMsg = "ended: reached the max number of peeled relations";
+		// known relations: are they in the span of the found ones?
+		std::ostringstream os;
+		os << tag << "CHAIN DONE: " << found.size() << " relation(s) found, " << endMsg << "; rank of found relations " << lcmRankModP(found);
+		bool allKnownIn = true;
+		for (size_t k = 0; k < knownRels.size(); ++k)
+		{
+			std::vector<std::vector<GRat>> aug = found; aug.push_back(knownRels[k]);
+			const bool in = !found.empty() && lcmRankModP(aug) == lcmRankModP(found);
+			if (!in) allKnownIn = false;
+			os << "\n    known relation '" << knownNames[k] << "' in span of found relations: " << (in ? "YES" : "NO");
+		}
+		// relations not accounted for by the known ones
+		int nUnknown = (int)found.size();
+		if (!knownRels.empty())
+		{
+			std::vector<std::vector<GRat>> kr = knownRels;
+			nUnknown = lcmRankModP(found) - lcmRankModP(kr);
+			if (!allKnownIn) nUnknown = lcmRankModP(found);
+		}
+		os << "\n    independent relations beyond the known ones: " << std::max(0, nUnknown);
+		std::lock_guard<std::mutex> lk(outMtx);
+		std::cout << os.str() << std::endl;
+		LcmWStat& st = stats[s];
+		st.relCount[ct.withZeta ? "with zeta" : "no zeta"] = (int)found.size();
+		if (!knownRels.empty()) { ++st.valRun; if (!allKnownIn || bad) ++st.valFail; }
+		if (nUnknown > 0) st.fresh += nUnknown;
+		if (!found.empty() && lastNb != 0) {}
+		if (lastNb != 0) { auto it = st.minNb.find(ps); if (it == st.minNb.end() || lastNb < it->second) st.minNb[ps] = lastNb; }
+		if (bad) ++st.spur;
+	};
+
+	// ---- run ----
+	std::cout << "\n=== jobs: " << jobs.size() << " standard + " << chains.size() << " peeling chains ===" << std::endl;
+	{
+		std::map<std::string, int> cnt, mx;
+		for (const auto& j : jobs) { ++cnt[j.part]; mx[j.part] = std::max<int>(mx[j.part], (int)j.colNames.size()); }
+		for (const auto& kv : cnt) std::cout << "  " << kv.first << ": " << kv.second << " jobs, n up to " << mx[kv.first] << std::endl;
+	}
+	auto runStd = [&](const LcmWJob& jb)
+	{
+		const auto t0 = std::chrono::steady_clock::now();
+		int sgn = 0;
+		std::vector<mpreal> v = jb.gen(sgn);
+		const PslqResult r = pslq(v);
+		const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+		std::ostringstream os;
+		os << "JOB " << jb.part << " n=" << v.size() << " power10^" << 0.8 * digits / v.size() << " " << jb.name;
+		if (sgn) os << " (sign of T: " << (sgn > 0 ? "+" : "-") << ")";
+		os << " : " << toString(r.status) << ", iter " << r.iterations << ", " << secs << " s";
+		bool pass = false, found = false, isReal = false, isBasis = false, isSpur = false;
+		const bool isVal = !jb.expected.empty();
+		if (isVal)
+		{
+			mpreal res = 0;
+			for (size_t i = 0; i < v.size(); ++i) res += jb.expected[i].val() * v[i];
+			os << "\n    residual of the expected relation at " << digits << " digits: " << mpfr::abs(res).toString("%.2Re");
+		}
+		if (r.status != PslqResult::Status::Found) os << "\n    no relation with |m|_2 < " << r.normBound.toString("%.3Re");
+		else
+		{
+			found = true;
+			mpreal::set_default_prec(mpfr::digits2bits(2 * digits));
+			int s2;
+			std::vector<mpreal> v2 = jb.gen(s2);
+			mpreal sum = 0;
+			for (size_t i = 0; i < v2.size(); ++i) sum += r.relation[i] * v2[i];
+			const bool ok = mpfr::abs(sum) < mpfr::pow(mpreal(10), -1.5 * digits);
+			mpreal::set_default_prec(mpfr::digits2bits(digits));
+			os << "\n    " << (ok ? "VERIFIED" : "SPURIOUS (not verified at 2x precision)") << " relation, residual@2D " << sum.toString("%.2Re") << ":\n    ";
+			for (size_t i = 0; i < v.size(); ++i) if (r.relation[i] != 0) os << " " << r.relation[i].toString("%.0Rf") << "*" << jb.colNames[i];
+			if (isVal)
+			{
+				bool same = false;
+				if (ok)
+				{
+					const auto& ex = jb.expected;
+					size_t ref = 0; while (ref < ex.size() && ex[ref].zero()) ++ref;
+					const long mr = r.relation[ref].toLong();
+					if (ref < ex.size() && mr != 0)
+					{
+						same = true;
+						for (size_t i = 0; i < v.size() && same; ++i)
+						{
+							const GRat a = gRatio(ex[i], ex[ref]), b = GRat((gi128)r.relation[i].toLong(), (gi128)mr);
+							if (a.n != b.n || a.d != b.d) same = false;
+						}
+					}
+				}
+				pass = same;
+				os << "\n    => " << (same ? "PASS (exact expected coefficients)" : "FAIL");
+			}
+			else if (!ok) isSpur = true;
+			else
+			{
+				bool tgt = jb.nTarget == 0;
+				for (int i = 0; i < jb.nTarget; ++i) if (r.relation[i] != 0) tgt = true;
+				if (tgt) { isReal = true; os << "\n    *** RELATION WITH ZETA: " << (jb.known.empty() ? "NEW - needs check" : jb.known) << " ***"; }
+				else { isBasis = true; os << "\n    (relation among basis columns only, zeta coefficient 0)"; }
+			}
+		}
+		std::lock_guard<std::mutex> lk(outMtx);
+		LcmWStat& st = stats[jb.s];
+		if (isVal) { ++st.valRun; if (!pass) ++st.valFail; }
+		else if (isReal) { if (jb.known.empty()) ++st.fresh; else ++st.known; }
+		else if (isBasis) ++st.basis;
+		else if (isSpur) ++st.spur;
+		else if (!found)
+		{
+			++st.none;
+			auto it = st.minNb.find(jb.part);
+			if (it == st.minNb.end() || r.normBound < it->second) st.minNb[jb.part] = r.normBound;
+		}
+		std::cout << os.str() << std::endl;
+	};
+	// task list: chains first (longest), then standard jobs by n descending
+	std::vector<std::function<void()>> tasks;
+	for (const auto& c : chains) tasks.push_back([&, c]() { runChain(c); });
+	std::vector<size_t> order(jobs.size());
+	for (size_t i = 0; i < order.size(); ++i) order[i] = i;
+	std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return jobs[a].colNames.size() > jobs[b].colNames.size(); });
+	for (size_t i : order) tasks.push_back([&, i]() { runStd(jobs[i]); });
+	gParallel(tasks.size(), nThreads, digits, [&](size_t q) { tasks[q](); });
+
+	int tv = 0, tf = 0, tk = 0, tn = 0, tb = 0, ts = 0;
+	for (int s : weights)
+	{
+		const LcmWStat& st = stats[s];
+		std::cout << "\n----- SUMMARY weight " << s << ": validation " << st.valRun - st.valFail << "/" << st.valRun << " PASS; known relations " << st.known << ", NEW (needs check) " << st.fresh
+			<< ", basis-only " << st.basis << ", spurious " << st.spur << ", no-relation jobs " << st.none << "; peeled relations:";
+		for (const auto& kv : st.relCount) std::cout << " [" << kv.first << ": " << kv.second << "]";
+		std::cout << "; min normBound per part:";
+		for (const auto& kv : st.minNb) std::cout << " " << kv.first << "=" << kv.second.toString("%.3Re");
+		std::cout << " -----" << std::endl;
+		tv += st.valRun - st.valFail; tf += st.valRun; tk += st.known; tn += st.fresh; tb += st.basis; ts += st.spur;
+	}
+	std::cout << "\n===== SUMMARY (all weights): validation " << tv << "/" << tf << " PASS; known " << tk << ", NEW " << tn << ", basis-only " << tb << ", spurious " << ts
+		<< "; total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
+}

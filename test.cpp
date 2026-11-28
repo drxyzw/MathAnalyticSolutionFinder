@@ -4596,13 +4596,13 @@ namespace
 	{
 		return { ly, mpreal(1), K.lpi, K.lgam, K.lG, K.l2, K.l3, K.l5, K.l7 };
 	}
-	MlJob mlRun(const MlSpec& s, const MlZ0& z0, int digits, int degree)
+	MlJob mlRunG(const std::function<mpreal(int, int&)>& ev, int digits, int degree)
 	{
 		MlJob jb;
 		const auto saved = mpreal::get_default_prec();
 		int st;
 		const int dg = digits + 60;
-		mpreal yw = mlEval(s, z0, dg, st);
+		mpreal yw = ev(dg, st);
 		if (st) { jb.evalFail = true; mpreal::set_default_prec(saved); return jb; }
 		const mpreal y = tepRound(yw, mpfr::digits2bits(digits));
 		mpreal ly = mpfr::log(mpfr::abs(yw));
@@ -4614,7 +4614,7 @@ namespace
 			for (auto& v : b) x2.push_back(tepRound(v, mpfr::digits2bits(digits)));
 		}
 		// T1
-		auto yAt = [&](int d) { int s2; mpreal r = mlEval(s, z0, d + 60, s2); return tepRound(r, mpfr::digits2bits(d)); };
+		auto yAt = [&](int d) { int s2; mpreal r = ev(d + 60, s2); return tepRound(r, mpfr::digits2bits(d)); };
 		const TepJobRes jr = tepRunJob(y, yAt, digits, degree);
 		jb.r1 = jr.r; jb.ver1 = jr.verified; jb.trueDeg = jr.trueDeg; jb.rel1 = jr.poly; jb.secs1 = jr.secs;
 		// T2
@@ -4638,7 +4638,7 @@ namespace
 			// verify at 2*digits
 			const int d2 = 2 * digits + 60;
 			int s3;
-			mpreal y2 = mlEval(s, z0, d2, s3);
+			mpreal y2 = ev(d2, s3);
 			if (!s3)
 			{
 				mpreal::set_default_prec(mpfr::digits2bits(d2));
@@ -4650,6 +4650,10 @@ namespace
 		}
 		mpreal::set_default_prec(saved);
 		return jb;
+	}
+	MlJob mlRun(const MlSpec& s, const MlZ0& z0, int digits, int degree)
+	{
+		return mlRunG([&](int dg, int& st) { return mlEval(s, z0, dg, st); }, digits, degree);
 	}
 	// integer polynomial division check: monic p divides r exactly
 	bool mlDivisible(const std::vector<mpreal>& relation, const std::vector<long>& p)
@@ -5447,4 +5451,392 @@ void test_pslq_zeta_lambert_cm_weights(int digits, int maxD, int gammaMaxN, std:
 	}
 	std::cout << "\n===== SUMMARY (all weights): validation " << tv << "/" << tf << " PASS; known " << tk << ", NEW " << tn << ", basis-only " << tb << ", spurious " << ts
 		<< "; total elapsed " << std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count() << " s =====" << std::endl;
+}
+
+
+// ============================================================================================================
+// Four-level compositions with constants between the levels:
+//   u1 = j(zeta3*a), u2 = h(u1*b), u3 = g(u2*c), u4 = f(u3*d), y = u4*k   (k absorbed by T1: algebraic, T2: log basis)
+// 8 functions, a in {1, 1/pi}, b,c,d in 10 constants (rational d only for inverse-type f).  Reuses the L3 helpers (ml*).
+// Env prefix ZETA3_ML4C_: THREADS, COUNT_ONLY, MAXJOBS, SKIP_DONE, DIGITS, PROGRESS, NOVAL
+// ============================================================================================================
+namespace
+{
+	const int L4_NF = 8, L4_NA = 2, L4_NC = 10;
+	const int kL4Fn[L4_NF] = { 0, 1, 2, 3, 8, 5, 9, 10 };      // index into the L3 function table: exp log sin cos arctan sinh arcsinh arcsin
+	const int kL4Cc[L4_NC] = { 0, 1, 2, 5, 7, 8, 9, 11, 13, 15 }; // index into the L3 constant table: 1 pi 1/pi e gamma G log2 sqrt2 2 1/2
+	const int kL4Aa[L4_NA] = { 0, 2 };                          // L3 av index: 1, 1/pi
+	bool l4InvType(int f) { return f == 1 || f == 4 || f == 6 || f == 7; } // log, arctan, arcsinh, arcsin (positions in kL4Fn)
+	bool l4Rule(int outer, int inner, int constBetween) // both are positions in kL4Fn; identical or inverse with constant 1 is excluded
+	{
+		if (constBetween != 0) return false;
+		return outer == inner || kMlInv[kL4Fn[outer]] == kL4Fn[inner];
+	}
+	struct L4Spec { int j, a, h, b, g, c, f, d; };
+	uint32_t l4Encode(const L4Spec& s) { return (uint32_t)((((((s.j * L4_NA + s.a) * L4_NF + s.h) * L4_NC + s.b) * L4_NF + s.g) * L4_NC + s.c) * L4_NF + s.f) * L4_NC + s.d; }
+	L4Spec l4Decode(uint32_t id)
+	{
+		L4Spec s;
+		s.d = id % L4_NC; id /= L4_NC;
+		s.f = id % L4_NF; id /= L4_NF;
+		s.c = id % L4_NC; id /= L4_NC;
+		s.g = id % L4_NF; id /= L4_NF;
+		s.b = id % L4_NC; id /= L4_NC;
+		s.h = id % L4_NF; id /= L4_NF;
+		s.a = id % L4_NA; id /= L4_NA;
+		s.j = (int)id;
+		return s;
+	}
+	std::string l4Name(const L4Spec& s)
+	{
+		return std::string(kMlName[kL4Fn[s.f]]) + "(" + kMlName[kL4Fn[s.g]] + "(" + kMlName[kL4Fn[s.h]] + "(" + kMlName[kL4Fn[s.j]] + "(zeta3*" + kMlA[kL4Aa[s.a]] + ")*" + kMlC[kL4Cc[s.b]] + ")*"
+			+ kMlC[kL4Cc[s.c]] + ")*" + kMlC[kL4Cc[s.d]] + ")";
+	}
+	const int MLR_SAT = 4;
+	// L3 apply plus saturation: arcsin argument within eps of +-1, arctan argument beyond 1/eps
+	int l4Apply(int fi, const mpreal& x, mpreal& out, const mpreal& eps)
+	{
+		if (fi == 10 && mpfr::abs(x) <= 1 && 1 - mpfr::abs(x) < eps) return MLR_SAT;
+		if (fi == 8 && mpfr::abs(x) > 1 / eps) return MLR_SAT;
+		return mlApply(fi, x, out);
+	}
+	mpreal l4Eps(int digits) { return mpfr::pow(mpreal(10), -std::min(digits / 4, 70)); }
+	// y = u4 at precision dg
+	mpreal l4Eval(const L4Spec& s, const MlZ0& z0, int dg, int digits, int& st)
+	{
+		mpreal::set_default_prec(mpfr::digits2bits(dg));
+		const MlConsts& K = mlK(dg);
+		const mpreal eps = l4Eps(digits);
+		mpreal u1, u2, u3, u4;
+		st = l4Apply(kL4Fn[s.j], z0(K) * K.av[kL4Aa[s.a]], u1, eps);
+		if (st) return mpreal(0);
+		st = l4Apply(kL4Fn[s.h], u1 * K.cv[kL4Cc[s.b]], u2, eps);
+		if (st) return mpreal(0);
+		st = l4Apply(kL4Fn[s.g], u2 * K.cv[kL4Cc[s.c]], u3, eps);
+		if (st) return mpreal(0);
+		st = l4Apply(kL4Fn[s.f], u3 * K.cv[kL4Cc[s.d]], u4, eps);
+		if (st) return mpreal(0);
+		return u4;
+	}
+	struct L4Key
+	{
+		long exp; uint64_t m[3]; uint32_t id;
+		bool operator<(const L4Key& o) const
+		{
+			if (exp != o.exp) return exp < o.exp;
+			for (int i = 0; i < 3; ++i) if (m[i] != o.m[i]) return m[i] < o.m[i];
+			return id < o.id;
+		}
+	};
+	L4Key l4MakeKey(const mpreal& v, uint32_t id)
+	{
+		static_assert(GMP_NUMB_BITS == 64, "64-bit limbs expected");
+		mpfr_t t;
+		mpfr_init2(t, 192);
+		mpfr_set(t, v.mpfr_srcptr(), MPFR_RNDN);
+		L4Key k;
+		k.exp = (long)mpfr_get_exp(t);
+		for (int i = 0; i < 3; ++i) k.m[i] = (uint64_t)t->_mpfr_d[2 - i];
+		k.id = id;
+		mpfr_clear(t);
+		return k;
+	}
+	bool l4KeyNear(const L4Key& a, const L4Key& b) // ~1e-45 relative
+	{
+		if (a.exp != b.exp || a.m[0] != b.m[0] || a.m[1] != b.m[1]) return false;
+		const uint64_t d = a.m[2] > b.m[2] ? a.m[2] - b.m[2] : b.m[2] - a.m[2];
+		return d < (1ULL << 40);
+	}
+}
+
+void test_pslq_zeta3_multilevel_const_L4(int digits, int degree)
+{
+	std::cout.precision(30);
+	const auto tStart = std::chrono::steady_clock::now();
+	auto elapsed = [&]() { return std::chrono::duration<double>(std::chrono::steady_clock::now() - tStart).count(); };
+	auto envInt = [](const char* n, long d) { const char* e = std::getenv(n); return e ? std::atol(e) : d; };
+	const unsigned nThreads = (unsigned)std::max(1L, envInt("ZETA3_ML4C_THREADS", 10));
+	digits = (int)envInt("ZETA3_ML4C_DIGITS", digits);
+	const bool countOnly = envInt("ZETA3_ML4C_COUNT_ONLY", 0) != 0, noVal = envInt("ZETA3_ML4C_NOVAL", 0) != 0;
+	const long maxJobs = envInt("ZETA3_ML4C_MAXJOBS", -1), skipDone = envInt("ZETA3_ML4C_SKIP_DONE", 0), progEvery = envInt("ZETA3_ML4C_PROGRESS", 50000);
+	const auto savedPrec = mpreal::get_default_prec();
+	setPslqAlgorithm(PslqAlgo::Multipair2L);
+	std::cout << "OUTPUT FILE (redirect stdout): results/zeta3_multilevel_const_L4_" << digits << "digits.txt" << std::endl;
+	std::cout << "u1 = j(zeta3*a), u2 = h(u1*b), u3 = g(u2*c), u4 = f(u3*d); 8 functions {exp,log,sin,cos,arctan,sinh,arcsinh,arcsin}; T1: polynomial PSLQ degree " << degree << " (n=" << degree + 1
+		<< "), T2: log-basis n=9; digits " << digits << ", threads " << nThreads << ", identical/inverse-adjacent kept only when the constant between them != 1" << std::endl;
+	std::cout << "PSLQ algorithm: " << (getPslqAlgorithm() == PslqAlgo::Multipair2L ? "Multipair2L (m2l)" : "Standard") << std::endl;
+	const int P1 = 80;
+	for (int dg : { P1, digits + 60, digits + 120, 2 * digits + 60 }) mlPrepare(dg);
+	mpreal::set_default_prec(savedPrec);
+
+	enum { C_RAW, C_BCD1, C_RULE, C_REDUND, C_DOM, C_HUGE, C_RNG, C_SAT, C_DUP, C_UNSTABLE, C_NEAR, C_ILL, C_N };
+	std::atomic<long long> cnt[C_N];
+	for (auto& c : cnt) c = 0;
+	std::atomic<long long> invAdj{ 0 }, identAdj{ 0 };
+	const size_t nTasks = (size_t)L4_NF * L4_NA * L4_NF * L4_NC * L4_NF * L4_NC;
+	std::vector<std::vector<L4Key>> tres(nTasks);
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t task; (task = next++) < nTasks;)
+					{
+						size_t q = task;
+						L4Spec s{};
+						s.c = q % L4_NC; q /= L4_NC;
+						s.g = q % L4_NF; q /= L4_NF;
+						s.b = q % L4_NC; q /= L4_NC;
+						s.h = q % L4_NF; q /= L4_NF;
+						s.a = q % L4_NA; q /= L4_NA;
+						s.j = (int)q;
+						mpreal::set_default_prec(mpfr::digits2bits(P1));
+						const MlConsts& K = mlK(P1);
+						const mpreal eps = l4Eps(digits);
+						const bool pre = l4Rule(s.h, s.j, s.b) || l4Rule(s.g, s.h, s.c);
+						mpreal u1, u2, u3;
+						int st = MLR_OK;
+						if (!pre)
+						{
+							st = l4Apply(kL4Fn[s.j], K.z3 * K.av[kL4Aa[s.a]], u1, eps);
+							if (!st) st = l4Apply(kL4Fn[s.h], u1 * K.cv[kL4Cc[s.b]], u2, eps);
+							if (!st) st = l4Apply(kL4Fn[s.g], u2 * K.cv[kL4Cc[s.c]], u3, eps);
+						}
+						auto& out = tres[task];
+						for (int f = 0; f < L4_NF; ++f)
+							for (int d = 0; d < L4_NC; ++d)
+							{
+								++cnt[C_RAW];
+								if (s.b == 0 && s.c == 0 && d == 0) { ++cnt[C_BCD1]; continue; }
+								if (pre || l4Rule(f, s.g, d)) { ++cnt[C_RULE]; continue; }
+								if (!l4InvType(f) && d >= 8) { ++cnt[C_REDUND]; continue; }
+								// bookkeeping of non-trivially enumerated adjacent pairs (once per leaf)
+								if (d != 0 && (f == s.g)) ++identAdj;
+								if (d != 0 && kMlInv[kL4Fn[f]] == kL4Fn[s.g]) ++invAdj;
+								int st2 = st;
+								mpreal u4;
+								if (!st2) st2 = l4Apply(kL4Fn[f], u3 * K.cv[kL4Cc[d]], u4, eps);
+								if (st2) { ++cnt[st2 == MLR_DOM ? C_DOM : st2 == MLR_HUGE ? C_HUGE : st2 == MLR_SAT ? C_SAT : C_RNG]; continue; }
+								mpreal a = mpfr::abs(u4);
+								out.push_back(l4MakeKey(a > 1 ? mpreal(1 / a) : a, l4Encode({ s.j, s.a, s.h, s.b, s.g, s.c, f, d })));
+							}
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::vector<L4Key> keys;
+	{
+		size_t tot = 0;
+		for (auto& v : tres) tot += v.size();
+		keys.reserve(tot);
+		for (auto& v : tres) { keys.insert(keys.end(), v.begin(), v.end()); std::vector<L4Key>().swap(v); }
+		std::vector<std::vector<L4Key>>().swap(tres);
+	}
+	const size_t nPhase1 = keys.size();
+	std::sort(keys.begin(), keys.end());
+	std::vector<uint32_t> cand;
+	{
+		size_t g = 0;
+		while (g < keys.size())
+		{
+			size_t e = g + 1;
+			while (e < keys.size() && l4KeyNear(keys[e - 1], keys[e])) ++e;
+			uint32_t keep = keys[g].id;
+			for (size_t k = g; k < e; ++k) keep = std::min(keep, keys[k].id);
+			cnt[C_DUP] += (long long)(e - g - 1);
+			cand.push_back(keep);
+			g = e;
+		}
+		std::vector<L4Key>().swap(keys);
+		std::sort(cand.begin(), cand.end());
+	}
+	std::vector<char> keep(cand.size(), 0);
+	{
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		const MlZ0 zz = [](const MlConsts& K) { return K.z3; };
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < cand.size();)
+					{
+						const L4Spec s = l4Decode(cand[i]);
+						int sa, sb;
+						mpreal ya = l4Eval(s, zz, digits + 60, digits, sa);
+						mpreal yb = l4Eval(s, zz, digits + 120, digits, sb);
+						if (sa || sb) { ++cnt[C_UNSTABLE]; continue; }
+						mpreal::set_default_prec(mpfr::digits2bits(digits + 120));
+						if (!(mpfr::abs(ya - yb) < mpfr::abs(yb) * mpfr::pow(mpreal(10), -digits))) { ++cnt[C_UNSTABLE]; continue; }
+						mpreal y = tepRound(yb, mpfr::digits2bits(digits));
+						const double ld = tepLogDistInt(y);
+						if (ld < -0.5 * digits) { ++cnt[C_NEAR]; continue; }
+						if (ld < -0.4 * digits / degree) { ++cnt[C_ILL]; continue; }
+						keep[i] = 1;
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::vector<uint32_t> finalIds;
+	for (size_t i = 0; i < cand.size(); ++i) if (keep[i]) finalIds.push_back(cand[i]);
+	std::vector<uint32_t>().swap(cand);
+	std::cout << "FILTER COUNTS (raw = 8*2*8*10*8*10*8*10 = " << cnt[C_RAW] << "): b=c=d=1 skipped " << cnt[C_BCD1] << "; adjacency rule (identical/inverse with const 1) " << cnt[C_RULE]
+		<< "; redundant rational d for exp/sin/cos/sinh f " << cnt[C_REDUND] << "; domain/nan " << cnt[C_DOM] << "; huge argument " << cnt[C_HUGE] << "; range (stage value >1e30 or <1e-30) " << cnt[C_RNG]
+		<< "; saturation (arcsin arg within 1e-" << std::min(digits / 4, 70) << " of +-1, arctan arg beyond 1e" << std::min(digits / 4, 70) << ") " << cnt[C_SAT]
+		<< "; numeric duplicates (~45 digits, +-u4, 1/u4) " << cnt[C_DUP] << "; unstable " << cnt[C_UNSTABLE] << "; near-integer " << cnt[C_NEAR] << "; ill-conditioned " << cnt[C_ILL]
+		<< "; after phase 1 " << nPhase1 << std::endl;
+	std::cout << "ENUMERATION CHECK (outer-pair leaves g,f enumerated with d != 1 before numeric filters): identical-adjacent " << identAdj << ", inverse-adjacent " << invAdj
+		<< "; rule(f=sin,g=arcsin,d=1) excluded? " << (l4Rule(2, 7, 0) ? "yes" : "NO (BUG)") << ", d!=1 excluded? " << (l4Rule(2, 7, 1) ? "YES (BUG)" : "no (enumerated)") << std::endl;
+	std::cout << "TOTAL TARGET COUNT = " << finalIds.size() << "  (elapsed " << elapsed() << " s)" << std::endl;
+
+	if (!countOnly && !noVal)
+	{
+		struct Val { std::string name; L4Spec s; MlZ0 z0; bool t1; std::vector<long> poly; std::vector<long long> expect2; bool pass = false; std::string msg; };
+		std::vector<Val> vals;
+		auto fi = [](const char* n) { for (int i = 0; i < L4_NF; ++i) if (std::string(n) == kMlName[kL4Fn[i]]) return i; return -1; };
+		auto ci = [](const char* n) { for (int i = 0; i < L4_NC; ++i) if (std::string(n) == kMlC[kL4Cc[i]]) return i; return -1; };
+		auto ai = [](const char* n) { for (int i = 0; i < L4_NA; ++i) if (std::string(n) == kMlA[kL4Aa[i]]) return i; return -1; };
+		auto mk = [&](const char* j, const char* a, const char* h, const char* b, const char* g, const char* c, const char* f, const char* d)
+		{ return L4Spec{ fi(j), ai(a), fi(h), ci(b), fi(g), ci(c), fi(f), ci(d) }; };
+		auto CV = [](const MlConsts& K, int i) -> const mpreal& { return K.cv[kL4Cc[i]]; };
+		{
+			Val v; v.name = "V1 (T1) f=sin d=pi, g=arcsinh c=gamma, h=sinh b=e (inverse-adjacent, c!=1), j=arctan a=1/pi, u4 = 2^(1/5)-1 (deg 5)"; v.t1 = true;
+			v.s = mk("arctan", "1/pi", "sinh", "e", "arcsinh", "gamma", "sin", "pi");
+			v.poly = { -1, 5, 10, 10, 5, 1 };
+			const L4Spec s = v.s;
+			v.z0 = [s, CV](const MlConsts& K) { mpreal al = tepPolyRoot({ -1, 5, 10, 10, 5, 1 }, mpreal("0.15"));
+				mpreal u3 = mpfr::asin(al) / CV(K, s.d); mpreal u2 = mpfr::sinh(u3) / CV(K, s.c); mpreal u1 = mpfr::asinh(u2) / CV(K, s.b);
+				return mpfr::tan(u1) / K.av[kL4Aa[s.a]]; };
+			vals.push_back(v);
+		}
+		{
+			Val v; v.name = "V2 (T1) f=exp d=gamma, g=exp c=e (identical-adjacent, c!=1), h=cos b=log2, j=log a=1, u4 = 2^(1/7) (deg 7)"; v.t1 = true;
+			v.s = mk("log", "1", "cos", "log2", "exp", "e", "exp", "gamma");
+			v.poly = { -2, 0, 0, 0, 0, 0, 0, 1 };
+			const L4Spec s = v.s;
+			v.z0 = [s, CV](const MlConsts& K) { mpreal al = tepPolyRoot({ -2, 0, 0, 0, 0, 0, 0, 1 }, mpreal("1.1"));
+				mpreal u3 = mpfr::log(al) / CV(K, s.d); mpreal u2 = mpfr::log(u3) / CV(K, s.c); mpreal u1 = mpfr::acos(u2) / CV(K, s.b);
+				return mpfr::exp(u1) / K.av[kL4Aa[s.a]]; };
+			vals.push_back(v);
+		}
+		{
+			Val v; v.name = "V3 (T2) f=arctan d=pi, g=sinh c=G, h=cos b=sqrt2, j=arcsin a=1/pi, u4 = 5^(1/2) pi^-1 e^(2/3) gamma"; v.t1 = false;
+			v.s = mk("arcsin", "1/pi", "cos", "sqrt2", "sinh", "G", "arctan", "pi");
+			v.expect2 = { 6, -4, 6, -6, 0, 0, 0, -3, 0 };
+			const L4Spec s = v.s;
+			v.z0 = [s, CV](const MlConsts& K) { mpreal u4 = mpfr::sqrt(mpreal(5)) / K.pi * mpfr::exp(mpreal(2) / 3) * K.gam;
+				mpreal u3 = mpfr::tan(u4) / CV(K, s.d); mpreal u2 = mpfr::asinh(u3) / CV(K, s.c); mpreal u1 = mpfr::acos(u2) / CV(K, s.b);
+				return mpfr::sin(u1) / K.av[kL4Aa[s.a]]; };
+			vals.push_back(v);
+		}
+		{
+			Val v; v.name = "V4 (T2) f=exp d=log2, g=arcsinh c=pi, h=sinh b=e (inverse-adjacent, c!=1), j=arcsin a=1/pi, u4 = 7 G^2 / pi"; v.t1 = false;
+			v.s = mk("arcsin", "1/pi", "sinh", "e", "arcsinh", "pi", "exp", "log2");
+			v.expect2 = { 1, 0, 1, 0, -2, 0, 0, 0, -1 };
+			const L4Spec s = v.s;
+			v.z0 = [s, CV](const MlConsts& K) { mpreal u4 = 7 * K.G * K.G / K.pi;
+				mpreal u3 = mpfr::log(u4) / CV(K, s.d); mpreal u2 = mpfr::sinh(u3) / CV(K, s.c); mpreal u1 = mpfr::asinh(u2) / CV(K, s.b);
+				return mpfr::sin(u1) / K.av[kL4Aa[s.a]]; };
+			vals.push_back(v);
+		}
+		std::cout << "--- validation (planted z0 replaces zeta3; same pipeline at " << digits << " digits) ---" << std::endl;
+		std::atomic<size_t> next{ 0 };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < std::min<unsigned>(nThreads, (unsigned)vals.size()); ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < vals.size();)
+					{
+						Val& v = vals[i];
+						const L4Spec s = v.s;
+						const MlZ0 z0 = v.z0;
+						const MlJob jb = mlRunG([&](int dg, int& st) { return l4Eval(s, z0, dg, digits, st); }, digits, degree);
+						bool ok = false;
+						std::ostringstream os;
+						if (jb.evalFail) os << "evaluation failed (domain/range/saturation)";
+						else if (v.t1)
+						{
+							ok = jb.r1.status == PslqResult::Status::Found && jb.ver1 && mlDivisible(jb.r1.relation, v.poly);
+							os << toString(jb.r1.status) << ", verified " << jb.ver1 << ", true degree " << jb.trueDeg << ", " << jb.secs1 << " s; relation: " << jb.rel1;
+						}
+						else
+						{
+							bool match = jb.r2.status == PslqResult::Status::Found && jb.rel2ints.size() == v.expect2.size();
+							long long sgn = 0;
+							for (size_t k = 0; match && k < v.expect2.size(); ++k)
+							{
+								if (v.expect2[k] == 0) { match = jb.rel2ints[k] == 0; continue; }
+								const long long sg = (jb.rel2ints[k] > 0) == (v.expect2[k] > 0) ? 1 : -1;
+								if (jb.rel2ints[k] != sg * v.expect2[k] || (sgn != 0 && sgn != sg)) match = false;
+								sgn = sg;
+							}
+							ok = match && jb.ver2;
+							os << toString(jb.r2.status) << ", verified " << jb.ver2 << ", " << jb.secs2 << " s; relation: " << jb.rel2;
+						}
+						v.pass = ok;
+						v.msg = std::string(ok ? "PASS " : "FAIL ") + v.name + " : " + os.str();
+					}
+				});
+		for (auto& t : th) t.join();
+		int nfail = 0;
+		for (auto& v : vals) { std::cout << v.msg << std::endl; nfail += !v.pass; }
+		std::cout << "validation: " << (nfail == 0 ? "all PASS" : "SOME FAIL") << std::endl;
+		if (nfail) { std::cout << "ABORT: validation failed" << std::endl; mpreal::set_default_prec(savedPrec); return; }
+	}
+	if (countOnly) { std::cout << "COUNT_ONLY: done, elapsed " << elapsed() << " s" << std::endl; mpreal::set_default_prec(savedPrec); return; }
+
+	size_t lo = (size_t)std::min<long>(skipDone, (long)finalIds.size());
+	size_t hi = finalIds.size();
+	if (maxJobs >= 0) hi = std::min(hi, lo + (size_t)maxJobs);
+	std::cout << "RUN: targets " << lo << ".." << hi << " of " << finalIds.size() << " (SKIP_DONE=" << skipDone << ", MAXJOBS=" << maxJobs << ")" << std::endl;
+	std::mutex mtx;
+	long long nReal = 0, nSpur = 0, nBasis = 0, nHit = 0, nFail = 0, nFound1 = 0, nFound2 = 0;
+	mpreal minNb1, minNb2;
+	bool have1 = false, have2 = false;
+	std::atomic<long long> done{ 0 };
+	const MlZ0 zz = [](const MlConsts& K) { return K.z3; };
+	{
+		std::atomic<size_t> next{ lo };
+		std::vector<std::thread> th;
+		for (unsigned t = 0; t < nThreads; ++t)
+			th.emplace_back([&]()
+				{
+					for (size_t i; (i = next++) < hi;)
+					{
+						const L4Spec s = l4Decode(finalIds[i]);
+						const MlJob jb = mlRunG([&](int dg, int& st) { return l4Eval(s, zz, dg, digits, st); }, digits, degree);
+						mpreal::set_default_prec(mpfr::digits2bits(digits));
+						std::lock_guard<std::mutex> lk(mtx);
+						const std::string desc = std::string(" (f=") + kMlName[kL4Fn[s.f]] + ", g=" + kMlName[kL4Fn[s.g]] + ", h=" + kMlName[kL4Fn[s.h]] + ", j=" + kMlName[kL4Fn[s.j]] + ", a=" + kMlA[kL4Aa[s.a]]
+							+ ", b=" + kMlC[kL4Cc[s.b]] + ", c=" + kMlC[kL4Cc[s.c]] + ", d=" + kMlC[kL4Cc[s.d]] + ")";
+						if (jb.evalFail) { ++nFail; }
+						else
+						{
+							if (jb.r1.status == PslqResult::Status::Found)
+							{
+								++nFound1; ++nHit;
+								(jb.ver1 ? nReal : nSpur) += 1;
+								std::cout << "HIT T1 [" << (jb.ver1 ? "REAL" : "SPURIOUS") << "] target #" << i << " " << l4Name(s) << desc << ": polynomial in u4 (true degree " << jb.trueDeg << "): " << jb.rel1 << std::endl;
+							}
+							else if (!have1 || jb.r1.normBound < minNb1) { minNb1 = jb.r1.normBound; have1 = true; }
+							if (jb.r2.status == PslqResult::Status::Found)
+							{
+								++nFound2; ++nHit;
+								if (jb.basisOnly) ++nBasis; else (jb.ver2 ? nReal : nSpur) += 1;
+								std::cout << "HIT T2 [" << (jb.basisOnly ? "BASIS-ONLY" : jb.ver2 ? "REAL" : "SPURIOUS") << (jb.ver2 ? ", verified" : ", not verified") << "] target #" << i << " " << l4Name(s) << desc << ": " << jb.rel2 << " = 0" << std::endl;
+							}
+							else if (!have2 || jb.r2.normBound < minNb2) { minNb2 = jb.r2.normBound; have2 = true; }
+						}
+						const long long dn = ++done;
+						if (progEvery > 0 && dn % progEvery == 0)
+							std::cout << "PROGRESS " << dn << "/" << (hi - lo) << " done, hits " << nHit << ", min normBound T1 " << (have1 ? minNb1.toString("%.3Re") : "-") << " T2 " << (have2 ? minNb2.toString("%.3Re") : "-")
+								<< ", elapsed " << elapsed() << " s" << std::endl;
+					}
+				});
+		for (auto& t : th) t.join();
+	}
+	std::cout << "\n===== SUMMARY: targets run " << done << " of " << finalIds.size() << ", T1 found " << nFound1 << ", T2 found " << nFound2 << ", REAL hits " << nReal << ", spurious " << nSpur << ", basis-only " << nBasis
+		<< ", eval failures " << nFail << "; min normBound T1 " << (have1 ? minNb1.toString("%.3Re") : "-") << " T2 " << (have2 ? minNb2.toString("%.3Re") : "-")
+		<< "; total elapsed " << elapsed() << " s =====" << std::endl;
+	mpreal::set_default_prec(savedPrec);
 }
